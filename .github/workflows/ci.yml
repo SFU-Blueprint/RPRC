@@ -13,7 +13,8 @@ jobs:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout code
+        uses: actions/checkout@v6
 
       - uses: actions/setup-node@v6
         with:
@@ -42,7 +43,16 @@ jobs:
       - name: Type check
         run: npm run type-check
 
-      - name: Lint
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            ts:
+              - "**/*.ts"
+              - "**/*.tsx"
+
+      - name: Lint changed files
+        if: steps.changes.outputs.ts == 'true'
         run: npm run lint
 
       - name: Prettier format check
