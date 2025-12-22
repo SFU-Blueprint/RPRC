@@ -30,6 +30,8 @@ npm run lint
 npm run format
 ```
 
+Additionally, a `.vscode` directory has also been set up such that will auto-format on both file save and paste
+
 ## Testing
 
 Running your test is also only one command away:
