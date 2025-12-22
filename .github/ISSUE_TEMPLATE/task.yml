@@ -1,0 +1,25 @@
+name: Task
+description: Assign a new task
+title: "<Project Component>: <Task Description>"
+assignees: nil
+body:
+  - type: textarea
+    attributes:
+      label: Purpose
+      placeholder: ex 'These changes were due to X and Y reasons and will lead to Z results'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      value: "Acceptence Criteria"
+      label: Acceptence Criteria
+      placeholder: |
+        - [ ] Change A
+        - [ ] Change B 
+        - [ ] Change C
+    validations: 
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional Comments
+      placeholder: ex 'We should also do ABC'

@@ -1,0 +1,45 @@
+name: Bug Report
+description: Report a bug in our application
+title: "Bug: <bug description>"
+labels: ["bug"]
+assignees: nil
+body: 
+  - type: textarea
+    attributes:
+      label: Description
+      placeholder: ex 'A bug was found in file ABC and led to result XYZ'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction
+      placeholder: |
+        1. Log in
+        2. Click on X element
+        3. Y was supposed to happen
+    validations: 
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behaviour
+      placeholder: |
+        1. Log In
+        2. Click on X element
+        3. Z was supposed to happen instead
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Browser
+      placeholder: e.g 'Chrome, Brave, DuckDuckGo, etc.'
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Operating System
+      placeholder: e.g 'Windows, macOS or any Linux distro'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional Comments
