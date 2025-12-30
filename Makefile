@@ -1,5 +1,4 @@
 dev:
-	supabase start
-	supabase db push
+	npx supabase start
 	npm install
 	npm run dev
