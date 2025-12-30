@@ -1,0 +1,65 @@
+name: CI (PR → dev)
+
+on:
+  pull_request:
+    branches: ["dev"]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_DB_PASSWORD: "postgres"
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: v24.12.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        run: supabase start
+
+      - name: Validate migrations
+        run: supabase db push --dry-run
+
+      - name: Lint schema
+        run: supabase db lint
+
+      - name: Check schema drift
+        run: bash ./scripts/check-schema-diff.sh
+
+      - name: Type check
+        run: npm run type-check
+
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            ts:
+              - "**/*.ts"
+              - "**/*.tsx"
+
+      - name: Lint changed files
+        if: steps.changes.outputs.ts == 'true'
+        run: npm run lint
+
+      - name: Prettier format check
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      - name: Tests
+        run: npm test
