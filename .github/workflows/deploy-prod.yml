@@ -20,7 +20,7 @@ jobs:
 
       - name: Push migrations to PROD DB
         run: |
-          supabase link --project-ref $SUPABASE_PROJECT_ID
+          supabase link --project-ref $SUPABASE_PROJECT_ID --access-token $SUPABASE_ACCESS_TOKEN
           supabase db push
 
       - name: Generate types
