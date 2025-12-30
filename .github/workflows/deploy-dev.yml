@@ -11,7 +11,7 @@ jobs:
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_RPRC_DEV_ID }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || '' }}
 
     steps:
       - uses: actions/checkout@v6
@@ -27,5 +27,6 @@ jobs:
         run: supabase gen types types/database.ts --lang=typescript
 
       - name: Deploy to Vercel (Dev)
+        if: ${{ secrets.VERCEL_TOKEN != '' }}
         run: |
           npx vercel --prod=false --token $VERCEL_TOKEN

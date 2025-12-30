@@ -38,7 +38,7 @@ jobs:
         run: supabase db lint
 
       - name: Check schema drift
-        run: bash ./scripts/check_schema_diff.sh
+        run: bash ./scripts/check-schema-diff.sh
 
       - name: Type check
         run: npm run type-check
