@@ -27,6 +27,6 @@ jobs:
         run: supabase gen types types/database.ts --lang=typescript
 
       - name: Deploy to Vercel (Dev)
-        if: ${{ secrets.VERCEL_TOKEN != '' }}
+        if: env.VERCEL_TOKEN != ''
         run: |
           npx vercel --prod=false --token $VERCEL_TOKEN
