@@ -17,10 +17,12 @@ jobs:
       - uses: actions/checkout@v6
 
       - uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
       - name: Push migrations to PROD DB
         run: |
-          supabase link --project-ref $SUPABASE_PROJECT_ID --access-token $SUPABASE_ACCESS_TOKEN
+          supabase link --project-ref $SUPABASE_PROJECT_ID
           supabase db push
 
       - name: Generate types
