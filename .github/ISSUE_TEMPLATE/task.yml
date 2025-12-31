@@ -11,7 +11,6 @@ body:
       required: true
   - type: textarea
     attributes:
-      value: "Acceptence Criteria"
       label: Acceptence Criteria
       placeholder: |
         - [ ] Change A
