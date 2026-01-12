@@ -1,9 +1,15 @@
+'use client';
+
 import { inter } from '@/app/fonts';
 import AdminNavbar from '@/components/AdminNavbar';
 import StatCard from '@/components/StatCard';
+import Tabs from '@/components/Tabs';
 import { ADMIN_DASHBOARD_MOCK, ADMIN_DASHBOARD_CONST } from './const';
+import { useState } from 'react';
 
 export default function AdminDashboard() {
+  const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
+
   return (
     <>
       <AdminNavbar
@@ -15,10 +21,17 @@ export default function AdminDashboard() {
       >
         {ADMIN_DASHBOARD_CONST.PAGE_TITLE}
       </div>
-      <div className="mt-15 flex justify-center gap-x-19">
-        {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
-          <StatCard key={card.label} label={card.label} value={card.value} />
-        ))}
+      <div className="mx-50">
+        <div className="mt-15 flex justify-center gap-x-19">
+          {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
+            <StatCard key={card.label} label={card.label} value={card.value} />
+          ))}
+        </div>
+        <Tabs
+          tabs={ADMIN_DASHBOARD_CONST.TABS}
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+        />
       </div>
     </>
   );

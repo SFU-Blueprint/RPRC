@@ -1,5 +1,27 @@
 export const ADMIN_DASHBOARD_CONST = {
   PAGE_TITLE: 'Admin Dashboard',
+  TABS: [
+    {
+      label: 'All',
+      value: 'all',
+    },
+    {
+      label: 'To Review',
+      value: 'toReview',
+    },
+    {
+      label: 'Payment Pending',
+      value: 'paymentPending',
+    },
+    {
+      label: 'Completed',
+      value: 'completed',
+    },
+    {
+      label: 'Rejected',
+      value: 'rejected',
+    },
+  ],
 };
 
 export const ADMIN_DASHBOARD_MOCK = {

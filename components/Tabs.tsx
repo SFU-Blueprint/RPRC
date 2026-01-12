@@ -1,0 +1,35 @@
+import { inter } from '@/app/fonts';
+
+type Tab = {
+  label: string;
+  value: string;
+};
+
+type TabsProps = {
+  tabs: Tab[];
+  currentTab: Tab;
+  setCurrentTab: (tab: Tab) => void;
+};
+
+export default function Tabs({ tabs, currentTab, setCurrentTab }: TabsProps) {
+  return (
+    <div className={`${inter.className} mt-24.25 flex gap-x-27.5`}>
+      {tabs.map((tab) => {
+        const isActive = tab.value === currentTab.value;
+
+        return (
+          <button
+            key={tab.value}
+            onClick={() => setCurrentTab(tab)}
+            className={`
+							cursor-pointer font-medium text-[16px] leading-[160%] tracking-[-0.03em] underline underline-offset-[3px]
+							${isActive ? 'inline-flex items-center px-6 py-2 bg-[#00519F54] rounded-[30px] border-4 border-[#00519F]' : ''}
+							`}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
