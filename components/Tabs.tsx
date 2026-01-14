@@ -9,11 +9,21 @@ type TabsProps = {
   tabs: Tab[];
   currentTab: Tab;
   setCurrentTab: (tab: Tab) => void;
+  additionalClasses?: {
+    wrapper: string;
+  };
 };
 
-export default function Tabs({ tabs, currentTab, setCurrentTab }: TabsProps) {
+export default function Tabs({
+  tabs,
+  currentTab,
+  setCurrentTab,
+  additionalClasses,
+}: TabsProps) {
   return (
-    <div className={`${inter.className} mt-24.25 flex gap-x-27.5`}>
+    <div
+      className={`${inter.className} ${additionalClasses?.wrapper} mt-24.25 flex gap-x-27.5`}
+    >
       {tabs.map((tab) => {
         const isActive = tab.value === currentTab.value;
 
