@@ -10,51 +10,46 @@ export default function AdminNavbar({
   profilePictureUrl,
 }: AdminNavbarProps) {
   return (
-    <div className="sticky top-0 z-50 w-full bg-[#393533]">
-      <div
-        className="
-          mx-auto
-          max-w-[120rem]
-          min-w-[30rem]
-          px-6 md:px-10 xl:px-16
-          h-[8.75rem]
-          flex items-center justify-between
+    <div
+      className="
+          px-10 md:px-17.5 h-24 md:h-35 bg-[#393533]  
+          flex items-center gap-x-3 md:gap-x-12
+          sticky top-0 z-50 w-full 
         "
-      >
-        <p
-          className={`
+    >
+      <p
+        className={`
             ${robotoCondensed.className}
             font-black text-[#89CC62]
-            text-[2rem] sm:text-[2.5rem] xl:text-[3rem]
+            text-[20px] md:text-[36px] lg:text-[48px]
             leading-[90%]
           `}
-        >
-          Richmond Poverty <br />
-          Reduction Coalition
-        </p>
+      >
+        Richmond Poverty <br />
+        Reduction Coalition
+      </p>
 
-        <div className="flex items-center gap-4">
-          <p
-            className={`
+      <div className="ml-auto flex items-center gap-1.5 md:gap-4">
+        <p
+          className={`
               ${inter.className}
               text-[#89CC62]
               font-semibold
-              text-[1.25rem] sm:text-[1.5rem] xl:text-[2rem]
+              text-[16px] md:text-[28px] lg:text-[32px]
             `}
-          >
-            {adminName}
-          </p>
+        >
+          {adminName}
+        </p>
 
-          {profilePictureUrl ? (
-            <img
-              src={profilePictureUrl}
-              alt=""
-              className="h-22.5 w-22.5 rounded-full object-cover"
-            />
-          ) : (
-            <div className="h-22.5 w-22.5 rounded-full bg-[#7C7C7C]" />
-          )}
-        </div>
+        {profilePictureUrl ? (
+          <img
+            src={profilePictureUrl}
+            alt=""
+            className="h-14 w-14 md:h-22.5 md:w-22.5 rounded-full object-cover"
+          />
+        ) : (
+          <div className="h-14 w-14 md:h-22.5 md:w-22.5 rounded-full bg-[#7C7C7C]" />
+        )}
       </div>
     </div>
   );
