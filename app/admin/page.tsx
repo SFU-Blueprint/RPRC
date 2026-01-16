@@ -33,13 +33,13 @@ export default function AdminDashboard() {
           currentTab={currentTab}
           setCurrentTab={setCurrentTab}
           additionalClasses={{
-            wrapper: 'ml:7 mt-10 md:mt-16 lg:mt-20 relative left-0',
+            wrapper: 'mt-10 md:mt-16 lg:mt-20',
           }}
         />
-        {/* <AdminDashboardTable
+        <AdminDashboardTable
           columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
           applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
-        /> */}
+        />
       </div>
     </>
   );

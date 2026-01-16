@@ -26,9 +26,11 @@ export default function Table({
   additionalClasses,
 }: TableProps) {
   return (
-    <div className={`${inter.className} ${additionalClasses?.wrapper ?? ''}`}>
+    <div
+      className={`${inter.className} ${additionalClasses?.wrapper ?? ''} overflow-x-auto w-full`}
+    >
       <table
-        className={`w-full table-fixed border-separate border-spacing-y-4.5 ${additionalClasses?.table ?? ''}`}
+        className={`w-full min-w-240 table-auto border-separate border-spacing-x-0 border-spacing-y-2 md:border-spacing-y-4.5 ${additionalClasses?.table ?? ''}`}
       >
         <thead>
           <tr>
@@ -36,7 +38,7 @@ export default function Table({
               <th
                 key={column.value}
                 className={`
-                  first:pl-7.5 last:pr-7.5 px-2 pb-1.5 text-left font-medium text-[16px]
+                  first:pl-4 last:pr-4 md:first:pl-7.5 md:last:pr-7.5 px-0 md:px-1 text-left font-medium text-[12px] md:text-[14px] lg:text-[16px]
                   ${column.width ?? ''}
                 `}
               >

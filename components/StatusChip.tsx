@@ -29,7 +29,10 @@ export default function StatusChip({ theme }: StatusChipProps) {
         style={{ backgroundColor: status.color }}
       ></div>
 
-      <p className="text-[24px] font-normal" style={{ color: status.color }}>
+      <p
+        className="text-[14px] md:text-[16px] lg:text-[24px]  font-normal"
+        style={{ color: status.color }}
+      >
         {status.label}
       </p>
     </div>
