@@ -30,7 +30,7 @@ export default function Table({
       className={`${inter.className} ${additionalClasses?.wrapper ?? ''} overflow-x-auto w-full`}
     >
       <table
-        className={`w-full min-w-240 table-auto border-separate border-spacing-x-0 border-spacing-y-2 md:border-spacing-y-4.5 ${additionalClasses?.table ?? ''}`}
+        className={`w-full min-w-200 md:min-w-240 table-auto border-separate border-spacing-x-0 border-spacing-y-2 md:border-spacing-y-4.5 ${additionalClasses?.table ?? ''}`}
       >
         <thead>
           <tr>
