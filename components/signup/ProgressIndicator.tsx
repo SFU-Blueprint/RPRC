@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { StepInfo } from '@/types/signup';
+import { inter } from '@/app/fonts';
 
 type ProgressIndicatorProps = {
   currentStep: number;
@@ -13,7 +14,7 @@ export function ProgressIndicator({
   steps,
 }: ProgressIndicatorProps) {
   return (
-    <div className="w-full py-8 md:py-12">
+    <div className={`w-full py-8 md:py-12 ${inter.className}`}>
       {/* Title */}
       <h2 className="text-center font-bold text-[18px] md:text-[24px] mb-8 md:mb-12">
         Application Process
