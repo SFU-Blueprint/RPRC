@@ -21,6 +21,8 @@ type SignUpContextType = {
   // Validation
   errors: ValidationErrors;
   setErrors: (errors: ValidationErrors) => void;
+  hasAttemptedValidation: boolean; // Track if user tried to submit/proceed (for validation)
+  setHasAttemptedValidation: (attempted: boolean) => void;
 
   // Submission
   isSubmitting: boolean;
@@ -39,6 +41,7 @@ export function SignUpProvider({ children }: { children: ReactNode }) {
   const [formData, setFormData] = useState<SignUpFormData>(SIGNUP_INITIAL);
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [hasAttemptedValidation, setHasAttemptedValidation] = useState(false); // NEW
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   /**
@@ -55,6 +58,7 @@ export function SignUpProvider({ children }: { children: ReactNode }) {
     if (currentStep < 3) {
       setCurrentStep((prev) => prev + 1);
       setErrors({}); // Clear errors when moving to next step
+      setHasAttemptedValidation(false); // Reset validation flag for new step
     }
   };
 
@@ -64,7 +68,8 @@ export function SignUpProvider({ children }: { children: ReactNode }) {
   const goToPreviousStep = () => {
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
-      setErrors({}); // Clear errors
+      setErrors({}); // Clear errors when going back
+      setHasAttemptedValidation(false); // Reset validation flag
     }
   };
 
@@ -77,6 +82,8 @@ export function SignUpProvider({ children }: { children: ReactNode }) {
     goToPreviousStep,
     errors,
     setErrors,
+    hasAttemptedValidation,
+    setHasAttemptedValidation,
     isSubmitting,
     setIsSubmitting,
   };
@@ -88,6 +95,7 @@ export function SignUpProvider({ children }: { children: ReactNode }) {
 
 /**
  * Custom hook to use the context
+ * Throws error if used outside provider
  */
 export function useSignUp() {
   const context = useContext(SignUpContext);
