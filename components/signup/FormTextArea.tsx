@@ -2,27 +2,27 @@
 
 import React from 'react';
 
-type FormInputProps = {
+type FormTextAreaProps = {
   label: string;
-  type?: 'text' | 'email' | 'password' | 'tel';
   value: string;
   onChange: (value: string) => void;
   error?: string;
   placeholder?: string;
+  rows?: number;
   required?: boolean;
   showValidation?: boolean;
 };
 
-export function FormInput({
+export function FormTextArea({
   label,
-  type = 'text',
   value,
   onChange,
   error,
   placeholder,
+  rows = 4,
   required = false,
   showValidation = false,
-}: FormInputProps) {
+}: FormTextAreaProps) {
   // Determine border color based on validation state
   const getBorderClass = () => {
     // Only show validation colors if showValidation is true
@@ -55,20 +55,20 @@ export function FormInput({
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
 
-      {/* Input */}
-      <input
-        title="input"
+      {/* TextArea */}
+      <textarea
         id={label}
-        type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        rows={rows}
         className={`
           w-full px-3 py-2 
           border-2 rounded-md
           text-[14px] md:text-[16px]
           focus:outline-none focus:ring-2
           transition-colors
+          resize-vertical
           ${getBorderClass()}
         `}
         aria-invalid={error ? 'true' : 'false'}

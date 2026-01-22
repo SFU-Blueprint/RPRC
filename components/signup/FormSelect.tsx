@@ -2,27 +2,27 @@
 
 import React from 'react';
 
-type FormInputProps = {
+type FormSelectProps = {
   label: string;
-  type?: 'text' | 'email' | 'password' | 'tel';
   value: string;
   onChange: (value: string) => void;
+  options: string[]; // Simple string array
   error?: string;
   placeholder?: string;
   required?: boolean;
   showValidation?: boolean;
 };
 
-export function FormInput({
+export function FormSelect({
   label,
-  type = 'text',
   value,
   onChange,
+  options,
   error,
-  placeholder,
+  placeholder = 'Select an option',
   required = false,
   showValidation = false,
-}: FormInputProps) {
+}: FormSelectProps) {
   // Determine border color based on validation state
   const getBorderClass = () => {
     // Only show validation colors if showValidation is true
@@ -55,25 +55,35 @@ export function FormInput({
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
 
-      {/* Input */}
-      <input
-        title="input"
+      {/* Select Dropdown */}
+      <select
         id={label}
-        type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
         className={`
           w-full px-3 py-2 
           border-2 rounded-md
           text-[14px] md:text-[16px]
           focus:outline-none focus:ring-2
           transition-colors
+          bg-white
           ${getBorderClass()}
         `}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${label}-error` : undefined}
-      />
+      >
+        {/* Placeholder option */}
+        <option value="" disabled>
+          {placeholder}
+        </option>
+
+        {/* Map through options */}
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
 
       {/* Error message - only show if validation attempted */}
       {showValidation && error && (

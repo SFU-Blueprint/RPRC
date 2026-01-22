@@ -44,3 +44,6 @@ next-env.d.ts
 # supabase local development
 supabase/.branches
 supabase/.temp
+
+# local test
+local-test/
