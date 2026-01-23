@@ -48,7 +48,9 @@ export default function MembershipLandingPage() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-3 mt-1">•</span>
-                  <span>Support and endorse RPRC's mission and values.</span>
+                  <span>
+                    Support and endorse RPRC&apos;s mission and values.
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <span className="mr-3 mt-1">•</span>

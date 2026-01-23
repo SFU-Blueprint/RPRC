@@ -5,6 +5,7 @@ import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from '@/components/signup/FormInput';
 import { inter } from '@/app/fonts';
 import { validateStep1, hasErrors } from '@/lib/signup-validation';
+import { PasswordInput } from './PasswordInput';
 
 export function Step1Form() {
   const {
@@ -62,27 +63,23 @@ export function Step1Form() {
         />
 
         {/* Password */}
-        <FormInput
+        <PasswordInput
           label="Password"
-          type="password"
           value={formData.password}
-          onChange={(val) => updateFormData({ password: val })}
           error={errors.password}
-          placeholder=""
-          required
           showValidation={hasAttemptedValidation}
+          onChange={(value) => updateFormData({ password: value })}
+          placeholder="Enter your password"
         />
 
         {/* Confirm Password */}
-        <FormInput
+        <PasswordInput
           label="Confirm Password"
-          type="password"
           value={formData.confirmPassword}
-          onChange={(val) => updateFormData({ confirmPassword: val })}
           error={errors.confirmPassword}
-          placeholder=""
-          required
           showValidation={hasAttemptedValidation}
+          onChange={(value) => updateFormData({ confirmPassword: value })}
+          placeholder="Re-enter your password"
         />
 
         {/* Membership Type */}
