@@ -7,6 +7,7 @@ export type SignUpFormData = {
   email: string;
   password: string;
   confirmPassword: string;
+  membershipType?: MembershipType;
 
   // page 2: Contact + Address Info
   fullName: string;
@@ -39,3 +40,5 @@ export type StepInfo = {
   title: string;
   description: string;
 };
+
+export type MembershipType = 'individual' | 'organization';

@@ -88,3 +88,19 @@ export const SIGNUP_INITIAL: SignUpFormData = {
   interests: [],
   whyJoin: '',
 };
+
+/**
+ * Membership type constants
+ */
+export const MEMBERSHIP_TYPES = {
+  INDIVIDUAL: 'individual',
+  ORGANIZATION: 'organization',
+} as const;
+
+/**
+ * Membership type options for form
+ */
+export const MEMBERSHIP_TYPE_OPTIONS = [
+  { value: MEMBERSHIP_TYPES.INDIVIDUAL, label: 'Individual' },
+  { value: MEMBERSHIP_TYPES.ORGANIZATION, label: 'Organization' },
+];

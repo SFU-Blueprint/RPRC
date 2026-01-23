@@ -1,36 +1,204 @@
-import { ValidationErrors } from '@/types/signup';
+import { SignUpFormData, ValidationErrors } from '@/types/signup';
+import { MEMBERSHIP_TYPES } from '@/app/membership/signup/const';
 
 /**
- * Regex patterns for validation
+ * Regular expression patterns for validation
  */
 export const VALIDATION_PATTERNS = {
+  // Email: standard email format
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, // 8+ chars, 1 upper, 1 lower, 1 number
-  phone: /^\d{10}$/, // 10 digits
-  postalCode: /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i, // Canadian: A1A 1A1 or A1A1A1
+
+  // Password: minimum 6 characters, any characters allowed
+  password: /^.{6,}$/,
+
+  // Phone: exactly 10 digits (after removing non-digits)
+  phone: /^\d{10}$/,
+
+  // Postal Code: Canadian format A1A 1A1 or A1A1A1 (case insensitive)
+  postalCode: /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i,
 };
 
 /**
- * Validation functions for individual fields
+ * Validate email address
  */
+export function validateEmail(email: string): string | undefined {
+  if (!email) {
+    return 'Email is required';
+  }
 
-// TODO: Add validateEmail() when building Step 1
-// TODO: Add validatePassword() when building Step 1
-// TODO: Add validatePasswordMatch() when building Step 1
-// TODO: Add validatePhone() when building Step 2
-// TODO: Add validatePostalCode() when building Step 2
-// TODO: Add validateRequired() when needed
+  if (!VALIDATION_PATTERNS.email.test(email)) {
+    return 'Invalid email format';
+  }
+
+  return undefined;
+}
 
 /**
- * Step validation functions
+ * Validate password strength
  */
+export function validatePassword(password: string): string | undefined {
+  if (!password) {
+    return 'Password is required';
+  }
 
-// TODO: Add validateStep1() when building account creation
-// TODO: Add validateStep2() when building contact/address form
-// TODO: Add validateStep3() when building interests form
+  if (password.length < 6) {
+    return 'Password must be at least 6 characters';
+  }
+
+  return undefined;
+}
 
 /**
- * Utility function to check if errors object has any errors
+ * Validate password confirmation matches
+ */
+export function validatePasswordMatch(
+  password: string,
+  confirmPassword: string,
+): string | undefined {
+  if (!confirmPassword) {
+    return 'Please confirm your password';
+  }
+
+  if (password !== confirmPassword) {
+    return 'Passwords do not match';
+  }
+
+  return undefined;
+}
+
+/**
+ * Validate membership type is selected
+ */
+/**
+ * Validate membership type is selected
+ */
+export function validateMembershipType(
+  membershipType: string | undefined,
+): string | undefined {
+  if (!membershipType) {
+    return 'Please select a membership type';
+  }
+
+  // Use constants instead of hardcoded strings
+  if (
+    membershipType !== MEMBERSHIP_TYPES.INDIVIDUAL &&
+    membershipType !== MEMBERSHIP_TYPES.ORGANIZATION
+  ) {
+    return 'Invalid membership type selected';
+  }
+
+  return undefined;
+}
+
+/**
+ * Validate required field (generic)
+ */
+export function validateRequired(
+  value: string,
+  fieldName: string,
+): string | undefined {
+  if (!value || value.trim() === '') {
+    return `${fieldName} is required`;
+  }
+  return undefined;
+}
+
+/**
+ * Validate phone number (10 digits)
+ */
+export function validatePhone(phone: string): string | undefined {
+  if (!phone) {
+    return 'Phone number is required';
+  }
+
+  const cleaned = phone.replace(/\D/g, ''); // Remove non-digits
+
+  if (!VALIDATION_PATTERNS.phone.test(cleaned)) {
+    return 'Phone number must be 10 digits';
+  }
+
+  return undefined;
+}
+
+/**
+ * Validate Canadian postal code
+ */
+export function validatePostalCode(postalCode: string): string | undefined {
+  if (!postalCode) {
+    return 'Postal code is required';
+  }
+
+  if (!VALIDATION_PATTERNS.postalCode.test(postalCode)) {
+    return 'Invalid postal code format (e.g., V5K 1A1)';
+  }
+
+  return undefined;
+}
+
+/**
+ * Validate entire Step 1 (Account Creation)
+ * Returns object with error for each field (or undefined if valid)
+ */
+export function validateStep1(data: Partial<SignUpFormData>): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  // Validate email
+  const emailError = validateEmail(data.email || '');
+  if (emailError) {
+    errors.email = emailError;
+  }
+
+  // Validate password
+  const passwordError = validatePassword(data.password || '');
+  if (passwordError) {
+    errors.password = passwordError;
+  }
+
+  // Validate confirm password
+  const confirmPasswordError = validatePasswordMatch(
+    data.password || '',
+    data.confirmPassword || '',
+  );
+  if (confirmPasswordError) {
+    errors.confirmPassword = confirmPasswordError;
+  }
+
+  // Validate membership type
+  const membershipTypeError = validateMembershipType(data.membershipType);
+  if (membershipTypeError) {
+    errors.membershipType = membershipTypeError;
+  }
+
+  return errors;
+}
+
+/**
+ * Validate entire Step 2 (Contact & Address Information)
+ * TODO: Implement when building Step 2
+ */
+export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  // TODO: Add validation for Step 2 fields
+
+  return errors;
+}
+
+/**
+ * Validate entire Step 3 (Membership Interests)
+ * TODO: Implement when building Step 3
+ */
+export function validateStep3(data: Partial<SignUpFormData>): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  // TODO: Add validation for Step 3 fields
+
+  return errors;
+}
+
+/**
+ * Check if an errors object has any actual errors
+ * Returns true if there are errors, false if all fields are valid
  */
 export function hasErrors(errors: ValidationErrors): boolean {
   return Object.values(errors).some((error) => error !== undefined);
