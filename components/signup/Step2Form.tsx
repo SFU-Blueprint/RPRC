@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from '@/components/signup/FormInput';
 import { FormTextArea } from '@/components/signup/FormTextArea';
 import { FormSelect } from '@/components/signup/FormSelect';
 import { inter } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/signup-validation';
+import { ConfirmationModal } from '@/components/signup/ConfirmationModal';
 import {
   MEMBERSHIP_INTERESTS,
   CANADIAN_PROVINCES,
@@ -23,6 +24,8 @@ export function Step2Form() {
     goToNextStep,
   } = useSignUp();
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
   const handleSubmit = () => {
     setHasAttemptedValidation(true);
 
@@ -31,11 +34,15 @@ export function Step2Form() {
 
     if (!hasErrors(validationErrors)) {
       console.log('Step 2 validation passed');
-      // Show confirmation modal here
-      goToNextStep();
+      setShowConfirmModal(true);
     } else {
       console.log('Step 2 validation failed:', validationErrors);
     }
+  };
+
+  const handleConfirmSubmit = () => {
+    setShowConfirmModal(false);
+    goToNextStep();
   };
 
   const toggleInterest = (interest: string) => {
@@ -286,6 +293,13 @@ export function Step2Form() {
           Submit Application
         </button>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmSubmit}
+      />
     </div>
   );
 }
