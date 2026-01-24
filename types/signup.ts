@@ -4,13 +4,14 @@
  */
 export type SignUpFormData = {
   // page 1: Account Info
-  email: string;
+  signupEmail: string;
   password: string;
   confirmPassword: string;
   membershipType?: MembershipType;
 
   // page 2: Contact + Address Info
   fullName: string;
+  contactEmail: string;
   phoneNumber: string;
   phoneType: 'home' | 'cell';
   mailingAddress: string;
@@ -20,7 +21,7 @@ export type SignUpFormData = {
 
   // page 3: Membership Interests
   interests: string[];
-  whyJoin: string;
+  reasonForJoining: string;
 };
 
 /**

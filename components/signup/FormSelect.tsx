@@ -24,40 +24,36 @@ export function FormSelect({
   required = false,
   showValidation = false,
 }: FormSelectProps) {
-  const getBorderClass = () => {
+  const getBorderColor = () => {
     if (!showValidation) {
-      return 'border-gray-300 focus:border-blue-500 focus:ring-blue-500';
+      return 'border-gray-300';
     }
     if (error) {
-      return 'border-red-500 focus:border-red-500 focus:ring-red-500';
+      return 'border-red-500';
     }
     if (value && !error) {
-      return 'border-green-500 focus:border-green-500 focus:ring-green-500';
+      return 'border-green-500';
     }
-    return 'border-gray-300 focus:border-blue-500 focus:ring-blue-500';
+    return 'border-gray-300';
   };
 
   return (
     <div className={`w-full ${inter.className}`}>
-      <label
-        htmlFor={label}
-        className="block font-medium text-[14px] md:text-[16px] text-gray-700 mb-1"
-      >
+      <label className="block text-[13px] sm:text-[14px] md:text-[15px] font-medium text-gray-700 mb-2">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <select
-        id={label}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`
-          w-full px-3 py-2 
-          border-2 rounded-md
-          text-[14px] md:text-[16px]
-          focus:outline-none focus:ring-2
-          transition-colors
+          w-full px-4 py-3 rounded-lg 
           bg-white
-          ${getBorderClass()}
+          text-gray-900 text-[14px] sm:text-[15px] md:text-[16px]
+          border-2
+          focus:outline-none focus:ring-2 focus:ring-[#90cd5f]
+          transition-all
+          ${getBorderColor()}
         `}
         aria-invalid={error ? 'true' : 'false'}
         aria-describedby={error ? `${label}-error` : undefined}
@@ -74,7 +70,7 @@ export function FormSelect({
       {showValidation && error && (
         <p
           id={`${label}-error`}
-          className="text-red-500 text-[14px] mt-1"
+          className="text-red-500 text-[13px] sm:text-[14px] mt-1"
           role="alert"
         >
           {error}

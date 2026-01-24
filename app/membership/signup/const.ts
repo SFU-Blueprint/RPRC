@@ -41,14 +41,14 @@ export const CANADIAN_PROVINCES: string[] = [
 ];
 
 /**
- * Membership interest options
+ * Membership interest options (in order)
  */
 export const MEMBERSHIP_INTERESTS: string[] = [
   'Health',
   'Education',
+  'Environment',
   'Arts+Culture',
   'Housing',
-  'Environment',
   'Other',
 ];
 
@@ -56,10 +56,11 @@ export const MEMBERSHIP_INTERESTS: string[] = [
  * Mock data
  */
 export const SIGNUP_MOCK: SignUpFormData = {
-  email: 'john.doe@example.com',
+  signupEmail: 'john.doe@example.com',
   password: 'Test1234',
   confirmPassword: 'Test1234',
   fullName: 'John Doe',
+  contactEmail: 'john.doe@example.com',
   phoneNumber: '6041234567',
   phoneType: 'cell',
   mailingAddress: '123 Main Street',
@@ -67,7 +68,7 @@ export const SIGNUP_MOCK: SignUpFormData = {
   province: 'British Columbia',
   postalCode: 'V5K 1A1',
   interests: ['Health', 'Housing'],
-  whyJoin:
+  reasonForJoining:
     'I want to help reduce poverty in Richmond and support community initiatives.',
 };
 
@@ -75,10 +76,11 @@ export const SIGNUP_MOCK: SignUpFormData = {
  * Empty form data - initial state
  */
 export const SIGNUP_INITIAL: SignUpFormData = {
-  email: '',
+  signupEmail: '',
   password: '',
   confirmPassword: '',
   fullName: '',
+  contactEmail: '',
   phoneNumber: '',
   phoneType: 'cell',
   mailingAddress: '',
@@ -86,7 +88,7 @@ export const SIGNUP_INITIAL: SignUpFormData = {
   province: '',
   postalCode: '',
   interests: [],
-  whyJoin: '',
+  reasonForJoining: '',
 };
 
 /**

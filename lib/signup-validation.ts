@@ -69,9 +69,6 @@ export function validatePasswordMatch(
 /**
  * Validate membership type is selected
  */
-/**
- * Validate membership type is selected
- */
 export function validateMembershipType(
   membershipType: string | undefined,
 ): string | undefined {
@@ -142,10 +139,10 @@ export function validatePostalCode(postalCode: string): string | undefined {
 export function validateStep1(data: Partial<SignUpFormData>): ValidationErrors {
   const errors: ValidationErrors = {};
 
-  // Validate email
-  const emailError = validateEmail(data.email || '');
-  if (emailError) {
-    errors.email = emailError;
+  // Validate signup email
+  const signupEmailError = validateEmail(data.signupEmail || '');
+  if (signupEmailError) {
+    errors.signupEmail = signupEmailError;
   }
 
   // Validate password
@@ -174,12 +171,65 @@ export function validateStep1(data: Partial<SignUpFormData>): ValidationErrors {
 
 /**
  * Validate entire Step 2 (Contact & Address Information)
- * TODO: Implement when building Step 2
  */
 export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
   const errors: ValidationErrors = {};
 
-  // TODO: Add validation for Step 2 fields
+  // Validate full name
+  const fullNameError = validateRequired(data.fullName || '', 'Full name');
+  if (fullNameError) {
+    errors.fullName = fullNameError;
+  }
+
+  // Validate contact email
+  const contactEmailError = validateEmail(data.contactEmail || '');
+  if (contactEmailError) {
+    errors.contactEmail = contactEmailError;
+  }
+
+  // Validate phone number
+  const phoneError = validatePhone(data.phoneNumber || '');
+  if (phoneError) {
+    errors.phoneNumber = phoneError;
+  }
+
+  // Validate mailing address
+  const addressError = validateRequired(
+    data.mailingAddress || '',
+    'Mailing address',
+  );
+  if (addressError) {
+    errors.mailingAddress = addressError;
+  }
+
+  // Validate city
+  const cityError = validateRequired(data.city || '', 'City');
+  if (cityError) {
+    errors.city = cityError;
+  }
+
+  // Validate province
+  const provinceError = validateRequired(data.province || '', 'Province');
+  if (provinceError) {
+    errors.province = provinceError;
+  }
+
+  // Validate postal code
+  const postalCodeError = validatePostalCode(data.postalCode || '');
+  if (postalCodeError) {
+    errors.postalCode = postalCodeError;
+  }
+
+  // Validate reason for joining
+  const reasonError = validateRequired(
+    data.reasonForJoining || '',
+    'Reason for joining',
+  );
+  if (reasonError) {
+    errors.reasonForJoining = reasonError;
+  }
+
+  // Note: Interests are optional, no validation needed
 
   return errors;
 }

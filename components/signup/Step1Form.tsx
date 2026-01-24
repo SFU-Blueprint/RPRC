@@ -25,10 +25,10 @@ export function Step1Form() {
     setErrors(validationErrors);
 
     if (!hasErrors(validationErrors)) {
-      console.log('✅ Step 1 validation passed');
+      console.log('Step 1 validation passed');
       goToNextStep();
     } else {
-      console.log('❌ Step 1 validation failed:', validationErrors);
+      console.log('Step 1 validation failed:', validationErrors);
     }
   };
 
@@ -54,9 +54,9 @@ export function Step1Form() {
         <FormInput
           label="Email Address"
           type="email"
-          value={formData.email}
-          onChange={(val) => updateFormData({ email: val })}
-          error={errors.email}
+          value={formData.signupEmail}
+          onChange={(val) => updateFormData({ signupEmail: val })}
+          error={errors.signupEmail}
           placeholder=""
           required
           showValidation={hasAttemptedValidation}

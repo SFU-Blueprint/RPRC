@@ -55,6 +55,7 @@ export function FormTextArea({
         className={`
           w-full px-3 py-2 
           border-2 rounded-md
+          bg-white
           text-[14px] md:text-[16px]
           focus:outline-none focus:ring-2
           transition-colors
