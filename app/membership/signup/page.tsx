@@ -3,10 +3,11 @@
 import { SignUpProvider, useSignUp } from '@/lib/contexts/SignUpContext';
 import { ProgressIndicator } from '@/components/signup/ProgressIndicator';
 import { SignUpInfoBox } from '@/components/signup/SignUpInfoBox';
-import { Step1Form } from '@/components/signup/Step1Form';
 import { SIGNUP_STEPS } from './const';
 import { inter } from '@/app/fonts';
+import { Step1Form } from '@/components/signup/Step1Form';
 import { Step2Form } from '@/components/signup/Step2Form';
+import { Step3Success } from '@/components/signup/Step3Success';
 
 function SignUpContent() {
   const { currentStep, goToPreviousStep, goToNextStep } = useSignUp();
@@ -33,27 +34,10 @@ function SignUpContent() {
           </div>
         )}
 
-        {/* Step 3: Placeholder */}
+        {/* Step 3: Success Page */}
         {currentStep === 3 && (
-          <div className="col-span-2">
-            <div className="bg-[#eeebe0] rounded-[25px] p-8 md:p-10 lg:p-12">
-              <h2 className="text-[24px] md:text-[28px] lg:text-[32px] font-bold mb-6 text-gray-900">
-                Step 3: Membership Interests
-              </h2>
-              <p className="text-gray-700 mb-6">Step 3 form will go here...</p>
-
-              <div className="flex gap-4">
-                <button
-                  onClick={goToPreviousStep}
-                  className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-semibold"
-                >
-                  Back
-                </button>
-                <button className="px-6 py-3 bg-[#90cd5f] text-white rounded-lg hover:bg-[#80bd4f] font-semibold">
-                  Submit
-                </button>
-              </div>
-            </div>
+          <div className="w-full flex justify-center">
+            <Step3Success />
           </div>
         )}
       </div>
