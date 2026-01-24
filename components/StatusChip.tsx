@@ -10,7 +10,7 @@ const STATUS_CHIPS: StatusChipType[] = [
   { color: '#00519F', label: 'To Review', theme: 'toReview' },
   { color: '#393533', label: 'Rejected', theme: 'rejected' },
   { color: '#C67D38', label: 'Payment Pending', theme: 'paymentPending' },
-  { color: '#3FA104', label: 'Complete', theme: 'complete' },
+  { color: '#3FA104', label: 'Complete', theme: 'completed' },
 ];
 
 type StatusChipProps = {

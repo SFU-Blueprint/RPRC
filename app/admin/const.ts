@@ -93,7 +93,7 @@ export const ADMIN_DASHBOARD_MOCK = {
       applicantName: 'Carter Higgins',
       type: 'Organization',
       dateReceived: '2025-11-05',
-      status: 'complete',
+      status: 'completed',
       reviewer1: 'John Doe',
       reviewer2: 'Jane Doe',
     },
