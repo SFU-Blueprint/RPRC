@@ -17,4 +17,8 @@ export type ApplicationType = {
 export type AdminDashboardTablePropTypes = {
   columns: ColumnType[];
   applications: ApplicationType[];
+  currentTab: {
+    label: string;
+    value: string;
+  };
 };

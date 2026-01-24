@@ -39,6 +39,7 @@ export default function AdminDashboard() {
         <AdminDashboardTable
           columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
           applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
+          currentTab={currentTab}
         />
       </div>
     </>
