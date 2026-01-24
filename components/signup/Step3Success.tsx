@@ -4,8 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import { inter } from '@/app/fonts';
 import { InfoCard } from './InfoCard';
+import { getApplicationNumber } from '@/lib/signup-mock-api'; // Mock api call
 
 export function Step3Success() {
+  const applicationId = getApplicationNumber(); //mock api call
   return (
     <div
       className={`w-full max-w-6xl mx-auto bg-white rounded-[25px] shadow-lg p-8 sm:p-10 md:p-12 lg:p-14 ${inter.className}`}
@@ -102,7 +104,7 @@ export function Step3Success() {
             </svg>
           }
           heading="Application ID"
-          description="Reference: APP-561995"
+          description={`Reference: ${applicationId}`}
         />
       </div>
 

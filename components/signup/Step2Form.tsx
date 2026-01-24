@@ -8,6 +8,7 @@ import { FormSelect } from '@/components/signup/FormSelect';
 import { inter } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/signup-validation';
 import { ConfirmationModal } from '@/components/signup/ConfirmationModal';
+import { submitToAPI } from '@/lib/signup-mock-api'; // Mock api call
 import {
   MEMBERSHIP_INTERESTS,
   CANADIAN_PROVINCES,
@@ -41,6 +42,11 @@ export function Step2Form() {
   };
 
   const handleConfirmSubmit = () => {
+    // Call mock API to submit data
+    const response = submitToAPI(formData);
+    console.log('API Response:', response);
+
+    // Close modal and proceed to success page
     setShowConfirmModal(false);
     goToNextStep();
   };
