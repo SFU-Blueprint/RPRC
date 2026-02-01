@@ -8,6 +8,7 @@ import Tabs from '@/components/Tabs';
 import AdminSearchBar from '@/components/AdminSearchBar';
 import { ADMIN_DASHBOARD_MOCK, ADMIN_DASHBOARD_CONST } from './const';
 import AdminDashboardTable from '@/components/AdminDashboardTable';
+import AdminDashboardMobileTable from '@/components/AdminDashboardMobileTable';
 
 export default function AdminDashboard() {
   const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
@@ -44,15 +45,27 @@ export default function AdminDashboard() {
       </div>
       <div className="px-4 md:px-8">
         <AdminSearchBar value={searchQuery} onChange={setSearchQuery} />
-        <AdminDashboardTable
-          columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
-          applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
-          currentTab={currentTab}
-          pagination={{
-            itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
-            numberPerPage: 5,
-          }}
-        />
+        <div className="block md:hidden">
+          <AdminDashboardMobileTable
+            applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
+            currentTab={currentTab}
+            pagination={{
+              itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
+              numberPerPage: 5,
+            }}
+          />
+        </div>
+        <div className="hidden md:block">
+          <AdminDashboardTable
+            columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
+            applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
+            currentTab={currentTab}
+            pagination={{
+              itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
+              numberPerPage: 5,
+            }}
+          />
+        </div>
       </div>
     </>
   );

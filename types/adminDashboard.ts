@@ -26,3 +26,15 @@ export type AdminDashboardTablePropTypes = {
     numberPerPage: number;
   };
 };
+
+export type AdminDashboardMobileTablePropTypes = {
+  applications: ApplicationType[];
+  currentTab: {
+    label: string;
+    value: string;
+  };
+  pagination?: {
+    itemCount: number;
+    numberPerPage: number;
+  };
+};

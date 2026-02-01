@@ -63,7 +63,7 @@ export const Pagination = ({
   if (hook.pageCount <= 1) return null;
 
   return (
-    <div className="flex justify-center items-center py-6">
+    <div className="flex flex-wrap justify-center items-center py-6">
       <div className="flex items-center gap-1">
         <Button
           name="paginationPage"
