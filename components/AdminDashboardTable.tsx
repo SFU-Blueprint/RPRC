@@ -12,14 +12,22 @@ export default function AdminDashboardTable({
 }: AdminDashboardTablePropTypes) {
   const [currentPage, setCurrentPage] = useState(1);
 
+  // TODO: This should be handled in the backend
+  const filteredApplications = useMemo(() => {
+    return applications.filter((app) =>
+      currentTab.value !== 'all' ? app.status === currentTab.value : true,
+    );
+  }, [applications, currentTab]);
+
+  // TODO: This should be handled in the backend
   const paginatedApplications = useMemo(() => {
     if (!pagination) {
-      return applications;
+      return filteredApplications;
     }
     const startIndex = (currentPage - 1) * pagination.numberPerPage;
     const endIndex = startIndex + pagination.numberPerPage;
-    return applications.slice(startIndex, endIndex);
-  }, [applications, currentPage, pagination]);
+    return filteredApplications.slice(startIndex, endIndex);
+  }, [filteredApplications, currentPage, pagination]);
 
   return (
     <Table
@@ -30,44 +38,41 @@ export default function AdminDashboardTable({
       pagination={
         pagination
           ? {
-              itemCount: pagination.itemCount,
+              itemCount: filteredApplications.length,
               numberPerPage: pagination.numberPerPage,
-              usePagination: pagination.itemCount > pagination.numberPerPage,
+              usePagination:
+                filteredApplications.length > pagination.numberPerPage,
             }
           : undefined
       }
       onPageChange={setCurrentPage}
     >
-      {paginatedApplications
-        .filter((app) =>
-          currentTab.value !== 'all' ? app.status === currentTab.value : true,
-        )
-        .map((app) => (
-          <tr
-            key={app.id}
-            className="bg-[#F5F4F2] not-last:border-b not-last:border-[#BAB7B2] leading-6 tracking-[-0.31px] text-[16px]"
-          >
-            <td className="p-6 font-bold">{app.applicantName}</td>
+      {paginatedApplications.map((app) => (
+        <tr
+          key={app.id}
+          className="bg-[#F5F4F2] not-last:border-b not-last:border-[#BAB7B2] leading-6 tracking-[-0.31px] text-[16px]"
+        >
+          <td className="p-6 font-bold">{app.applicantName}</td>
 
-            <td className="p-6 font-normal">{app.type}</td>
+          <td className="p-6 font-normal">{app.type}</td>
 
-            <td className="p-6 font-normal">
-              {formatDateWithOrdinal(app.dateReceived)}
-            </td>
+          <td className="p-6 font-normal">
+            {formatDateWithOrdinal(app.dateReceived)}
+          </td>
 
-            <td className="p-6 font-normal">
-              <StatusChip theme={app.status} />
-            </td>
+          <td className="p-6 font-normal">
+            <StatusChip theme={app.status} />
+          </td>
 
-            <td className="p-6 font-normal">
-              {app.reviewer1 === '' ? '-' : app.reviewer1}
-            </td>
+          <td className="p-6 font-normal">
+            {app.reviewer1 === '' ? '-' : app.reviewer1}
+          </td>
 
-            <td className="p-6 font-normal">
-              {app.reviewer2 === '' ? '-' : app.reviewer2}
-            </td>
-          </tr>
-        ))}
+          <td className="p-6 font-normal">
+            {app.reviewer2 === '' ? '-' : app.reviewer2}
+          </td>
+        </tr>
+      ))}
     </Table>
   );
 }
