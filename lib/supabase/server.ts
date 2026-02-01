@@ -1,20 +1,33 @@
-import { createClient } from "@supabase/supabase-js";
 
-import type { Database } from "@/types/database";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-const getRequiredEnv = (key: string) => {
-  const value = process.env[key];
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
 
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
-
-  return value;
-};
-
-export const createServerClient = () => {
-  const supabaseUrl = getRequiredEnv("SUPABASE_URL");
-  const supabaseAnonKey = getRequiredEnv("SUPABASE_ANON_KEY");
-
-  return createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const createClient = async () => {
+  const cookieStore = await cookies();
+  
+  return createServerClient(
+    supabaseUrl!,
+    supabaseKey!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => 
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    },
+  );
 };
