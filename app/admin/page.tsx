@@ -14,21 +14,22 @@ export default function AdminDashboard() {
   return (
     <>
       <AdminNavbar />
-      <div className="px-8">
+      <div className="md:px-7.25">
         <Tabs
           tabs={ADMIN_DASHBOARD_CONST.TABS}
           currentTab={currentTab}
           setCurrentTab={setCurrentTab}
           additionalClasses={{
-            wrapper: 'mt-[43px]',
+            wrapper: 'md:mt-[43px] p-[10px] md:p-0',
           }}
         />
-        {/* <div className="max-w-480 mx-auto px-8 md:px-14 xl:px-28">
-        <div className="mt-10 md:mt-15 flex justify-center gap-x-4 md:gap-x-8 lg:gap-x-12">
-          {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
-            <StatCard key={card.label} label={card.label} value={card.value} />
-          ))}
-        </div>
+      </div>
+      <div className="px-4 md:px-8 mt-5.75 md:mt-10.5 flex justify-around gap-x-4 md:gap-x-6 w-full">
+        {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
+          <StatCard key={card.label} label={card.label} value={card.value} />
+        ))}
+      </div>
+      {/* <div className="max-w-480 mx-auto px-8 md:px-14 xl:px-28">
         
         <AdminDashboardTable
           columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
@@ -36,7 +37,6 @@ export default function AdminDashboard() {
           currentTab={currentTab}
         />
       </div> */}
-      </div>
     </>
   );
 }

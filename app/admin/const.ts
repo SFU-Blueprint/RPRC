@@ -51,7 +51,7 @@ export const ADMIN_DASHBOARD_MOCK = {
       value: 20,
     },
     {
-      label: 'New Applications Submitted',
+      label: 'New Applications',
       value: 6,
     },
   ],
