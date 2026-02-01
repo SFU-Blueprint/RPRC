@@ -8,16 +8,18 @@ export default function AdminDashboardTable({
   columns,
   applications,
   currentTab,
+  pagination,
 }: AdminDashboardTablePropTypes) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
 
-  // Calculate paginated data - this will change as paginated data should come from the backend.
   const paginatedApplications = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    if (!pagination) {
+      return applications;
+    }
+    const startIndex = (currentPage - 1) * pagination.numberPerPage;
+    const endIndex = startIndex + pagination.numberPerPage;
     return applications.slice(startIndex, endIndex);
-  }, [applications, currentPage, itemsPerPage]);
+  }, [applications, currentPage, pagination]);
 
   return (
     <Table
@@ -25,11 +27,15 @@ export default function AdminDashboardTable({
       additionalClasses={{
         wrapper: 'mt-4 md:mt-8',
       }}
-      pagination={{
-        itemCount: applications.length,
-        numberPerPage: itemsPerPage,
-        usePagination: applications.length > itemsPerPage,
-      }}
+      pagination={
+        pagination
+          ? {
+              itemCount: pagination.itemCount,
+              numberPerPage: pagination.numberPerPage,
+              usePagination: pagination.itemCount > pagination.numberPerPage,
+            }
+          : undefined
+      }
       onPageChange={setCurrentPage}
     >
       {paginatedApplications
@@ -37,29 +43,28 @@ export default function AdminDashboardTable({
           currentTab.value !== 'all' ? app.status === currentTab.value : true,
         )
         .map((app) => (
-          <tr key={app.id} className="bg-[#D4D0CA]">
-            <td className="pl-4 md:pl-7.5 py-6 md:py-8 lg:py-10 xl:py-13.75 font-bold text-[14px] md:text-[16px] lg:text-[24px] leading-[160%] tracking-[0] border-y-0 border-[#CEC8B9] border-l-4 rounded-l-[25px]">
-              {app.applicantName}
-            </td>
+          <tr
+            key={app.id}
+            className="bg-[#F5F4F2] not-last:border-b not-last:border-[#BAB7B2] leading-6 tracking-[-0.31px] text-[16px]"
+          >
+            <td className="p-6 font-bold">{app.applicantName}</td>
 
-            <td className="px-2 md:px-2 py-6 md:py-8 lg:py-10 xl:py-13.75 font-normal text-[14px] md:text-[16px] lg:text-[24px] leading-[150%] tracking-[0] border-y-0 border-[#CEC8B9]">
-              {app.type}
-            </td>
+            <td className="p-6 font-normal">{app.type}</td>
 
-            <td className="px-2 md:px-2 py-6 md:py-8 lg:py-10 xl:py-13.75 font-normal text-[14px] md:text-[16px] lg:text-[24px] leading-[150%] tracking-[0] border-y-0 border-[#CEC8B9]">
+            <td className="p-6 font-normal">
               {formatDateWithOrdinal(app.dateReceived)}
             </td>
 
-            <td className="px-2 md:px-2 py-6 md:py-8 lg:py-10 xl:py-13.75 border-y-0 border-[#CEC8B9]">
+            <td className="p-6 font-normal">
               <StatusChip theme={app.status} />
             </td>
 
-            <td className="px-2 md:px-2 py-6 md:py-8 lg:py-10 xl:py-13.75 font-normal text-[14px] md:text-[16px] lg:text-[24px] leading-[150%] tracking-[0] border-y-0 border-[#CEC8B9]">
-              {app.reviewer1}
+            <td className="p-6 font-normal">
+              {app.reviewer1 === '' ? '-' : app.reviewer1}
             </td>
 
-            <td className="pr-4 md:pr-7.5 py-6 md:py-8 lg:py-10 xl:py-13.75 font-normal text-[14px] md:text-[16px] lg:text-[24px] leading-[150%] tracking-[0] border-y-0 border-[#CEC8B9] border-r-4 rounded-r-[25px]">
-              {app.reviewer2}
+            <td className="p-6 font-normal">
+              {app.reviewer2 === '' ? '-' : app.reviewer2}
             </td>
           </tr>
         ))}

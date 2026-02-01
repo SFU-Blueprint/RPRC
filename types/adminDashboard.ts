@@ -9,7 +9,7 @@ export type ApplicationType = {
   applicantName: string;
   type: 'Individual' | 'Organization';
   dateReceived: string | Date;
-  status: 'toReview' | 'rejected' | 'paymentPending' | 'complete';
+  status: 'toReview' | 'rejected' | 'paymentPending' | 'active' | 'expired';
   reviewer1: string;
   reviewer2: string;
 };
@@ -20,5 +20,9 @@ export type AdminDashboardTablePropTypes = {
   currentTab: {
     label: string;
     value: string;
+  };
+  pagination?: {
+    itemCount: number;
+    numberPerPage: number;
   };
 };

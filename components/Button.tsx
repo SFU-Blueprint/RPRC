@@ -2,30 +2,32 @@ type IconButtonAdditionalClassesPropTypes = {
   button: string[];
 };
 
-type IconButtonComponentPropTypes = {
+type ButtonComponentPropTypes = {
   children: React.ReactNode;
   name?: string;
   value?: string;
   handleClick: React.MouseEventHandler<HTMLButtonElement>;
   additionalClasses?: IconButtonAdditionalClassesPropTypes;
+  isActive?: boolean;
   disabled?: boolean;
 };
 
-export const IconButton = ({
+export const Button = ({
   children,
   name,
   value,
   handleClick,
   disabled = false,
   additionalClasses,
-}: Readonly<IconButtonComponentPropTypes>) => {
+  isActive = false,
+}: Readonly<ButtonComponentPropTypes>) => {
   return (
     <button
       onClick={handleClick}
       name={name}
       value={value}
       disabled={disabled}
-      className={`${additionalClasses?.button.join('')} flex items-center justify-center w-10 h-10 rounded-xl transition-all`}
+      className={`${additionalClasses?.button.join('')} flex items-center justify-center rounded-xl transition-all px-4.5 py-2.5 border-2 border-[#BAB7B2] cursor-pointer ${isActive ? 'bg-[#5EB42D] text-[#FFFDFA] border-transparent' : ''} disabled:opacity-50  font-semibold text-[16px]`}
     >
       {children}
     </button>

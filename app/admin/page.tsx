@@ -15,10 +15,10 @@ export default function AdminDashboard() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
 
   // Debounce the search query
+  // TODO: Use the debouncedSearchQuery to filter the applications in the backend
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-      console.log(debouncedSearchQuery);
     }, 300); // 300ms delay
 
     return () => clearTimeout(timer);
@@ -44,15 +44,16 @@ export default function AdminDashboard() {
       </div>
       <div className="px-4 md:px-8">
         <AdminSearchBar value={searchQuery} onChange={setSearchQuery} />
-      </div>
-      {/* <div className="max-w-480 mx-auto px-8 md:px-14 xl:px-28">
-        
         <AdminDashboardTable
           columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
           applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
           currentTab={currentTab}
+          pagination={{
+            itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
+            numberPerPage: 5,
+          }}
         />
-      </div> */}
+      </div>
     </>
   );
 }

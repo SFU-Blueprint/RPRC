@@ -38,18 +38,20 @@ export default function Table({
 
   return (
     <div className={`${inter.className} ${additionalClasses?.wrapper ?? ''}`}>
-      <div className="overflow-x-auto w-full">
+      <div className="overflow-hidden rounded-t-4xl rounded-b-4xl border-2 border-[#BAB7B2]">
         <table
-          className={`w-full min-w-200 md:min-w-240 table-auto border-separate border-spacing-x-0 border-spacing-y-2 md:border-spacing-y-4.5 ${additionalClasses?.table ?? ''}`}
+          className={`w-full table-fixed ${additionalClasses?.table ?? ''}`}
         >
           <thead>
-            <tr>
-              {columnNames.map((column) => (
+            <tr className="bg-[#E2F4D9] border-b-2 border-[#BAB7B2]">
+              {columnNames.map((column, idx) => (
                 <th
                   key={column.value}
-                  className={`
-                    first:pl-4 last:pr-4 md:first:pl-7.5 md:last:pr-7.5 px-0 md:px-1 text-left font-medium text-[12px] md:text-[14px] lg:text-[16px]
-                    ${column.width ?? ''}
+                  style={{ width: `${100 / columnNames.length}%` }}
+                  className={`text-left p-6
+                    ${column.width ?? ''} ${idx === 0 ? 'rounded-tl-4xl' : ''} 
+                    ${idx === columnNames.length - 1 ? 'rounded-tr-4xl' : ''}
+                    text-[16px] ${inter.className} leading-6 font-semibold tracking-[-0.31px]
                   `}
                 >
                   {column.label}

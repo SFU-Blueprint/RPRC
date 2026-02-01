@@ -1,5 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { IconButton } from './IconButton';
+import { Button } from './Button';
 import { useState, useEffect } from 'react';
 
 type PaginationPropTypes = {
@@ -65,17 +65,14 @@ export const Pagination = ({
   return (
     <div className="flex justify-center items-center py-6">
       <div className="flex items-center gap-1">
-        <IconButton
+        <Button
           name="paginationPage"
           value={`${Math.max(activePage - 1, 1)}`}
           disabled={activePage === 1}
           handleClick={() => onPageChange(Math.max(activePage - 1, 1))}
-          additionalClasses={{
-            button: ['bg-[#F1F2F4] hover:bg-[#dce5fa] cursor-pointer'],
-          }}
         >
-          <ChevronLeftIcon className="w-5 h-5" />
-        </IconButton>
+          Previous
+        </Button>
 
         <div className="flex items-center gap-1">
           {Array.from({ length: Math.min(5, hook.pageCount) }).map(
@@ -84,39 +81,30 @@ export const Pagination = ({
               const isActive = activePage === pageNumber;
 
               return (
-                <IconButton
+                <Button
                   key={`pagination-${pageNumber}`}
                   name="paginationPage"
                   value={`${pageNumber}`}
                   handleClick={() => onPageChange(pageNumber)}
-                  additionalClasses={{
-                    button: [
-                      isActive
-                        ? 'bg-[#195CFF] text-white shadow-sm'
-                        : 'text-black bg-[#F1F2F4] hover:bg-[#dce5fa] cursor-pointer',
-                    ],
-                  }}
+                  isActive={isActive}
                 >
                   {pageNumber}
-                </IconButton>
+                </Button>
               );
             },
           )}
         </div>
 
-        <IconButton
+        <Button
           name="paginationPage"
           value={`${Math.min(activePage + 1, hook.pageCount)}`}
           disabled={activePage === hook.pageCount}
           handleClick={() =>
             onPageChange(Math.min(activePage + 1, hook.pageCount))
           }
-          additionalClasses={{
-            button: ['bg-[#F1F2F4] hover:bg-[#dce5fa] cursor-pointer'],
-          }}
         >
-          <ChevronRightIcon className="w-5 h-5" />
-        </IconButton>
+          Next
+        </Button>
       </div>
     </div>
   );
