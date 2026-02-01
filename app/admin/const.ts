@@ -16,8 +16,12 @@ export const ADMIN_DASHBOARD_CONST = {
       value: 'paymentPending',
     },
     {
-      label: 'Completed',
-      value: 'completed',
+      label: 'Active',
+      value: 'active',
+    },
+    {
+      label: 'Expired',
+      value: 'expired',
     },
     {
       label: 'Rejected',

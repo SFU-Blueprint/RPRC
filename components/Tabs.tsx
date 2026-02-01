@@ -22,7 +22,7 @@ export default function Tabs({
 }: TabsProps) {
   return (
     <div
-      className={`${inter.className} ${additionalClasses?.wrapper} flex gap-x-4 md:gap-x-8 lg:gap-x-16 pl-4 md:pl-7.5`}
+      className={`${inter.className} ${additionalClasses?.wrapper} flex gap-x-2`}
     >
       {tabs.map((tab) => {
         const isActive = tab.value === currentTab.value;
@@ -32,8 +32,8 @@ export default function Tabs({
             key={tab.value}
             onClick={() => setCurrentTab(tab)}
             className={`
-							cursor-pointer font-medium text-[12px] md:text-[14px] lg:text-[16px] leading-[160%] tracking-[-0.03em] underline underline-offset-[3px]
-							${isActive ? 'inline-flex items-center px-2 md:px-6 py-1 md:py-2 bg-[#00519F54] rounded-[30px] border-4 border-[#00519F]' : ''}
+							cursor-pointer font-semibold text-[16px] px-6.75 py-3.5 rounded-2xl border-2 border-[#BAB7B2]
+							${isActive ? 'bg-[#5EB42D] border-none text-[#FFFDFA] shadow-[0px_2px_4px_-2px_#0000001A,0px_4px_6px_-1px_#0000001A]' : ''}
 						`}
           >
             {tab.label}
