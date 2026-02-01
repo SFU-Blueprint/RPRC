@@ -43,7 +43,7 @@ export default function AdminDashboard() {
           <StatCard key={card.label} label={card.label} value={card.value} />
         ))}
       </div>
-      <div className="px-4 md:px-8">
+      <div className="px-4 md:px-8 mb-20">
         <AdminSearchBar value={searchQuery} onChange={setSearchQuery} />
         <div className="block md:hidden">
           <AdminDashboardMobileTable
