@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { applicationSchema } from "@/types/applicationSchema";
+import { applicationSchemaIndividual } from "@/types/applicationSchema";
 
 export async function POST(request: Request) {
     const body = await request.json();
-    const parseResult = applicationSchema.safeParse(body);
+    const parseResult = applicationSchemaIndividual.safeParse(body);
     if (!parseResult.success) {
         const result: Record<string, string> = {};
         for (const issue of parseResult.error.issues) {
