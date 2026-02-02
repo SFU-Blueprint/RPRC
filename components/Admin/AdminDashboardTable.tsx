@@ -1,6 +1,6 @@
-import Table from './Table';
+import Table from '@/components/Table';
 import { formatDateWithOrdinal } from '@/lib/utils';
-import StatusChip from './StatusChip';
+import StatusChip from '@/components/StatusChip';
 import { AdminDashboardTablePropTypes } from '@/types/adminDashboard';
 import { useState, useMemo } from 'react';
 

@@ -1,9 +1,9 @@
-import Table from './Table';
+import Table from '@/components/Table';
 import { formatDateWithOrdinal } from '@/lib/utils';
-import StatusChip from './StatusChip';
+import StatusChip from '@/components/StatusChip';
 import { AdminDashboardMobileTablePropTypes } from '@/types/adminDashboard';
 import { useState, useMemo } from 'react';
-import { Pagination } from './Pagination';
+import { Pagination } from '@/components/Pagination';
 
 export default function AdminDashboardMobileTable({
   applications,

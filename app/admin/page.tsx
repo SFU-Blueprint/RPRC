@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { inter } from '@/app/fonts';
-import AdminNavbar from '@/components/AdminNavbar';
+import AdminNavbar from '@/components/Admin/AdminNavbar';
 import StatCard from '@/components/StatCard';
 import Tabs from '@/components/Tabs';
-import AdminSearchBar from '@/components/AdminSearchBar';
+import AdminSearchBar from '@/components/Admin/AdminSearchBar';
 import { ADMIN_DASHBOARD_MOCK, ADMIN_DASHBOARD_CONST } from './const';
-import AdminDashboardTable from '@/components/AdminDashboardTable';
-import AdminDashboardMobileTable from '@/components/AdminDashboardMobileTable';
+import AdminDashboardTable from '@/components/Admin/AdminDashboardTable';
+import AdminDashboardMobileTable from '@/components/Admin/AdminDashboardMobileTable';
 
 export default function AdminDashboard() {
   const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
@@ -28,6 +28,7 @@ export default function AdminDashboard() {
   return (
     <>
       <AdminNavbar />
+      <div className="container mx-auto max-w-screen-md">
       <div className="md:px-7.25">
         <Tabs
           tabs={ADMIN_DASHBOARD_CONST.TABS}
@@ -67,6 +68,8 @@ export default function AdminDashboard() {
           />
         </div>
       </div>
+      </div>
+      
     </>
   );
 }
