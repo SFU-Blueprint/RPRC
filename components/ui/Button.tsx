@@ -1,4 +1,4 @@
-type IconButtonAdditionalClassesPropTypes = {
+type ButtonAdditionalClassesPropTypes = {
   button: string[];
 };
 
@@ -7,7 +7,7 @@ type ButtonComponentPropTypes = {
   name?: string;
   value?: string;
   handleClick: React.MouseEventHandler<HTMLButtonElement>;
-  additionalClasses?: IconButtonAdditionalClassesPropTypes;
+  additionalClasses?: ButtonAdditionalClassesPropTypes;
   isActive?: boolean;
   disabled?: boolean;
 };
