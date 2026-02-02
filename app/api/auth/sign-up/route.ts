@@ -1,10 +1,10 @@
-// app/api/auth/sign-in/route.ts
+// app/api/auth/sign-up/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 // Validation schema matching acceptance criteria
-const signInSchema = z
+const signUpSchema = z
   .object({
     email: z
       .string()
@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate request body
-    const validatedData = signInSchema.parse(body);
+    const validatedData = signUpSchema.parse(body);
 
     // Create Supabase client
-    const supabase = createServerClient();
+    const supabase = await createClient();
 
     // Sign up user with Supabase Auth
     const { data, error } = await supabase.auth.signUp({
@@ -64,13 +64,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          details: (error as z.ZodError).errors,
+          details: error,
         },
         { status: 400 },
       );
     }
 
-    console.error('Sign-in error:', error);
+    console.error('Sign-up error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },
