@@ -1,8 +1,9 @@
-import Table from './Table';
+import Table from '../../components/Table';
 import { formatDateWithOrdinal } from '@/lib/utils';
-import StatusChip from './StatusChip';
-import { AdminDashboardTablePropTypes } from '@/types/adminDashboard';
+import StatusChip from '../../components/StatusChip';
+import { AdminDashboardTablePropTypes } from '@/types/admin.types';
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminDashboardTable({
   columns,
@@ -11,6 +12,7 @@ export default function AdminDashboardTable({
   pagination,
 }: AdminDashboardTablePropTypes) {
   const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
 
   // TODO: This should be handled in the backend
   const filteredApplications = useMemo(() => {
@@ -28,6 +30,10 @@ export default function AdminDashboardTable({
     const endIndex = startIndex + pagination.numberPerPage;
     return filteredApplications.slice(startIndex, endIndex);
   }, [filteredApplications, currentPage, pagination]);
+
+  const handleRowClick = (appId: string) => {
+    router.push(`/admin/dashboard/${appId}`);
+  };
 
   return (
     <Table
@@ -50,7 +56,8 @@ export default function AdminDashboardTable({
       {paginatedApplications.map((app) => (
         <tr
           key={app.id}
-          className="bg-[#F5F4F2] not-last:border-b not-last:border-[#BAB7B2] leading-6 tracking-[-0.31px] text-[16px]"
+          onClick={() => handleRowClick(app.id)}
+          className="bg-[#F5F4F2] cursor-pointer not-last:border-b not-last:border-[#BAB7B2] leading-6 tracking-[-0.31px] text-[16px]"
         >
           <td className="p-6 font-bold">{app.applicantName}</td>
 

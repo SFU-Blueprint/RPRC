@@ -1,6 +1,6 @@
 import { inter } from '@/app/fonts';
 import { ReactNode, useState } from 'react';
-import { ColumnType } from '@/types/adminDashboard';
+import { ColumnType } from '@/types/admin.types';
 import { Pagination } from './Pagination';
 
 type TableProps = {

@@ -1,4 +1,4 @@
-import { ApplicationType } from '@/types/adminDashboard';
+import { ApplicationType } from '@/types/admin.types';
 
 export const ADMIN_DASHBOARD_CONST = {
   PAGE_TITLE: 'Admin Dashboard',

@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { inter } from '@/app/fonts';
-import AdminNavbar from '@/components/AdminNavbar';
+import AdminNavbar from '@/app/admin/AdminNavbar';
 import StatCard from '@/components/StatCard';
 import Tabs from '@/components/Tabs';
 import AdminSearchBar from '@/components/AdminSearchBar';
 import { ADMIN_DASHBOARD_MOCK, ADMIN_DASHBOARD_CONST } from './const';
-import AdminDashboardTable from '@/components/AdminDashboardTable';
-import AdminDashboardMobileTable from '@/components/AdminDashboardMobileTable';
+import AdminDashboardTable from '@/app/admin/AdminDashboardTable';
+import AdminDashboardMobileTable from './AdminDashboardMobileTable';
 
 export default function AdminDashboard() {
   const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
