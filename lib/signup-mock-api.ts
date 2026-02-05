@@ -14,33 +14,33 @@ import { SignUpFormData } from '@/types/signup';
  */
 export function submitToAPI(formData: SignUpFormData) {
   console.log('\n' + '='.repeat(60));
-  console.log(' MEMBERSHIP APPLICATION SUBMITTED');
+  console.log('MEMBERSHIP APPLICATION SUBMITTED');
   console.log('='.repeat(60));
 
-  console.log('\n ACCOUNT INFORMATION');
+  console.log('\nACCOUNT INFORMATION');
   console.log('━'.repeat(60));
-  console.log(`Email:           ${formData.signupEmail}`);
+  console.log(`Email:           ${formData.email}`);
   console.log(`Membership Type: ${formData.membershipType || 'Not selected'}`);
   console.log(
     `Password:        ${'*'.repeat(formData.password.length)} (${formData.password.length} characters)`,
   );
 
-  console.log('\n CONTACT INFORMATION');
+  console.log('\nCONTACT INFORMATION');
   console.log('━'.repeat(60));
   console.log(`Full Name:       ${formData.fullName}`);
-  console.log(`Contact Email:   ${formData.contactEmail}`);
   console.log(
     `Phone Number:    ${formData.phoneNumber} (${formData.phoneType})`,
   );
 
-  console.log('\n ADDRESS INFORMATION');
+  console.log('\nADDRESS INFORMATION');
   console.log('━'.repeat(60));
   console.log(`Mailing Address: ${formData.mailingAddress}`);
   console.log(`City:            ${formData.city}`);
   console.log(`Province:        ${formData.province}`);
+  console.log(`Country:         ${formData.country}`);
   console.log(`Postal Code:     ${formData.postalCode}`);
 
-  console.log('\n MEMBERSHIP INTERESTS');
+  console.log('\nMEMBERSHIP INTERESTS');
   console.log('━'.repeat(60));
   if (formData.interests && formData.interests.length > 0) {
     formData.interests.forEach((interest, index) => {
@@ -50,11 +50,30 @@ export function submitToAPI(formData: SignUpFormData) {
     console.log('None selected');
   }
 
-  console.log('\n💭 REASON FOR JOINING');
+  console.log('\nWHY RPRC MEMBER?');
   console.log('━'.repeat(60));
-  console.log(formData.reasonForJoining || 'Not provided');
+  console.log(formData.whyrpcmember || 'Not provided');
 
-  console.log('\n APPLICATION STATUS');
+  // Individual-specific fields
+  if (formData.membershipType === 'individual') {
+    console.log('\nMEMBERSHIP FEE WAIVER');
+    console.log('━'.repeat(60));
+    console.log(
+      `Waiver Requested: ${formData.membershipwaiver ? 'Yes' : 'No'}`,
+    );
+    if (formData.membershipwaiver && formData.waiverreason) {
+      console.log(`Reason:           ${formData.waiverreason}`);
+    }
+  }
+
+  // Organization-specific fields
+  if (formData.membershipType === 'organization') {
+    console.log('\nORGANIZATION SERVICES');
+    console.log('━'.repeat(60));
+    console.log(formData.organisationservices || 'Not provided');
+  }
+
+  console.log('\nAPPLICATION STATUS');
   console.log('━'.repeat(60));
   const applicationId = getApplicationNumber();
   console.log(`Application ID:  ${applicationId}`);
@@ -62,7 +81,7 @@ export function submitToAPI(formData: SignUpFormData) {
   console.log(`Timestamp:       ${new Date().toISOString()}`);
 
   console.log('\n' + '='.repeat(60));
-  console.log(' SUBMISSION SUCCESSFUL');
+  console.log('SUBMISSION SUCCESSFUL');
   console.log('='.repeat(60) + '\n');
 
   // Return mock success response
@@ -73,7 +92,7 @@ export function submitToAPI(formData: SignUpFormData) {
 }
 
 /**
- * Mock function to generate application number
+ * Mock function to generate application number (used in earlier ui design)
  * Returns hardcoded value
  *
  * @returns string - Application reference number

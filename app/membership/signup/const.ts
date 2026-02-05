@@ -53,42 +53,68 @@ export const MEMBERSHIP_INTERESTS: string[] = [
 ];
 
 /**
- * Mock data
+ * Mock data: individual
  */
-export const SIGNUP_MOCK: SignUpFormData = {
-  signupEmail: 'john.doe@example.com',
+export const SIGNUP_MOCK_INDIVIDUAL: SignUpFormData = {
+  email: 'john.doe@example.com',
   password: 'Test1234',
   confirmPassword: 'Test1234',
   fullName: 'John Doe',
-  contactEmail: 'john.doe@example.com',
   phoneNumber: '6041234567',
   phoneType: 'cell',
   mailingAddress: '123 Main Street',
   city: 'Vancouver',
   province: 'British Columbia',
+  country: 'Canada',
   postalCode: 'V5K 1A1',
   interests: ['Health', 'Housing'],
-  reasonForJoining:
+  whyrpcmember:
     'I want to help reduce poverty in Richmond and support community initiatives.',
+  membershipwaiver: false,
+};
+
+/**
+ * Mock data: individual
+ */
+export const SIGNUP_MOCK_MEMBER: SignUpFormData = {
+  email: 'john.doe@example.com',
+  password: 'Test1234',
+  confirmPassword: 'Test1234',
+  fullName: 'John Doe',
+  phoneNumber: '6041234567',
+  phoneType: 'cell',
+  mailingAddress: '123 Main Street',
+  city: 'Vancouver',
+  province: 'British Columbia',
+  country: 'Canada',
+  postalCode: 'V5K 1A1',
+  interests: ['Health', 'Housing'],
+  whyrpcmember:
+    'I want to help reduce poverty in Richmond and support community initiatives.',
+  organisationservices:
+    'We provide community outreach and support services in Richmond.',
 };
 
 /**
  * Empty form data - initial state
  */
 export const SIGNUP_INITIAL: SignUpFormData = {
-  signupEmail: '',
+  email: '',
   password: '',
   confirmPassword: '',
   fullName: '',
-  contactEmail: '',
   phoneNumber: '',
   phoneType: 'cell',
   mailingAddress: '',
   city: '',
   province: '',
+  country: '',
   postalCode: '',
   interests: [],
-  reasonForJoining: '',
+  whyrpcmember: '',
+  membershipwaiver: false,
+  waiverreason: '',
+  organisationservices: '',
 };
 
 /**
@@ -106,3 +132,5 @@ export const MEMBERSHIP_TYPE_OPTIONS = [
   { value: MEMBERSHIP_TYPES.INDIVIDUAL, label: 'Individual' },
   { value: MEMBERSHIP_TYPES.ORGANIZATION, label: 'Organization' },
 ];
+
+export const COUNTRIES: string[] = ['Canada', 'United States'];

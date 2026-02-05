@@ -19,11 +19,11 @@ export function Navbar() {
               href="/"
               className="text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors"
             >
-              HOME
+              Home
             </Link>
 
             <button className="flex items-center gap-1 text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors">
-              ABOUT
+              About
               <svg
                 className="w-3 h-3 mt-0.5"
                 fill="none"
@@ -43,11 +43,11 @@ export function Navbar() {
               href="/events"
               className="text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors"
             >
-              EVENTS
+              Events
             </Link>
 
             <button className="flex items-center gap-1 text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors">
-              POLICY AREAS
+              Policy Areas
               <svg
                 className="w-3 h-3 mt-0.5"
                 fill="none"
@@ -64,7 +64,7 @@ export function Navbar() {
             </button>
 
             <button className="flex items-center gap-1 text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors">
-              RESOURCES
+              Resources
               <svg
                 className="w-3 h-3 mt-0.5"
                 fill="none"
@@ -84,7 +84,7 @@ export function Navbar() {
               href="/contact"
               className="text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors"
             >
-              CONTACT
+              Contact
             </Link>
           </div>
 
@@ -125,7 +125,7 @@ export function Navbar() {
                 hover:bg-[#90cd5f] hover:text-[#383533] 
                 transition-colors"
             >
-              JOIN US
+              Join Us
             </Link>
 
             <Link
@@ -139,7 +139,7 @@ export function Navbar() {
                 hover:bg-[#7ab84f] 
                 transition-colors"
             >
-              DONATE
+              Donate
             </Link>
           </div>
         </div>
