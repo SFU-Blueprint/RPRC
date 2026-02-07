@@ -114,29 +114,33 @@ export function Navbar() {
 
           {/* Right Side - Action Buttons */}
           <div className="flex items-center gap-3 md:gap-4">
+            {/* Primary Button - Join Us */}
             <Link
               href="/membership"
               className="px-4 md:px-5 lg:px-6 py-2 md:py-2.5 
-                border-2 border-[#90cd5f] 
-                text-[#90cd5f] 
+                bg-[#5EB42D]
+                text-white
                 text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px]
                 font-semibold 
                 rounded-lg 
-                hover:bg-[#90cd5f] hover:text-[#383533] 
+                hover:bg-[#2B8100]
+                active:bg-[#004E00]
                 transition-colors"
             >
               Join Us
             </Link>
 
+            {/* Secondary Button - Donate */}
             <Link
               href="/donate"
               className="px-4 md:px-5 lg:px-6 py-2 md:py-2.5 
-                bg-[#90cd5f] 
-                text-[#383533] 
+                bg-[#383533]
+                text-white
                 text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px]
                 font-semibold 
                 rounded-lg 
-                hover:bg-[#7ab84f] 
+                hover:bg-[#4a4745]
+                active:bg-black
                 transition-colors"
             >
               Donate

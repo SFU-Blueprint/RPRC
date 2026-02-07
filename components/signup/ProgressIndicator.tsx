@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StepInfo } from '@/types/signup';
-import { inter } from '@/app/fonts';
+import { robotoCondensed } from '@/app/fonts';
 
 type ProgressIndicatorProps = {
   currentStep: number;
@@ -13,20 +13,27 @@ export function ProgressIndicator({
   currentStep,
   steps,
 }: ProgressIndicatorProps) {
-  return (
-    <div className={`w-full py-4 md:py-6 ${inter.className}`}>
-      <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24">
-        {/* Title */}
-        <h2 className="font-normal text-[24px] md:text-[32px] lg:text-[36px] mb-4 md:mb-6">
-          Application Process
-        </h2>
+  // Dynamic title based on step
+  const title =
+    currentStep === 3
+      ? 'Application Submitted!'
+      : 'RPRC Membership Application';
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-between">
+  return (
+    <div className="w-full bg-[#FFFDFA] py-6 md:py-8">
+      <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24">
+        {/* Title - Full width, separate from progress indicator */}
+        <h1
+          className={`${robotoCondensed.className} font-semibold text-[32px] md:text-[40px] lg:text-[48px] mb-8 md:mb-10`}
+        >
+          {title}
+        </h1>
+
+        {/* Progress Indicator - Centered */}
+        <div className="flex items-center justify-center">
           {steps.map((step, index) => {
             const stepNumber = index + 1;
             const isCompleted = stepNumber <= currentStep;
-            const isActive = stepNumber === currentStep;
 
             return (
               <React.Fragment key={step.id}>
@@ -35,19 +42,18 @@ export function ProgressIndicator({
                   {/* Circle with Icon */}
                   <div
                     className={`
-                    w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32
+                    w-16 h-16 md:w-18 md:h-18
                     rounded-full
                     flex items-center justify-center
                     transition-colors duration-300
-                    ${isCompleted ? 'bg-[#89CC62]' : 'bg-[#393533]'}
+                    ${isCompleted ? 'bg-[#90cd5f]' : 'bg-[#383533]'}
                   `}
                   >
-                    {/* Icon */}
-                    <div className="text-white text-2xl md:text-3xl lg:text-4xl">
+                    <div className={isCompleted ? 'text-black' : 'text-white'}>
                       {stepNumber === 1 && (
                         // Lock icon for account creation
                         <svg
-                          className="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16"
+                          className="w-9 h-9 md:w-11 md:h-11"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -57,7 +63,7 @@ export function ProgressIndicator({
                       {stepNumber === 2 && (
                         // Form/pencil icon for form completion
                         <svg
-                          className="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16"
+                          className="w-9 h-9 md:w-11 md:h-11"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -68,7 +74,7 @@ export function ProgressIndicator({
                       {stepNumber === 3 && (
                         // Document icon for submission
                         <svg
-                          className="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16"
+                          className="w-9 h-9 md:w-11 md:h-11"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -80,20 +86,20 @@ export function ProgressIndicator({
                   </div>
 
                   {/* Label */}
-                  <p className="mt-3 md:mt-4 text-center font-normal text-[12px] md:text-[14px] lg:text-[16px] max-w-[100px] md:max-w-[120px]">
+                  <p className="mt-2 md:mt-3 text-center font-normal text-[12px] md:text-[14px] max-w-[100px]">
                     {step.title}
                   </p>
                 </div>
 
-                {/* Connecting Line (except after last step) */}
+                {/* Connecting Line (center-to-center, except after last step) */}
                 {index < steps.length - 1 && (
                   <div
                     className={`
-                    h-1 md:h-1.5
-                    w-16 md:w-32 lg:w-48
-                    mx-2 md:mx-4
+                    h-0.5 md:h-1
+                    w-24 md:w-32 lg:w-40
+                    mx-2 md:mx-3
                     transition-colors duration-300
-                    ${stepNumber < currentStep ? 'bg-[#89CC62]' : 'bg-[#393533]'}
+                    ${stepNumber < currentStep ? 'bg-[#90cd5f]' : 'bg-[#383533]'}
                   `}
                   />
                 )}
