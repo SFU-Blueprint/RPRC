@@ -3,13 +3,17 @@
 import React from 'react';
 import { inter } from '@/app/fonts';
 
-interface InfoCardProps {
+interface SuccessInfoCardProps {
   icon: React.ReactNode;
   heading: string;
   description: string;
 }
 
-export function InfoCard({ icon, heading, description }: InfoCardProps) {
+export function SuccessInfoCard({
+  icon,
+  heading,
+  description,
+}: SuccessInfoCardProps) {
   return (
     <div
       className={`bg-[#f5f5f0] rounded-2xl p-6 sm:p-7 md:p-8 flex flex-col items-center text-center ${inter.className}`}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StepInfo } from '@/types/signup';
-import { robotoCondensed } from '@/app/fonts';
+import { robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 
 type ProgressIndicatorProps = {
   currentStep: number;
@@ -24,7 +24,7 @@ export function ProgressIndicator({
       <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24">
         {/* Title - Full width, separate from progress indicator */}
         <h1
-          className={`${robotoCondensed.className} font-semibold text-[32px] md:text-[40px] lg:text-[48px] mb-8 md:mb-10`}
+          className={`${robotoCondensed.className} mb-8 md:mb-10 ${headerStyles.lResponsive}`}
         >
           {title}
         </h1>
@@ -86,7 +86,9 @@ export function ProgressIndicator({
                   </div>
 
                   {/* Label */}
-                  <p className="mt-2 md:mt-3 text-center font-normal text-[12px] md:text-[14px] max-w-[100px]">
+                  <p
+                    className={`mt-2 md:mt-3 text-center font-normal ${bodyStyles.s} max-w-[100px]`}
+                  >
                     {step.title}
                   </p>
                 </div>

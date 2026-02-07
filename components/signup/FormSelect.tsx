@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { inter } from '@/app/fonts';
+import { inter, bodyStyles } from '@/app/fonts';
 
 type FormSelectProps = {
   label: string;
@@ -39,7 +39,7 @@ export function FormSelect({
 
   return (
     <div className={`w-full ${inter.className}`}>
-      <label className="block text-[13px] sm:text-[14px] md:text-[15px] font-medium text-gray-700 mb-2">
+      <label className={`block text-gray-700 mb-2 ${bodyStyles.m}`}>
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -49,7 +49,7 @@ export function FormSelect({
         className={`
           w-full px-4 py-3 rounded-lg 
           bg-white
-          text-gray-900 text-[14px] sm:text-[15px] md:text-[16px]
+          text-gray-900 ${bodyStyles.m}
           border-2
           focus:outline-none focus:ring-2 focus:ring-[#90cd5f]
           transition-all
@@ -70,7 +70,7 @@ export function FormSelect({
       {showValidation && error && (
         <p
           id={`${label}-error`}
-          className="text-red-500 text-[13px] sm:text-[14px] mt-1"
+          className="text-red-500 ${bodyStyles.s}] mt-1"
           role="alert"
         >
           {error}

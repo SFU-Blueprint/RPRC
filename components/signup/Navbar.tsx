@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { inter } from '@/app/fonts';
+import { inter, buttonStyles } from '@/app/fonts';
 
 export function Navbar() {
   return (
@@ -17,12 +17,14 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-6 lg:gap-8 xl:gap-10">
             <Link
               href="/"
-              className="text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors"
+              className={` ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
             >
               Home
             </Link>
 
-            <button className="flex items-center gap-1 text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors">
+            <button
+              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+            >
               About
               <svg
                 className="w-3 h-3 mt-0.5"
@@ -41,12 +43,14 @@ export function Navbar() {
 
             <Link
               href="/events"
-              className="text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors"
+              className={` ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
             >
               Events
             </Link>
 
-            <button className="flex items-center gap-1 text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors">
+            <button
+              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+            >
               Policy Areas
               <svg
                 className="w-3 h-3 mt-0.5"
@@ -63,7 +67,9 @@ export function Navbar() {
               </svg>
             </button>
 
-            <button className="flex items-center gap-1 text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors">
+            <button
+              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+            >
               Resources
               <svg
                 className="w-3 h-3 mt-0.5"
@@ -82,7 +88,7 @@ export function Navbar() {
 
             <Link
               href="/contact"
-              className="text-[14px] lg:text-[15px] xl:text-[16px] font-medium hover:text-[#90cd5f] transition-colors"
+              className={` ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
             >
               Contact
             </Link>
@@ -117,15 +123,15 @@ export function Navbar() {
             {/* Primary Button - Join Us */}
             <Link
               href="/membership"
-              className="px-4 md:px-5 lg:px-6 py-2 md:py-2.5 
+              className={`px-4 md:px-5 lg:px-6 py-2 md:py-2.5 
                 bg-[#5EB42D]
                 text-white
-                text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px]
+                ${buttonStyles.text}
                 font-semibold 
                 rounded-lg 
                 hover:bg-[#2B8100]
                 active:bg-[#004E00]
-                transition-colors"
+                transition-colors`}
             >
               Join Us
             </Link>
@@ -133,15 +139,15 @@ export function Navbar() {
             {/* Secondary Button - Donate */}
             <Link
               href="/donate"
-              className="px-4 md:px-5 lg:px-6 py-2 md:py-2.5 
+              className={`px-4 md:px-5 lg:px-6 py-2 md:py-2.5 
                 bg-[#383533]
                 text-white
-                text-[13px] md:text-[14px] lg:text-[15px] xl:text-[16px]
+                ${buttonStyles.text}
                 font-semibold 
                 rounded-lg 
                 hover:bg-[#4a4745]
                 active:bg-black
-                transition-colors"
+                transition-colors`}
             >
               Donate
             </Link>

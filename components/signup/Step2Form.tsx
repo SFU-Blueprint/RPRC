@@ -9,6 +9,7 @@ import { inter } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/signup-validation';
 import { ConfirmationModal } from '@/components/signup/ConfirmationModal';
 import { submitToAPI } from '@/lib/signup-mock-api'; // Mock api call
+import { InterestCard } from '@/components/signup/InterestCard';
 import {
   MEMBERSHIP_INTERESTS,
   CANADIAN_PROVINCES,
@@ -26,6 +27,7 @@ export function Step2Form() {
   } = useSignUp();
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [interests, setInterests] = useState<string[]>([]);
 
   const handleSubmit = () => {
     setHasAttemptedValidation(true);
@@ -52,11 +54,11 @@ export function Step2Form() {
   };
 
   const toggleInterest = (interest: string) => {
-    const currentInterests = formData.interests || [];
-    const newInterests = currentInterests.includes(interest)
-      ? currentInterests.filter((i) => i !== interest)
-      : [...currentInterests, interest];
-    updateFormData({ interests: newInterests });
+    setInterests((prev) =>
+      prev.includes(interest)
+        ? prev.filter((i) => i !== interest)
+        : [...prev, interest],
+    );
   };
 
   return (
@@ -222,35 +224,22 @@ export function Step2Form() {
         </h2>
 
         {/* Interest boxes - 3 columns grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {MEMBERSHIP_INTERESTS.map((interest) => (
-            <button
+            <InterestCard
               key={interest}
-              type="button"
-              onClick={() => toggleInterest(interest)}
-              className={`
-                px-4 py-3 sm:py-4 rounded-lg text-left text-[14px] sm:text-[15px] md:text-[16px] font-normal
-                transition-colors border-2
-                ${
-                  formData.interests?.includes(interest)
-                    ? 'bg-white border-[#67b827] text-gray-900'
-                    : 'bg-white border-transparent text-gray-900 hover:border-gray-300'
-                }
-              `}
-            >
-              {interest}
-            </button>
+              label={interest}
+              isSelected={interests.includes(interest)}
+              onToggle={() => toggleInterest(interest)}
+            />
           ))}
         </div>
       </div>
 
       {/* Why do you want to be an RPRC member? */}
       <div className="mb-8 md:mb-10">
-        <h2 className="text-[20px] sm:text-[22px] md:text-[24px] lg:text-[26px] font-normal mb-5 sm:mb-6 text-gray-900">
-          Why do you want to be an RPRC member?
-        </h2>
         <FormTextArea
-          label=""
+          label="Why do you want to be an RPRC member?"
           value={formData.reasonForJoining}
           onChange={(val) => updateFormData({ reasonForJoining: val })}
           error={errors.reasonForJoining}

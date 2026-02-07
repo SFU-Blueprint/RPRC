@@ -7,18 +7,22 @@ interface PasswordInputProps {
   label: string;
   value: string;
   error?: string;
+  helperText?: string;
   showValidation: boolean;
   onChange: (value: string) => void;
   placeholder?: string;
+  required?: boolean;
 }
 
 export function PasswordInput({
   label,
   value,
   error,
+  helperText,
   showValidation,
   onChange,
   placeholder = '',
+  required = false,
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -29,16 +33,20 @@ export function PasswordInput({
         type={showPassword ? 'text' : 'password'}
         value={value}
         error={error}
+        helperText={helperText}
         showValidation={showValidation}
         onChange={onChange}
         placeholder={placeholder}
+        required={required}
       />
 
-      {/* Eye Icon Toggle */}
+      {/* Eye Icon Toggle - Positioned to avoid error icon */}
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700 focus:outline-none"
+        className={`absolute top-[45px] text-gray-500 hover:text-gray-700 focus:outline-none transition-colors ${
+          showValidation && error ? 'right-10' : 'right-3'
+        }`}
         aria-label={showPassword ? 'Hide password' : 'Show password'}
       >
         {showPassword ? (

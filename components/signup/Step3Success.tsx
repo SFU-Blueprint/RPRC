@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { inter } from '@/app/fonts';
-import { InfoCard } from './InfoCard';
+import { SuccessInfoCard } from './SuccessInfoCard';
 import { getApplicationNumber } from '@/lib/signup-mock-api'; // Mock api call
 
 export function Step3Success() {
@@ -45,7 +45,7 @@ export function Step3Success() {
       {/* Info Cards - 3 columns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 mb-10 sm:mb-12 md:mb-14">
         {/* Card 1: Check Your Email */}
-        <InfoCard
+        <SuccessInfoCard
           icon={
             <svg
               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-[#90cd5f]"
@@ -66,7 +66,7 @@ export function Step3Success() {
         />
 
         {/* Card 2: Review Period */}
-        <InfoCard
+        <SuccessInfoCard
           icon={
             <svg
               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-[#90cd5f]"
@@ -87,7 +87,7 @@ export function Step3Success() {
         />
 
         {/* Card 3: Application ID */}
-        <InfoCard
+        <SuccessInfoCard
           icon={
             <svg
               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-[#90cd5f]"

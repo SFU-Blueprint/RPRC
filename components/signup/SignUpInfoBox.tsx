@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { inter, robotoCondensed } from '@/app/fonts';
+import { inter, robotoCondensed, bodyStyles } from '@/app/fonts';
 
 export function SignUpInfoBox() {
   return (
@@ -49,7 +49,7 @@ export function SignUpInfoBox() {
 
         {/* Text - Directly under person circle */}
         <div className={`text-center px-6 ${robotoCondensed.className}`}>
-          <p className="text-[14px] md:text-[16px] lg:text-[18px] leading-relaxed font-semibold">
+          <p className={`font-semibold ${bodyStyles.m}`}>
             Your membership portal is where you will
             <br />
             receive updates about membership,

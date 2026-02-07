@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from '@/components/signup/FormInput';
 import { inter } from '@/app/fonts';
 import { validateStep1, hasErrors } from '@/lib/signup-validation';
 import { PasswordInput } from './PasswordInput';
+import { MembershipInfoCard } from './MembershipInfoCard';
 
 export function Step1Form() {
   const {
@@ -32,6 +33,10 @@ export function Step1Form() {
     }
   };
 
+  const [membershipType, setMembershipType] = useState<
+    'individual' | 'organization' | undefined
+  >();
+
   return (
     <div
       className={`bg-[#eeebe0] rounded-[25px] p-8 md:p-10 lg:p-12 ${inter.className}`}
@@ -54,9 +59,9 @@ export function Step1Form() {
         <FormInput
           label="Email Address"
           type="email"
-          value={formData.signupEmail}
-          onChange={(val) => updateFormData({ signupEmail: val })}
-          error={errors.signupEmail}
+          value={formData.email}
+          onChange={(val) => updateFormData({ email: val })}
+          error={errors.email}
           placeholder=""
           required
           showValidation={hasAttemptedValidation}
@@ -83,53 +88,24 @@ export function Step1Form() {
         />
 
         {/* Membership Type */}
-        <div className="mt-6">
-          <label className="block font-medium text-[14px] md:text-[16px] text-gray-900 mb-3">
-            Membership type:
-          </label>
-          <div className="flex gap-8">
-            {/* Individual */}
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="membershipType"
-                value="individual"
-                checked={formData.membershipType === 'individual'}
-                onChange={(e) =>
-                  updateFormData({
-                    membershipType: e.target.value as
-                      | 'individual'
-                      | 'organization',
-                  })
-                }
-                className="w-5 h-5 accent-[#383533] border-gray-400 focus:ring-[#383533] cursor-pointer"
-              />
-              <span className="ml-2 text-[14px] md:text-[16px] text-gray-900">
-                Individual ($5.00)
-              </span>
-            </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <MembershipInfoCard
+            type="individual"
+            title="Individual"
+            price="$5/yr"
+            description="This is the option for individuals who want to join the RPRC. the Membership fee may be waived in special cases. The $5 fee is due after application is approved."
+            isSelected={membershipType === 'individual'}
+            onSelect={() => setMembershipType('individual')}
+          />
 
-            {/* Organisation */}
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="membershipType"
-                value="organization"
-                checked={formData.membershipType === 'organization'}
-                onChange={(e) =>
-                  updateFormData({
-                    membershipType: e.target.value as
-                      | 'individual'
-                      | 'organization',
-                  })
-                }
-                className="w-5 h-5 accent-[#383533] border-gray-400 focus:ring-[#383533] cursor-pointer"
-              />
-              <span className="ml-2 text-[14px] md:text-[16px] text-gray-900">
-                Organisation ($25.00)
-              </span>
-            </label>
-          </div>
+          <MembershipInfoCard
+            type="organization"
+            title="Organization"
+            price="$25/yr"
+            description="This option is for organizations that want to join or work with the RPRC. The $25 organization fee is due after application is accepted."
+            isSelected={membershipType === 'organization'}
+            onSelect={() => setMembershipType('organization')}
+          />
         </div>
 
         {/* Sign Up Button */}
