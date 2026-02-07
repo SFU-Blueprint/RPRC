@@ -1,102 +1,182 @@
-/**
- * Mock API Functions for RPRC Membership Signup
- * These will be replaced with real API calls later
- */
-
 import { SignUpFormData } from '@/types/signup';
 
 /**
- * Mock function to submit application data to API
- * Logs formatted data to console
- *
- * @param formData - Complete sign up form data
- * @returns { success: boolean, applicationId: string }
+ * Generate a mock application number
  */
-export function submitToAPI(formData: SignUpFormData) {
-  console.log('\n' + '='.repeat(60));
-  console.log('MEMBERSHIP APPLICATION SUBMITTED');
-  console.log('='.repeat(60));
+export function getApplicationNumber(): string {
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 1000)
+    .toString()
+    .padStart(3, '0');
+  return `RPRC-${timestamp}-${random}`;
+}
 
-  console.log('\nACCOUNT INFORMATION');
-  console.log('━'.repeat(60));
-  console.log(`Email:           ${formData.email}`);
-  console.log(`Membership Type: ${formData.membershipType || 'Not selected'}`);
-  console.log(
-    `Password:        ${'*'.repeat(formData.password.length)} (${formData.password.length} characters)`,
-  );
-
-  console.log('\nCONTACT INFORMATION');
-  console.log('━'.repeat(60));
-  console.log(`Full Name:       ${formData.fullName}`);
-  console.log(
-    `Phone Number:    ${formData.phoneNumber} (${formData.phoneType})`,
-  );
-
-  console.log('\nADDRESS INFORMATION');
-  console.log('━'.repeat(60));
-  console.log(`Mailing Address: ${formData.mailingAddress}`);
-  console.log(`City:            ${formData.city}`);
-  console.log(`Province:        ${formData.province}`);
-  console.log(`Country:         ${formData.country}`);
-  console.log(`Postal Code:     ${formData.postalCode}`);
-
-  console.log('\nMEMBERSHIP INTERESTS');
-  console.log('━'.repeat(60));
-  if (formData.interests && formData.interests.length > 0) {
-    formData.interests.forEach((interest, index) => {
-      console.log(`${index + 1}. ${interest}`);
-    });
-  } else {
-    console.log('None selected');
-  }
-
-  console.log('\nWHY RPRC MEMBER?');
-  console.log('━'.repeat(60));
-  console.log(formData.whyrpcmember || 'Not provided');
-
-  // Individual-specific fields
-  if (formData.membershipType === 'individual') {
-    console.log('\nMEMBERSHIP FEE WAIVER');
-    console.log('━'.repeat(60));
-    console.log(
-      `Waiver Requested: ${formData.membershipwaiver ? 'Yes' : 'No'}`,
-    );
-    if (formData.membershipwaiver && formData.waiverreason) {
-      console.log(`Reason:           ${formData.waiverreason}`);
-    }
-  }
-
-  // Organization-specific fields
-  if (formData.membershipType === 'organization') {
-    console.log('\nORGANIZATION SERVICES');
-    console.log('━'.repeat(60));
-    console.log(formData.organisationservices || 'Not provided');
-  }
-
-  console.log('\nAPPLICATION STATUS');
-  console.log('━'.repeat(60));
+/**
+ * Submit Individual Membership Application
+ * Sends only individual-relevant fields
+ */
+function submitIndividualToAPI(data: SignUpFormData): {
+  success: boolean;
+  applicationId: string;
+  message: string;
+  submittedData: any;
+} {
   const applicationId = getApplicationNumber();
-  console.log(`Application ID:  ${applicationId}`);
-  console.log(`Status:          Submitted`);
-  console.log(`Timestamp:       ${new Date().toISOString()}`);
 
-  console.log('\n' + '='.repeat(60));
-  console.log('SUBMISSION SUCCESSFUL');
-  console.log('='.repeat(60) + '\n');
+  // Structure data for Individual membership
+  const individualPayload = {
+    applicationType: 'individual',
+    applicationId,
+    timestamp: new Date().toISOString(),
 
-  // Return mock success response
+    // Account Info
+    account: {
+      email: data.email,
+      membershipType: data.membershipType,
+    },
+
+    // Personal Info
+    personalInfo: {
+      fullName: data.fullName,
+      phone: {
+        number: data.phoneNumber,
+        type: data.phoneType,
+      },
+    },
+
+    // Address Info
+    address: {
+      mailingAddress: data.mailingAddress,
+      city: data.city,
+      province: data.province,
+      country: data.country,
+      postalCode: data.postalCode,
+    },
+
+    // Membership Details
+    membershipDetails: {
+      interests: data.interests || [],
+      whyJoining: data.whyrpcmember,
+    },
+
+    // Waiver Info (if applicable)
+    waiver: data.membershipwaiver
+      ? {
+          requested: true,
+          reason: data.waiverreason || 'No reason provided',
+        }
+      : null,
+  };
+
+  // Log to console as formatted JSON
+  console.log('=== INDIVIDUAL MEMBERSHIP APPLICATION ===');
+  console.log(JSON.stringify(individualPayload, null, 2));
+  console.log('=========================================');
+
   return {
     success: true,
-    applicationId: applicationId,
+    applicationId,
+    message: 'Individual membership application submitted successfully',
+    submittedData: individualPayload,
   };
 }
 
 /**
- * Mock function to generate application number (used in earlier ui design)
- * Returns hardcoded value
- *
- * @returns string - Application reference number
+ * Submit Organization Membership Application
+ * Sends only organization-relevant fields
  */
-export function getApplicationNumber(): string {
-  return 'APP-561995';
+function submitOrganizationToAPI(data: SignUpFormData): {
+  success: boolean;
+  applicationId: string;
+  message: string;
+  submittedData: any;
+} {
+  const applicationId = getApplicationNumber();
+
+  // Structure data for Organization membership
+  const organizationPayload = {
+    applicationType: 'organization',
+    applicationId,
+    timestamp: new Date().toISOString(),
+
+    // Account Info
+    account: {
+      email: data.email,
+      membershipType: data.membershipType,
+    },
+
+    // Organization Info
+    organizationInfo: {
+      organizationName: data.fullName, // fullName is used as org name
+      phone: {
+        number: data.phoneNumber,
+        type: data.phoneType,
+      },
+      programsAndServices: data.organisationservices || '',
+    },
+
+    // Representative Info
+    representative: {
+      name: data.representativeName || '',
+      email: data.representativeEmail || null,
+    },
+
+    // Address Info
+    address: {
+      mailingAddress: data.mailingAddress,
+      city: data.city,
+      province: data.province,
+      country: data.country,
+      postalCode: data.postalCode,
+    },
+
+    // Membership Details
+    membershipDetails: {
+      interests: data.interests || [],
+      whyJoining: data.whyrpcmember,
+    },
+  };
+
+  // Log to console as formatted JSON
+  console.log('=== ORGANIZATION MEMBERSHIP APPLICATION ===');
+  console.log(JSON.stringify(organizationPayload, null, 2));
+  console.log('===========================================');
+
+  return {
+    success: true,
+    applicationId,
+    message: 'Organization membership application submitted successfully',
+    submittedData: organizationPayload,
+  };
+}
+
+/**
+ * Main submission function - Wrapper that routes to correct function
+ * This is what components call
+ */
+export function submitToAPI(data: SignUpFormData): {
+  success: boolean;
+  applicationId: string;
+  message: string;
+  submittedData: any;
+} {
+  console.log('=== SUBMISSION STARTED ===');
+  console.log(`Membership Type: ${data.membershipType}`);
+  console.log('=========================');
+
+  // Route to appropriate submission function
+  if (data.membershipType === 'individual') {
+    return submitIndividualToAPI(data);
+  } else if (data.membershipType === 'organization') {
+    return submitOrganizationToAPI(data);
+  } else {
+    // Fallback for invalid membership type
+    console.error('Invalid membership type:', data.membershipType);
+    return {
+      success: false,
+      applicationId: '',
+      message: 'Invalid membership type',
+      submittedData: null,
+    };
+  }
 }
