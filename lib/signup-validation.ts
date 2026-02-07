@@ -234,6 +234,8 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
     errors.postalCode = postalCodeError;
   }
 
+  /* CODE FOR VALIDATING REASON FOR JOINING WAS REMOVED AS THIS FIELD IS OPTIONAL
+  TO MAKE IT REQUIRED, UNCOMMENT THIS CODE.
   // Validate reason for joining (whyrpcmember)
   const whyRPRCError = validateRequired(
     data.whyrpcmember,
@@ -242,6 +244,7 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
   if (whyRPRCError) {
     errors.whyrpcmember = whyRPRCError;
   }
+  */
 
   // Note: Interests are optional, no validation needed
   // Note: membershipwaiver is boolean, no validation needed
@@ -269,7 +272,10 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
       }
     }
 
-    // Validate organization services (required for organization)
+    /* CODE TO VALIDATE ORGANIZATION SERVICES WAS REMOVED AS THIS FIELD IS OPTIONAL
+    TO MAKE IT REQUIRED, UNCOMMENT THIS CODE.
+    
+    // Validate organization services
     const servicesError = validateRequired(
       data.organisationservices,
       'What programs or services does your organization offer',
@@ -277,21 +283,11 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
     if (servicesError) {
       errors.organisationservices = servicesError;
     }
+    */
   }
 
   // Individual-specific fields don't need validation
   // (membershipwaiver is boolean, waiverreason is optional)
-
-  return errors;
-}
-
-/**
- * Validate entire Step 3 (Success Page - no validation needed)
- */
-export function validateStep3(data: Partial<SignUpFormData>): ValidationErrors {
-  const errors: ValidationErrors = {};
-
-  // Step 3 is the success page, no validation needed
 
   return errors;
 }

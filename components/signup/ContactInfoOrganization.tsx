@@ -63,13 +63,12 @@ export function ContactInfoOrganization() {
 
         {/* Representative Email Address (Optional) */}
         <FormInput
-          label="Representative Email Address"
+          label="Representative Email Address (if different from the one given above)"
           type="email"
           value={formData.representativeEmail || ''}
           onChange={(val) => updateFormData({ representativeEmail: val })}
           error={errors.representativeEmail}
           placeholder=""
-          helperText="if different from the one given above"
           showValidation={hasAttemptedValidation}
         />
       </div>
