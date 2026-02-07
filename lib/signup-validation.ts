@@ -91,7 +91,7 @@ export function validateMembershipType(
  * Validate required field (generic)
  */
 export function validateRequired(
-  value: string,
+  value: string | undefined,
   fieldName: string,
 ): string | undefined {
   if (!value || value.trim() === '') {
@@ -142,10 +142,10 @@ export function validateStep1(
 ): ValidationErrors {
   const errors: ValidationErrors = {};
 
-  // Validate signup email
-  const signupEmailError = validateEmail(data.email || '');
-  if (signupEmailError) {
-    errors.email = signupEmailError;
+  // Validate email
+  const emailError = validateEmail(data.email || '');
+  if (emailError) {
+    errors.email = emailError;
   }
 
   // Validate password
@@ -173,21 +173,29 @@ export function validateStep1(
 }
 
 /**
- * Validate entire Step 2 (Contact & Address Information)
+ * Validate entire Step 2 (Contact & Address Information + Membership Interests)
+ * Validates common fields, then membership-type-specific fields
  */
 export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
   const errors: ValidationErrors = {};
 
-  // Validate full name
-  const fullNameError = validateRequired(data.fullName || '', 'Full name');
+  // COMMON FIELDS (Both Individual & Organization)
+
+  // Validate full name (Individual: "Name", Organization: "Organization Name")
+  const fullNameError = validateRequired(
+    data.fullName,
+    data.membershipType === MEMBERSHIP_TYPES.ORGANIZATION
+      ? 'Organization name'
+      : 'Name',
+  );
   if (fullNameError) {
     errors.fullName = fullNameError;
   }
 
-  // Validate contact email
-  const contactEmailError = validateEmail(data.contactEmail || '');
-  if (contactEmailError) {
-    errors.contactEmail = contactEmailError;
+  // Email is pre-filled and disabled, but validate for safety
+  const emailError = validateEmail(data.email || '');
+  if (emailError) {
+    errors.email = emailError;
   }
 
   // Validate phone number
@@ -197,24 +205,27 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
   }
 
   // Validate mailing address
-  const addressError = validateRequired(
-    data.mailingAddress || '',
-    'Mailing address',
-  );
+  const addressError = validateRequired(data.mailingAddress, 'Mailing address');
   if (addressError) {
     errors.mailingAddress = addressError;
   }
 
   // Validate city
-  const cityError = validateRequired(data.city || '', 'City');
+  const cityError = validateRequired(data.city, 'City');
   if (cityError) {
     errors.city = cityError;
   }
 
   // Validate province
-  const provinceError = validateRequired(data.province || '', 'Province');
+  const provinceError = validateRequired(data.province, 'Province');
   if (provinceError) {
     errors.province = provinceError;
+  }
+
+  // Validate country
+  const countryError = validateRequired(data.country, 'Country');
+  if (countryError) {
+    errors.country = countryError;
   }
 
   // Validate postal code
@@ -223,28 +234,64 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
     errors.postalCode = postalCodeError;
   }
 
-  // Validate reason for joining
-  const reasonError = validateRequired(
-    data.reasonForJoining || '',
-    'Reason for joining',
+  // Validate reason for joining (whyrpcmember)
+  const whyRPRCError = validateRequired(
+    data.whyrpcmember,
+    'Why do you want to be an RPRC member',
   );
-  if (reasonError) {
-    errors.reasonForJoining = reasonError;
+  if (whyRPRCError) {
+    errors.whyrpcmember = whyRPRCError;
   }
 
   // Note: Interests are optional, no validation needed
+  // Note: membershipwaiver is boolean, no validation needed
+  // Note: waiverreason is optional, no validation needed
+
+  // MEMBERSHIP-TYPE-SPECIFIC FIELDS
+
+  if (data.membershipType === MEMBERSHIP_TYPES.ORGANIZATION) {
+    // Organization-specific validations
+
+    // Validate representative name (required for organization)
+    const repNameError = validateRequired(
+      data.representativeName,
+      'Organization representative name',
+    );
+    if (repNameError) {
+      errors.representativeName = repNameError;
+    }
+
+    // Validate representative email (optional, but validate format if provided)
+    if (data.representativeEmail && data.representativeEmail.trim() !== '') {
+      const repEmailError = validateEmail(data.representativeEmail);
+      if (repEmailError) {
+        errors.representativeEmail = repEmailError;
+      }
+    }
+
+    // Validate organization services (required for organization)
+    const servicesError = validateRequired(
+      data.organisationservices,
+      'What programs or services does your organization offer',
+    );
+    if (servicesError) {
+      errors.organisationservices = servicesError;
+    }
+  }
+
+  // Individual-specific fields don't need validation
+  // (membershipwaiver is boolean, waiverreason is optional)
 
   return errors;
 }
 
 /**
- * Validate entire Step 3 (Membership Interests)
- * TODO: Implement when building Step 3
+ * Validate entire Step 3 (Success Page - no validation needed)
  */
 export function validateStep3(data: Partial<SignUpFormData>): ValidationErrors {
   const errors: ValidationErrors = {};
 
-  // TODO: Add validation for Step 3 fields
+  // Step 3 is the success page, no validation needed
 
   return errors;
 }

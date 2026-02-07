@@ -79,7 +79,7 @@ export function FormTextArea({
           disabled={disabled}
           className={`
             w-full px-4 py-3 
-            border rounded-lg
+            border rounded-[20px]
             ${bodyStyles.m}
             text-gray-900
             placeholder:text-gray-400

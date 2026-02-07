@@ -9,7 +9,7 @@ export type SignUpFormData = {
   membershipType?: MembershipType;
 
   // Step 2.1: Contact + Address Info
-  fullName: string;
+  fullName: string; // "Name" for Individual, "Organization Name" for Organization
   phoneNumber: string;
   phoneType: 'home' | 'cell';
   mailingAddress: string;
@@ -21,12 +21,15 @@ export type SignUpFormData = {
   // Step 2.2: Membership Interests
   interests: string[]; // Multiple selection
   whyrpcmember: string;
+
   // Step 2.3: Individual-specific fields
   membershipwaiver?: boolean;
   waiverreason?: string;
 
   // Step 2.4: Organization-specific fields
   organisationservices?: string;
+  representativeName?: string;
+  representativeEmail?: string; //  optional alternative email
 };
 
 /**

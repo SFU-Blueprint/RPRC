@@ -60,46 +60,7 @@ export const MEMBERSHIP_TYPES = {
   ORGANIZATION: 'organization',
 } as const;
 
-/**
- * Mock data: individual
- */
-export const SIGNUP_MOCK_INDIVIDUAL: SignUpFormData = {
-  email: 'john.doe@example.com',
-  password: 'Test1234',
-  fullName: 'John Doe',
-  phoneNumber: '6041234567',
-  phoneType: 'cell',
-  mailingAddress: '123 Main Street',
-  city: 'Vancouver',
-  province: 'British Columbia',
-  country: 'Canada',
-  postalCode: 'V5K 1A1',
-  interests: ['Health', 'Housing'],
-  whyrpcmember:
-    'I want to help reduce poverty in Richmond and support community initiatives.',
-  membershipwaiver: false,
-};
-
-/**
- * Mock data: individual
- */
-export const SIGNUP_MOCK_MEMBER: SignUpFormData = {
-  email: 'john.doe@example.com',
-  password: 'Test1234',
-  fullName: 'John Doe',
-  phoneNumber: '6041234567',
-  phoneType: 'cell',
-  mailingAddress: '123 Main Street',
-  city: 'Vancouver',
-  province: 'British Columbia',
-  country: 'Canada',
-  postalCode: 'V5K 1A1',
-  interests: ['Health', 'Housing'],
-  whyrpcmember:
-    'I want to help reduce poverty in Richmond and support community initiatives.',
-  organisationservices:
-    'We provide community outreach and support services in Richmond.',
-};
+export const COUNTRIES: string[] = ['Canada', 'United States'];
 
 /**
  * Empty form data - initial state
@@ -131,4 +92,45 @@ export const MEMBERSHIP_TYPE_OPTIONS = [
   { value: MEMBERSHIP_TYPES.ORGANIZATION, label: 'Organization' },
 ];
 
-export const COUNTRIES: string[] = ['Canada', 'United States'];
+/**
+ * Mock data: Organization
+ */
+export const SIGNUP_MOCK_ORGANIZATION: SignUpFormData = {
+  email: 'john.doe@example.com',
+  password: 'Test1234',
+  fullName: 'John Doe',
+  representativeName: 'John Doe',
+  representativeEmail: 'john.personal@example.com',
+  phoneNumber: '6041234567',
+  phoneType: 'cell',
+  mailingAddress: '123 Main Street',
+  city: 'Vancouver',
+  province: 'British Columbia',
+  country: 'Canada',
+  postalCode: 'V5K 1A1',
+  interests: ['Health', 'Housing'],
+  whyrpcmember:
+    'I want to help reduce poverty in Richmond and support community initiatives.',
+  organisationservices:
+    'We provide community outreach and support services in Richmond.',
+};
+
+/**
+ * Mock data: individual
+ */
+export const SIGNUP_MOCK_INDIVIDUAL: SignUpFormData = {
+  email: 'john.doe@example.com',
+  password: 'Test1234',
+  fullName: 'John Doe',
+  phoneNumber: '6041234567',
+  phoneType: 'cell',
+  mailingAddress: '123 Main Street',
+  city: 'Vancouver',
+  province: 'British Columbia',
+  country: 'Canada',
+  postalCode: 'V5K 1A1',
+  interests: ['Health', 'Housing'],
+  whyrpcmember:
+    'I want to help reduce poverty in Richmond and support community initiatives.',
+  membershipwaiver: false,
+};
