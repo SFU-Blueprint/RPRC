@@ -1,74 +1,61 @@
 'use client';
 
 import React from 'react';
-import { inter } from '@/app/fonts';
+import { inter, robotoCondensed } from '@/app/fonts';
 
 export function SignUpInfoBox() {
   return (
     <div
-      className={`bg-[#383533] rounded-[25px] text-white ${inter.className} min-h-[350px] md:min-h-[400px] lg:min-h-[450px] flex items-center justify-center p-6 md:p-8 overflow-hidden`}
+      className={`bg-[#403f39] rounded-[25px] text-white ${inter.className} min-h-[350px] md:min-h-[400px] lg:min-h-[450px] flex flex-col items-center justify-center relative overflow-hidden`}
     >
-      <div className="flex flex-col items-center space-y-6 md:space-y-8 w-full">
-        {/* Three Circles - spanning edge to edge */}
-        <div className="flex items-center justify-between w-full px-0 gap-3 md:gap-4 lg:gap-5">
-          {/* Left Circle (darker green, LARGE - 70% inside, 30% outside) */}
-          <div className="w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full bg-[#638149] flex items-center justify-center -ml-16 md:-ml-19 lg:-ml-22">
-            {/* Empty */}
-          </div>
+      {/* Email Circle - Top Left Corner */}
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 lg:top-8 lg:left-8">
+        <div className="w-30 h-30 md:w-36 md:h-36 lg:w-42 lg:h-42 rounded-full bg-[#25221a] flex items-center justify-center p-[20%]">
+          <svg
+            className="w-full h-full text-[#b2dc93]"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+          </svg>
+        </div>
+      </div>
 
-          {/* Center Circle (lighter green, bigger) */}
-          <div className="w-42 h-42 md:w-52 md:h-52 lg:w-60 lg:h-60 rounded-full bg-[#90cd5f] flex flex-col items-center justify-center gap-2 md:gap-3">
-            {/* Email Icon - Outline */}
-            <svg
-              className="w-16 h-16 md:w-18 md:h-18 lg:w-24 lg:h-24 text-[#383533]"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
+      {/* Bell Circle - Top Right Corner (slightly lower) */}
+      <div className="absolute top-8 right-4 md:top-10 md:right-6 lg:top-12 lg:right-8">
+        <div className="w-30 h-30 md:w-36 md:h-36 lg:w-42 lg:h-42 rounded-full bg-[#25221a] flex items-center justify-center p-[20%]">
+          <svg
+            className="w-full h-full text-[#b2dc93]"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+          </svg>
+        </div>
+      </div>
 
-            {/* Bell Icon - Outline */}
-            <svg
-              className="w-13 h-13 md:w-15 md:h-15 lg:w-18 lg:h-18 text-[#383533]"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-              />
-            </svg>
-          </div>
-
-          {/* Right Circle (darker green, LARGE - 70% inside, 30% outside) */}
-          <div className="w-56 h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full bg-[#638149] flex items-center justify-center -mr-16 md:-mr-19 lg:-mr-22">
-            {/* Empty */}
-          </div>
+      {/* Center Content - Person Circle + Text */}
+      <div className="flex flex-col items-center justify-center gap-4 md:gap-5 lg:gap-6">
+        {/* Person Circle - Center (both horizontally and vertically) */}
+        <div className="w-60 h-60 md:w-72 md:h-72 lg:w-84 lg:h-84 rounded-full bg-[#25221a] flex items-center justify-center p-[20%]">
+          <svg
+            className="w-full h-full text-[#b2dc93]"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+          </svg>
         </div>
 
-        {/* Text */}
-        <div className="text-center">
-          <p className="text-[14px] md:text-[16px] lg:text-[18px] leading-relaxed">
-            This is where you will receive
+        {/* Text - Directly under person circle */}
+        <div className={`text-center px-6 ${robotoCondensed.className}`}>
+          <p className="text-[14px] md:text-[16px] lg:text-[18px] leading-relaxed font-semibold">
+            Your membership portal is where you will
             <br />
-            updates about membership
+            receive updates about membership,
+            <br />
+            renewals and events.
           </p>
-
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-4 md:mt-5">
-            <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-white"></div>
-            <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-white opacity-50"></div>
-            <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-white opacity-50"></div>
-          </div>
         </div>
       </div>
     </div>
