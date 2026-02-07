@@ -136,13 +136,16 @@ export function validatePostalCode(postalCode: string): string | undefined {
  * Validate entire Step 1 (Account Creation)
  * Returns object with error for each field (or undefined if valid)
  */
-export function validateStep1(data: Partial<SignUpFormData>): ValidationErrors {
+export function validateStep1(
+  data: Partial<SignUpFormData>,
+  confirmPassword: string,
+): ValidationErrors {
   const errors: ValidationErrors = {};
 
   // Validate signup email
-  const signupEmailError = validateEmail(data.signupEmail || '');
+  const signupEmailError = validateEmail(data.email || '');
   if (signupEmailError) {
-    errors.signupEmail = signupEmailError;
+    errors.email = signupEmailError;
   }
 
   // Validate password
@@ -154,7 +157,7 @@ export function validateStep1(data: Partial<SignUpFormData>): ValidationErrors {
   // Validate confirm password
   const confirmPasswordError = validatePasswordMatch(
     data.password || '',
-    data.confirmPassword || '',
+    confirmPassword,
   );
   if (confirmPasswordError) {
     errors.confirmPassword = confirmPasswordError;

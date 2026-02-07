@@ -13,13 +13,13 @@ function SignUpContent() {
   const { currentStep, goToPreviousStep, goToNextStep } = useSignUp();
 
   return (
-    <div className={`min-h-screen bg-[#f7f6f1] ${inter.className}`}>
+    <div className={`min-h-screen bg-[#FFFDFA] ${inter.className}`}>
       {/* Progress Indicator */}
       <ProgressIndicator currentStep={currentStep} steps={SIGNUP_STEPS} />
 
       {/* Main Content */}
       <div className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-24 pb-12 md:pb-16 lg:pb-20">
-        {/* Step 1: Show info box */}
+        {/* Step 1: Show info box and form */}
         {currentStep === 1 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16">
             <SignUpInfoBox />

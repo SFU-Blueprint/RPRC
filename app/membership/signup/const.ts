@@ -53,12 +53,19 @@ export const MEMBERSHIP_INTERESTS: string[] = [
 ];
 
 /**
+ * Membership type constants
+ */
+export const MEMBERSHIP_TYPES = {
+  INDIVIDUAL: 'individual',
+  ORGANIZATION: 'organization',
+} as const;
+
+/**
  * Mock data: individual
  */
 export const SIGNUP_MOCK_INDIVIDUAL: SignUpFormData = {
   email: 'john.doe@example.com',
   password: 'Test1234',
-  confirmPassword: 'Test1234',
   fullName: 'John Doe',
   phoneNumber: '6041234567',
   phoneType: 'cell',
@@ -79,7 +86,6 @@ export const SIGNUP_MOCK_INDIVIDUAL: SignUpFormData = {
 export const SIGNUP_MOCK_MEMBER: SignUpFormData = {
   email: 'john.doe@example.com',
   password: 'Test1234',
-  confirmPassword: 'Test1234',
   fullName: 'John Doe',
   phoneNumber: '6041234567',
   phoneType: 'cell',
@@ -101,9 +107,9 @@ export const SIGNUP_MOCK_MEMBER: SignUpFormData = {
 export const SIGNUP_INITIAL: SignUpFormData = {
   email: '',
   password: '',
-  confirmPassword: '',
   fullName: '',
   phoneNumber: '',
+  membershipType: MEMBERSHIP_TYPES.ORGANIZATION,
   phoneType: 'cell',
   mailingAddress: '',
   city: '',
@@ -116,14 +122,6 @@ export const SIGNUP_INITIAL: SignUpFormData = {
   waiverreason: '',
   organisationservices: '',
 };
-
-/**
- * Membership type constants
- */
-export const MEMBERSHIP_TYPES = {
-  INDIVIDUAL: 'individual',
-  ORGANIZATION: 'organization',
-} as const;
 
 /**
  * Membership type options for form
