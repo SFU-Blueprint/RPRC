@@ -1,3 +1,4 @@
+import { count } from "console";
 import * as z from "zod";
 
 const provinceNames = [
@@ -75,6 +76,8 @@ const applicationSchemaOrganization = z.object({
 
     province: z.enum(provinceNames, "Invalid province name"),
 
+    country: z.string(),
+
     postal_code: z.string().regex(/^[A-Z][0-9][A-Z] [0-9][A-Z][0-9]$/, "Invalid Canadian postal code"),
 
     membership_interests: z.array(z.string()).refine(arr => {
@@ -86,7 +89,7 @@ const applicationSchemaOrganization = z.object({
         return wordCount >= 100 && wordCount <= 200;
     }, { message: "Reason must be between 100 and 200 words" }),
 
-    programs_or_services: z.string()
+    programs_or_services: z.array(z.string()).refine(arr => arr.length > 0, { message: "At least one program or service must be provided" })
 });
 
 export { applicationSchemaIndividual, applicationSchemaOrganization };
