@@ -15,7 +15,7 @@ const STATUS_CHIPS: StatusChipType[] = [
 ];
 
 type StatusChipProps = {
-  theme: 'toReview' | 'rejected' | 'paymentPending' | 'active' | 'expired';
+  theme: string;
 };
 
 export default function StatusChip({ theme }: StatusChipProps) {
