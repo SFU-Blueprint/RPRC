@@ -3,18 +3,21 @@
 ## Project Overview
 
 We have 2 Supabase projects:
+
 - **Supabase_rprc_dev** - Development database (remote)
 - **Supabase_rprc_prod** - Production database (remote)
 
 ## Understanding Local vs Remote
 
 ### Your Local Database
+
 - **Completely isolated** - runs on your machine via Docker
 - **Only applies migrations** from `supabase/migrations/` folder
 - **Does NOT automatically sync** with remote databases
 - **Starts fresh** each time you run `supabase start` (applies all migrations in order)
 
 ### Remote Databases (Dev/Prod)
+
 - **Updated automatically** by CI/CD when you merge PRs
 - **Dev** gets updated when you merge to `dev` branch
 - **Prod** gets updated when you merge to `main` branch
@@ -44,6 +47,7 @@ make dev
 ```
 
 **What `make dev` does:**
+
 - Starts local Supabase instance
 - Applies all migrations from `supabase/migrations/` folder
 - Installs npm packages
@@ -66,6 +70,7 @@ npx supabase db reset
 ```
 
 **Important**: Your local DB only updates when you:
+
 1. Pull new migration files from git
 2. Restart/reset Supabase to apply them
 
@@ -95,6 +100,7 @@ create table users (
 ```
 
 **Alternative**: If you made changes in Supabase Dashboard UI:
+
 ```bash
 # Generate migration from your local DB changes
 npx supabase db diff -f add_user_table
@@ -139,6 +145,7 @@ git push
 ### Step 7: Open Pull Request
 
 CI automatically runs:
+
 - ✅ Migration validation
 - ✅ Schema linting
 - ✅ Drift detection
@@ -149,10 +156,12 @@ CI automatically runs:
 ### Step 8: After Merge
 
 **Merge to `dev` branch:**
+
 - CI/CD automatically applies migrations to **dev database**
 - Deploys to dev environment
 
 **Merge to `main` branch:**
+
 - CI/CD automatically applies migrations to **prod database**
 - Deploys to production
 
@@ -206,17 +215,17 @@ make dev
 
 ## Key Commands Reference
 
-| Command | What It Does |
-|---------|-------------|
-| `make dev` | Start local environment (Supabase + Next.js) |
-| `npx supabase start` | Start local Supabase instance |
-| `npx supabase stop` | Stop local Supabase instance |
-| `npx supabase db reset` | Reset local DB and reapply all migrations |
-| `npx supabase migration new <name>` | Create new migration file |
-| `npx supabase db diff -f <name>` | Generate migration from local changes |
-| `npx supabase db pull` | Pull schema from remote to create migration |
-| `npx supabase db push --dry-run` | Validate migrations without applying |
-| `npx supabase db lint` | Check schema for issues |
+| Command                             | What It Does                                 |
+| ----------------------------------- | -------------------------------------------- |
+| `make dev`                          | Start local environment (Supabase + Next.js) |
+| `npx supabase start`                | Start local Supabase instance                |
+| `npx supabase stop`                 | Stop local Supabase instance                 |
+| `npx supabase db reset`             | Reset local DB and reapply all migrations    |
+| `npx supabase migration new <name>` | Create new migration file                    |
+| `npx supabase db diff -f <name>`    | Generate migration from local changes        |
+| `npx supabase db pull`              | Pull schema from remote to create migration  |
+| `npx supabase db push --dry-run`    | Validate migrations without applying         |
+| `npx supabase db lint`              | Check schema for issues                      |
 
 ---
 
@@ -233,17 +242,20 @@ make dev
 ## Troubleshooting
 
 **"My local DB doesn't match remote"**
+
 ```bash
 git pull  # Get latest migrations
 npx supabase db reset  # Reapply all migrations
 ```
 
 **"Migration failed"**
+
 - Check the migration file for SQL errors
 - Verify it works locally with `npx supabase db reset`
 - Check CI logs for specific error messages
 
 **"Supabase won't start"**
+
 - Ensure Docker Desktop is running
 - Try: `npx supabase stop` then `npx supabase start`
 - Check Docker has enough resources allocated

@@ -47,3 +47,6 @@ supabase/.temp
 
 # local test
 local-test/
+
+# docs
+per-docs

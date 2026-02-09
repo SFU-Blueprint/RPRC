@@ -1,7 +1,7 @@
 // app/api/auth/log-in/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 
 // Validation schema for log-in
 const logInSchema = z.object({
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const validatedData = logInSchema.parse(body);
 
     // Create Supabase client
-    const supabase = createServerClient();
+    const supabase = await createClient();
 
     // Log in user with Supabase Auth
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          details: (error as z.ZodError).errors,
+          details: (error as z.ZodError).issues,
         },
         { status: 400 },
       );
