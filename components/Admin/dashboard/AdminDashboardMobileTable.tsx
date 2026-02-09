@@ -1,37 +1,27 @@
+'use client';
+
 import Table from '@/components/Table';
 import { formatDateWithOrdinal } from '@/lib/utils';
 import StatusChip from '@/components/StatusChip';
 import { AdminDashboardMobileTablePropTypes } from '@/types/admin.types';
-import { useState, useMemo } from 'react';
 import { Pagination } from '@/components/Pagination';
+import { useApplicationList } from './useApplicationList';
 
 export default function AdminDashboardMobileTable({
   applications,
   currentTab,
   pagination,
 }: AdminDashboardMobileTablePropTypes) {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  // TODO: This should be handled in the backend
-  const filteredApplications = useMemo(() => {
-    return applications.filter((app) =>
-      currentTab.value !== 'all' ? app.status === currentTab.value : true,
-    );
-  }, [applications, currentTab]);
-
-  // TODO: This should be handled in the backend
-  const paginatedApplications = useMemo(() => {
-    if (!pagination) {
-      return filteredApplications;
-    }
-    const startIndex = (currentPage - 1) * pagination.numberPerPage;
-    const endIndex = startIndex + pagination.numberPerPage;
-    return filteredApplications.slice(startIndex, endIndex);
-  }, [filteredApplications, currentPage, pagination]);
+  const {
+    filteredApplications,
+    paginatedApplications,
+    currentPage,
+    setCurrentPage,
+  } = useApplicationList({
+    applications,
+    currentTab,
+    pagination,
+  });
 
   return (
     <>
@@ -81,7 +71,7 @@ export default function AdminDashboardMobileTable({
           activePage={currentPage}
           itemCount={filteredApplications.length}
           numberItemsPerPage={pagination.numberPerPage}
-          onPageChange={handlePageChange}
+          onPageChange={setCurrentPage}
         />
       )}
     </>

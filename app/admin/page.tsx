@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { inter } from '@/app/fonts';
-import AdminNavbar from '@/components/Admin/AdminNavbar';
+import AdminNavbar from '@/components/Admin/layout/AdminNavbar';
 import StatCard from '@/components/StatCard';
 import Tabs from '@/components/Tabs';
-import AdminSearchBar from '@/components/Admin/AdminSearchBar';
+import AdminSearchBar from '@/components/Admin/dashboard/AdminSearchBar';
 import { ADMIN_DASHBOARD_MOCK, ADMIN_DASHBOARD_CONST } from './const';
-import AdminDashboardTable from '@/components/Admin/AdminDashboardTable';
-import AdminDashboardMobileTable from '@/components/Admin/AdminDashboardMobileTable';
+import AdminDashboardTable from '@/components/Admin/dashboard/AdminDashboardTable';
+import AdminDashboardMobileTable from '@/components/Admin/dashboard/AdminDashboardMobileTable';
 
 export default function AdminDashboard() {
   const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
