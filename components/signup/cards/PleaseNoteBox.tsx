@@ -42,8 +42,8 @@ export function PleaseNoteBox() {
             <span>•</span>
             <span>
               All memberships require a renewal every January. If you join after
-              October 1st, your membership carries over, and you won't need to
-              renew until January of the year after next.
+              October 1st, your membership carries over, and you won&apos;t need
+              to renew until January of the year after next.
             </span>
           </li>
         </ul>

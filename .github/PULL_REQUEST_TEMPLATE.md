@@ -1,16 +1,19 @@
 # Purpose
+
 <!-- Summarize why this PR is being made -->
 
 ## Changes
+
 <!-- Make a bullet point lists of the changes that were made -->
 
 ## Issue(s)
+
 <!-- If this PR closes any issues, replace the XXX with the issue number
 Example:
 Closes #123
 
-If this PR closes multiple issues, include as many `Closes #XXX` phrase as needed, 
-Example: 
+If this PR closes multiple issues, include as many `Closes #XXX` phrase as needed,
+Example:
 Closes #123
 Closes #456
 etc.

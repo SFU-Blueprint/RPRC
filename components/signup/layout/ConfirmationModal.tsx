@@ -49,8 +49,8 @@ export function ConfirmationModal({
 
           {/* Description Text */}
           <p className={`text-gray-700 mb-6 leading-relaxed ${bodyStyles.m}`}>
-            Please review all information carefully before submitting. You won't
-            be able to make changes after submission
+            Please review all information carefully before submitting. You
+            won&apos;t be able to make changes after submission
           </p>
 
           {/* Buttons - Right aligned */}

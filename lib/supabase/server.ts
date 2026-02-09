@@ -1,6 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 
-import type { Database } from "@/types/database";
+import type { Database } from '@/types/database';
 
 const getRequiredEnv = (key: string) => {
   const value = process.env[key];
@@ -13,8 +13,8 @@ const getRequiredEnv = (key: string) => {
 };
 
 export const createServerClient = () => {
-  const supabaseUrl = getRequiredEnv("SUPABASE_URL");
-  const supabaseAnonKey = getRequiredEnv("SUPABASE_ANON_KEY");
+  const supabaseUrl = getRequiredEnv('SUPABASE_URL');
+  const supabaseAnonKey = getRequiredEnv('SUPABASE_ANON_KEY');
 
   return createClient<Database>(supabaseUrl, supabaseAnonKey);
 };
