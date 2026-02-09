@@ -3,28 +3,38 @@
  * Contains all fields collected across the multi-step form
  */
 export type SignUpFormData = {
-  // page 1: Account Info
+  // Step 1: Account Info
   email: string;
   password: string;
-  confirmPassword: string;
+  membershipType?: MembershipType;
 
-  // page 2: Contact + Address Info
-  fullName: string;
+  // Step 2.1: Contact + Address Info
+  fullName: string; // "Name" for Individual, "Organization Name" for Organization
   phoneNumber: string;
   phoneType: 'home' | 'cell';
   mailingAddress: string;
   city: string;
   province: string;
+  country: string;
   postalCode: string;
 
-  // page 3: Membership Interests
-  interests: string[];
-  whyJoin: string;
+  // Step 2.2: Membership Interests
+  interests: string[]; // Multiple selection
+  whyrpcmember: string;
+
+  // Step 2.3: Individual-specific fields
+  membershipwaiver?: boolean;
+  waiverreason?: string;
+
+  // Step 2.4: Organization-specific fields
+  organisationservices?: string;
+  representativeName?: string;
+  representativeEmail?: string; //  optional alternative email
 };
 
 /**
  * Validation errors object
- * SignUpFormData field names: error messages
+ * Maps SignUpFormData field names to error messages
  */
 export type ValidationErrors = {
   [key: string]: string | undefined;
@@ -39,3 +49,5 @@ export type StepInfo = {
   title: string;
   description: string;
 };
+
+export type MembershipType = 'individual' | 'organization';

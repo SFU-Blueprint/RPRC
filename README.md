@@ -5,12 +5,14 @@ A revamped website for the Richmond Poverty Reduction Coalition built with Next.
 ## About
 
 This is a modern web application that provides:
+
 - **Member Portal**: Sign in/log in and dashboard for members
 - **Admin Dashboard**: Administrative interface for managing the organization
 - **News Feed**: Latest updates and announcements
 - **Events Calendar**: Upcoming events and activities
 
 The project uses:
+
 - **Next.js 16** - React framework
 - **Supabase** - Backend as a Service (database, auth, storage)
 - **TypeScript** - Type-safe development
@@ -28,12 +30,14 @@ The project uses:
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd RPRC
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
@@ -41,6 +45,7 @@ The project uses:
 3. **Start Docker Desktop** (ensure it's running)
 
 4. **Start the development environment**
+
    ```bash
    make dev
    ```
@@ -55,20 +60,21 @@ The project uses:
 
 ### Core Commands
 
-| Command | Description |
-|---------|-------------|
-| `make dev` | Start local Supabase + Next.js dev server |
-| `npm run dev` | Start Next.js dev server only |
-| `npm run build` | Build for production |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
-| `npm run test` | Run tests |
-| `npx supabase status` | Check Supabase services status |
-| `npx supabase stop` | Stop local Supabase services |
+| Command               | Description                               |
+| --------------------- | ----------------------------------------- |
+| `make dev`            | Start local Supabase + Next.js dev server |
+| `npm run dev`         | Start Next.js dev server only             |
+| `npm run build`       | Build for production                      |
+| `npm run lint`        | Run ESLint                                |
+| `npm run format`      | Format code with Prettier                 |
+| `npm run test`        | Run tests                                 |
+| `npx supabase status` | Check Supabase services status            |
+| `npx supabase stop`   | Stop local Supabase services              |
 
 ### Accessing Your Local Database
 
 **Supabase Studio** (Visual Database UI):
+
 - URL: http://127.0.0.1:54323
 - Features:
   - Browse and edit tables/data
@@ -79,6 +85,7 @@ The project uses:
   - View logs
 
 **Database Connection** (for external tools):
+
 - Host: `127.0.0.1`
 - Port: `54322`
 - Database: `postgres`
@@ -92,6 +99,7 @@ For detailed development workflows, database migrations, and best practices, see
 📖 **[DEVELOPMENT.md](./DEVELOPMENT.md)** - Complete development guide
 
 This includes:
+
 - Daily development workflow
 - Making database schema changes
 - Syncing with remote databases
@@ -119,6 +127,7 @@ npm run format    # Format code with Prettier
 ```
 
 VS Code extensions (recommended):
+
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
