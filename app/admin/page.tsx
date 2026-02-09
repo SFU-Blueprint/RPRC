@@ -28,48 +28,47 @@ export default function AdminDashboard() {
   return (
     <>
       <AdminNavbar />
-      <div className="container mx-auto max-w-screen-md">
-      <div className="md:px-7.25">
-        <Tabs
-          tabs={ADMIN_DASHBOARD_CONST.TABS}
-          currentTab={currentTab}
-          setCurrentTab={setCurrentTab}
-          additionalClasses={{
-            wrapper: 'md:mt-[43px] p-[10px] md:p-0',
-          }}
-        />
-      </div>
-      <div className="px-4 md:px-8 mt-5.75 md:mt-10.5 flex justify-around gap-x-4 md:gap-x-6 w-full">
-        {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
-          <StatCard key={card.label} label={card.label} value={card.value} />
-        ))}
-      </div>
-      <div className="px-4 md:px-8 mb-20">
-        <AdminSearchBar value={searchQuery} onChange={setSearchQuery} />
-        <div className="block md:hidden">
-          <AdminDashboardMobileTable
-            applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
+      <div className="mx-auto">
+        <div className="md:px-7.25">
+          <Tabs
+            tabs={ADMIN_DASHBOARD_CONST.TABS}
             currentTab={currentTab}
-            pagination={{
-              itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
-              numberPerPage: 5,
+            setCurrentTab={setCurrentTab}
+            additionalClasses={{
+              wrapper: 'md:mt-[43px] p-[10px] md:p-0',
             }}
           />
         </div>
-        <div className="hidden md:block">
-          <AdminDashboardTable
-            columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
-            applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
-            currentTab={currentTab}
-            pagination={{
-              itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
-              numberPerPage: 5,
-            }}
-          />
+        <div className="px-4 md:px-8 mt-5.75 md:mt-10.5 flex justify-around gap-x-4 md:gap-x-6 w-full">
+          {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
+            <StatCard key={card.label} label={card.label} value={card.value} />
+          ))}
+        </div>
+        <div className="px-4 md:px-8 mb-20">
+          <AdminSearchBar value={searchQuery} onChange={setSearchQuery} />
+          <div className="block md:hidden">
+            <AdminDashboardMobileTable
+              applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
+              currentTab={currentTab}
+              pagination={{
+                itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
+                numberPerPage: 5,
+              }}
+            />
+          </div>
+          <div className="hidden md:block">
+            <AdminDashboardTable
+              columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
+              applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
+              currentTab={currentTab}
+              pagination={{
+                itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
+                numberPerPage: 5,
+              }}
+            />
+          </div>
         </div>
       </div>
-      </div>
-      
     </>
   );
 }
