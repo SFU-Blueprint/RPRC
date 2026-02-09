@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
-import { FormTextArea } from '@/components/signup/FormTextArea';
+import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
 import {
   inter,
   robotoCondensed,
@@ -10,15 +10,15 @@ import {
   buttonStyles,
 } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/signup-validation';
-import { ConfirmationModal } from '@/components/signup/ConfirmationModal';
+import { ConfirmationModal } from '@/components/signup/layout/ConfirmationModal';
 import { submitToAPI } from '@/lib/signup-mock-api';
-import { ContactInfoIndividual } from './ContactInfoIndividual';
-import { ContactInfoOrganization } from './ContactInfoOrganization';
-import { AddressInformation } from './AddressInformation';
-import { MembershipInterests } from './MembershipInterests';
-import { MembershipWaiverSection } from './MembershipWaiverSection';
-import { OrganizationServicesSection } from './OrganizationServicesSection';
-import { PleaseNoteBox } from './PleaseNoteBox';
+import { ContactInfoIndividual } from '../domain/ContactInfoIndividual';
+import { ContactInfoOrganization } from '../domain/ContactInfoOrganization';
+import { AddressInformation } from '../inputs/AddressInformation';
+import { MembershipInterests } from '../cards/MembershipInterests';
+import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
+import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
+import { PleaseNoteBox } from '../cards/PleaseNoteBox';
 
 export function Step2Form() {
   const {

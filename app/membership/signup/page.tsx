@@ -1,13 +1,13 @@
 'use client';
 
 import { SignUpProvider, useSignUp } from '@/lib/contexts/SignUpContext';
-import { ProgressIndicator } from '@/components/signup/ProgressIndicator';
-import { SignUpInfoBox } from '@/components/signup/SignUpInfoBox';
+import { ProgressIndicator } from '@/components/signup/layout/ProgressIndicator';
+import { SignUpInfoBox } from '@/components/signup/cards/SignUpInfoBox';
 import { SIGNUP_STEPS } from './const';
 import { inter } from '@/app/fonts';
-import { Step1Form } from '@/components/signup/Step1Form';
-import { Step2Form } from '@/components/signup/Step2Form';
-import { Step3Success } from '@/components/signup/Step3Success';
+import { Step1Form } from '@/components/signup/pages/Step1Form';
+import { Step2Form } from '@/components/signup/pages/Step2Form';
+import { Step3Success } from '@/components/signup/pages/Step3Success';
 
 function SignUpContent() {
   const { currentStep } = useSignUp();

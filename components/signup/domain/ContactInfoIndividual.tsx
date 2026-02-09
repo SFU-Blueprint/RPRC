@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
-import { FormInput } from './FormInput';
+import { FormInput } from '../inputs/FormInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
-import { FormRadioButton } from './FormRadioButton';
+import { FormRadioButton } from '../inputs/FormRadioButton';
 
-export function ContactInfoOrganization() {
+export function ContactInfoIndividual() {
   const { formData, updateFormData, errors, hasAttemptedValidation } =
     useSignUp();
 
@@ -19,11 +19,11 @@ export function ContactInfoOrganization() {
         Contact Information
       </h2>
 
-      {/* Organization Name + Organization Email (2 columns) */}
+      {/* Name + Email (2 columns) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
-        {/* Organization Name */}
+        {/* Name */}
         <FormInput
-          label="Organization Name"
+          label="Name"
           type="text"
           value={formData.fullName}
           onChange={(val) => updateFormData({ fullName: val })}
@@ -33,9 +33,9 @@ export function ContactInfoOrganization() {
           showValidation={hasAttemptedValidation}
         />
 
-        {/* Organization Email Address - Pre-filled and disabled */}
+        {/* Email Address - Pre-filled and disabled */}
         <FormInput
-          label="Organization Email Address"
+          label="Email Address"
           type="email"
           value={formData.email}
           onChange={() => {}} // No-op since it's disabled
@@ -43,32 +43,6 @@ export function ContactInfoOrganization() {
           placeholder=""
           required
           disabled
-          showValidation={hasAttemptedValidation}
-        />
-      </div>
-
-      {/* Organization Representative Name + Representative Email (2 columns) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
-        {/* Organization Representative Name */}
-        <FormInput
-          label="Organization Representative Name"
-          type="text"
-          value={formData.representativeName || ''}
-          onChange={(val) => updateFormData({ representativeName: val })}
-          error={errors.representativeName}
-          placeholder=""
-          required
-          showValidation={hasAttemptedValidation}
-        />
-
-        {/* Representative Email Address (Optional) */}
-        <FormInput
-          label="Representative Email Address (if different from the one given above)"
-          type="email"
-          value={formData.representativeEmail || ''}
-          onChange={(val) => updateFormData({ representativeEmail: val })}
-          error={errors.representativeEmail}
-          placeholder=""
           showValidation={hasAttemptedValidation}
         />
       </div>

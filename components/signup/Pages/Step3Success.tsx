@@ -9,7 +9,7 @@ import {
   bodyStyles,
   buttonStyles,
 } from '@/app/fonts';
-import { SuccessInfoCard } from './SuccessInfoCard';
+import { SuccessInfoCard } from '../cards/SuccessInfoCard';
 
 export function Step3Success() {
   return (

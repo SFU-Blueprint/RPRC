@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
-import { FormInput } from './FormInput';
+import { FormInput } from '../inputs/FormInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
-import { FormRadioButton } from './FormRadioButton';
+import { FormRadioButton } from '../inputs/FormRadioButton';
 
 export function MembershipWaiverSection() {
   const { formData, updateFormData, errors, hasAttemptedValidation } =

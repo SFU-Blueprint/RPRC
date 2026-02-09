@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
-import { FormInput } from '@/components/signup/FormInput';
+import { FormInput } from '@/components/signup/inputs/FormInput';
 import {
   inter,
   robotoCondensed,
@@ -11,8 +11,8 @@ import {
   buttonStyles,
 } from '@/app/fonts';
 import { validateStep1, hasErrors } from '@/lib/signup-validation';
-import { PasswordInput } from './PasswordInput';
-import { MembershipInfoCard } from './MembershipInfoCard';
+import { PasswordInput } from '../inputs/PasswordInput';
+import { MembershipInfoCard } from '../cards/MembershipInfoCard';
 
 export function Step1Form() {
   const {

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
-import { FormTextArea } from './FormTextArea';
+import { FormTextArea } from '../inputs/FormTextArea';
 
 export function OrganizationServicesSection() {
   const { formData, updateFormData, errors, hasAttemptedValidation } =
