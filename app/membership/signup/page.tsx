@@ -5,9 +5,9 @@ import { ProgressIndicator } from '@/components/signup/layout/ProgressIndicator'
 import { SignUpInfoBox } from '@/components/signup/cards/SignUpInfoBox';
 import { SIGNUP_STEPS } from './const';
 import { inter } from '@/app/fonts';
-import { Step1Form } from '@/components/signup/pages/Step1Form';
-import { Step2Form } from '@/components/signup/pages/Step2Form';
-import { Step3Success } from '@/components/signup/pages/Step3Success';
+import { Step1Form } from '@/components/signup/Pages/Step1Form';
+import { Step2Form } from '@/components/signup/Pages/Step2Form';
+import { Step3Success } from '@/components/signup/Pages/Step3Success';
 
 function SignUpContent() {
   const { currentStep } = useSignUp();
