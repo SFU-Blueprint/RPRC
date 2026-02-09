@@ -1,7 +1,7 @@
 import Table from '@/components/Table';
 import { formatDateWithOrdinal } from '@/lib/utils';
 import StatusChip from '@/components/StatusChip';
-import { AdminDashboardMobileTablePropTypes } from '@/types/adminDashboard';
+import { AdminDashboardMobileTablePropTypes } from '@/types/admin.types';
 import { useState, useMemo } from 'react';
 import { Pagination } from '@/components/Pagination';
 
