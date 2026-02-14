@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { Input } from '@/components/ui/Input';
@@ -20,7 +20,9 @@ import { MembershipInfoCard } from '../cards/MembershipInfoCard';
 import { UserRole } from '@/lib/constants/enums';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { signup, resendConfirmationEmail } from '@/app/actions/auth';
+import { AuthErrorCode } from '@/lib/constants/auth-errors';
+import { ROUTES } from '@/lib/constants/routes';
 
 export function Step1Form() {
   const {
@@ -38,6 +40,52 @@ export function Step1Form() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [resendCountdown, setResendCountdown] = useState(60);
+  const [isResending, setIsResending] = useState(false);
+  const [showEmailExistsError, setShowEmailExistsError] = useState(false);
+
+  // Countdown timer for resend email
+  useEffect(() => {
+    if (showEmailConfirmation && resendCountdown > 0) {
+      const timer = setTimeout(() => {
+        setResendCountdown(resendCountdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [showEmailConfirmation, resendCountdown]);
+
+  const handleResendEmail = async () => {
+    setIsResending(true);
+
+    try {
+      // Create FormData for server action - only need email
+      const formDataObj = new FormData();
+      formDataObj.append('email', formData.email);
+
+      // Call resend confirmation email action
+      const result = await resendConfirmationEmail(formDataObj);
+
+      if ('error' in result) {
+        console.error('Resend email error:', result.error, 'Code:', result.code);
+        
+        // Show user-friendly error message based on error code
+        if (result.code === AuthErrorCode.RATE_LIMITED) {
+          alert(result.error); // Could replace with a toast notification
+        } else {
+          alert('Failed to resend email. Please try again or contact support.');
+        }
+      } else {
+        console.log('Email resent successfully');
+        // Reset countdown to 60 seconds
+        setResendCountdown(60);
+      }
+    } catch (error) {
+      console.error('Unexpected error during resend:', error);
+      alert('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const handleSubmit = async () => {
     setHasAttemptedValidation(true);
@@ -58,51 +106,45 @@ export function Step1Form() {
         ? UserRole.INDIVIDUAL 
         : UserRole.ORGANIZATION;
 
-      // Create user with Supabase Auth (client-side for PKCE flow)
-      const supabase = createClient();
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            role: role,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
+      // Create FormData for server action
+      const formDataObj = new FormData();
+      formDataObj.append('email', formData.email);
+      formDataObj.append('password', formData.password);
+      formDataObj.append('role', role);
 
-      if (signUpError) {
-        console.error('Supabase signup error:', signUpError);
+      // Call server action
+      const result = await signup(formDataObj);
+
+      if ('error' in result) {
+        console.error('Signup error:', result.error, 'Code:', result.code);
         
-        // Handle specific errors
-        if (signUpError.message.includes('already registered') || 
-            signUpError.message.includes('User already registered')) {
+        // Handle specific errors by code
+        if (result.code === AuthErrorCode.VALIDATION_ERROR) {
           setErrors({
             ...validationErrors,
-            email: 'Email already exists. Please login instead.',
+            email: result.error,
           });
         } else {
           setErrors({
             ...validationErrors,
-            email: signUpError.message || 'Failed to create account. Please try again.',
+            email: result.error || 'Failed to create account. Please try again.',
           });
         }
         return;
       }
 
-      if (!data.user) {
-        setErrors({
-          ...validationErrors,
-          email: 'Failed to create account. Please try again.',
-        });
+      // Check if email already exists (returns 200 to avoid console errors)
+      if (result.emailExists) {
+        console.log('Email already exists, showing user message');
+        setShowEmailExistsError(true);
         return;
       }
 
       // Success! User created - show email confirmation message
-      console.log('User created successfully:', data.user.id);
+      console.log('User created successfully:', result.userId);
       setUserEmail(formData.email);
       setShowEmailConfirmation(true);
-      updateFormData({ userId: data.user.id });
+      updateFormData({ userId: result.userId });
     } catch (error) {
       console.error('Unexpected error during signup:', error);
       setErrors({
@@ -134,11 +176,32 @@ export function Step1Form() {
           <p className={`text-gray-700 ${bodyStyles.m}`}>
             Please click the link in the email to verify your account and complete your registration.
           </p>
-          <Alert variant="default" className="mt-6">
+          <Alert variant="info" className="mt-6">
             <AlertDescription>
               <strong>Note:</strong> The link will expire in 24 hours. If you don&apos;t see the email, check your spam folder.
             </AlertDescription>
           </Alert>
+
+          {/* Resend Email Button */}
+          <div className="mt-6 gap-1 flex flex-col items-start">
+            <Button
+              onClick={handleResendEmail}
+              disabled={resendCountdown > 0 || isResending}
+              variant="outline"
+              size="sm"
+            >
+              {isResending
+                ? 'Resending...'
+                : resendCountdown > 0
+                ? `Resend email in ${resendCountdown}s`
+                : 'Resend email'}
+            </Button>
+            {resendCountdown === 0 && !isResending && (
+              <p className="text-xs text-muted-foreground pl-1">
+                Didn&apos;t receive the email? Click above to resend.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -155,6 +218,18 @@ export function Step1Form() {
         Create an account
       </h2>
 
+      {/* Email Already Exists Alert */}
+      {showEmailExistsError && (
+        <Alert variant="destructive" className="mb-6 w-fit">
+          <AlertDescription>
+            This email is already registered. Please sign in instead.
+            <Link href={ROUTES.HOME} className="font-semibold underline hover:text-destructive/90">
+              Sign in here
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Form Fields */}
       <div className="space-y-5">
         {/* Email Address */}
@@ -166,7 +241,10 @@ export function Step1Form() {
             id="email"
             type="email"
             value={formData.email}
-            onChange={(e) => updateFormData({ email: e.target.value })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              updateFormData({ email: e.target.value });
+              setShowEmailExistsError(false); // Clear error when user types
+            }}
             placeholder="your.email@example.com"
             className={hasAttemptedValidation && errors.email ? 'border-destructive' : ''}
             aria-invalid={hasAttemptedValidation && !!errors.email}
@@ -240,7 +318,7 @@ export function Step1Form() {
           <p className={`text-gray-700 text-center ${bodyStyles.m}`}>
             Already have an account?{' '}
             <Link
-              href="/"
+              href={ROUTES.HOME}
               className="text-[#5EB42D] hover:text-[#2B8100] font-medium underline"
             >
               Sign in here

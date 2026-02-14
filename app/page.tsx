@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { HomePageForm } from "@/components/homepage/HomePageForm";
 import { getUser, hasApplication } from "@/lib/auth/helpers";
 import { redirect } from "next/navigation";
+import { ROUTES } from "@/lib/constants/routes";
 
 export default async function HomePage() {
   // Check if user is already logged in
@@ -17,11 +18,11 @@ export default async function HomePage() {
 
     if (userHasApplication) {
       // Has application - redirect to dashboard
-      redirect('/membership/dashboard');
+      redirect(ROUTES.MEMBERSHIP_DASHBOARD);
     }
 
     // No application - redirect to form
-    redirect('/membership/form');
+    redirect(ROUTES.MEMBERSHIP_FORM);
   }
 
   return (
@@ -57,7 +58,7 @@ export default async function HomePage() {
                 After account creation you will need to fill out an application form. 
               </p>
             </div>
-            <Link className="mx-auto block pt-4 w-fit" href="/membership/signup">
+            <Link className="mx-auto block pt-4 w-fit" href={ROUTES.MEMBERSHIP_SIGNUP}>
                 <Button size="sm" className="text-xs">Sign Up</Button>
             </Link>
           </div>

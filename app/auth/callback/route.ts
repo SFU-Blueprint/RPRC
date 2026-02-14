@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
+import { ROUTES } from '@/lib/constants/routes'
 
 // GET /auth/callback
 // This route is used to handle the callback from the email confirmation link
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   if (!code) {
     console.error('No code provided in callback')
-    return NextResponse.redirect(new URL('/membership/signup?error=no_code', requestUrl.origin))
+    return NextResponse.redirect(new URL(`${ROUTES.MEMBERSHIP_SIGNUP}?error=no_code`, requestUrl.origin))
   }
 
   const supabase = await createClient()
@@ -20,12 +21,12 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     console.error('Error exchanging code for session:', error)
-    return NextResponse.redirect(new URL('/membership/signup?error=auth_failed', requestUrl.origin))
+    return NextResponse.redirect(new URL(`${ROUTES.MEMBERSHIP_SIGNUP}?error=auth_failed`, requestUrl.origin))
   }
 
   if (!data.user) {
     console.error('No user returned after exchanging code')
-    return NextResponse.redirect(new URL('/membership/signup?error=no_user', requestUrl.origin))
+    return NextResponse.redirect(new URL(`${ROUTES.MEMBERSHIP_SIGNUP}?error=no_user`, requestUrl.origin))
   }
 
   console.log('Session established for user:', data.user.id)
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
       if (applicationData.application) {
         // Has application - redirect to dashboard
         console.log('→ Redirecting to dashboard (has application)')
-        return NextResponse.redirect(new URL('/membership/dashboard', requestUrl.origin))
+        return NextResponse.redirect(new URL(ROUTES.MEMBERSHIP_DASHBOARD, requestUrl.origin))
       }
     }
   } catch (error) {
@@ -52,5 +53,5 @@ export async function GET(request: NextRequest) {
 
   // No application - redirect to form
   console.log('→ Redirecting to form (no application)')
-  return NextResponse.redirect(new URL('/membership/form', requestUrl.origin))
+  return NextResponse.redirect(new URL(ROUTES.MEMBERSHIP_FORM, requestUrl.origin))
 }

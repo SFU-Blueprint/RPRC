@@ -3,20 +3,54 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
 import { subheaderStyles, bodyStyles } from '@/app/fonts';
+import { ROUTES } from '@/lib/constants/routes';
+import { login } from '@/app/actions/auth';
+import { AuthErrorCode } from '@/lib/constants/auth-errors';
 
 export const HomePageForm = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Add authentication logic
-    console.log('Sign in attempt:', formData);
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('email', formData.email);
+      formDataObj.append('password', formData.password);
+
+      const result = await login(formDataObj);
+
+      if ('error' in result) {
+        console.error('Login error:', result.error, 'Code:', result.code);
+        
+        // Show user-friendly error messages
+        if (result.code === AuthErrorCode.INVALID_CREDENTIALS) {
+          setError('Invalid email or password. Please try again.');
+        } else if (result.code === AuthErrorCode.VALIDATION_ERROR) {
+          setError('Please enter both email and password.');
+        } else {
+          setError(result.error || 'Failed to sign in. Please try again.');
+        }
+      }
+      // Success case handled by server action (redirects to dashboard)
+    } catch (error) {
+      console.error('Unexpected error during login:', error);
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -30,7 +64,13 @@ export const HomePageForm = () => {
         upcoming events, and manage your preferences.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5 text-gray-500">
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-5 ">
         {/* Email Address */}
         <div>
           <Label htmlFor="email" className="text-xs">
@@ -48,32 +88,31 @@ export const HomePageForm = () => {
         </div>
 
         {/* Password */}
-        <div>
-          <Label htmlFor="password" className="text-xs">
-            Password <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id="password"
-            type="password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            placeholder="Enter your password"
-            required
-            className='mt-1'
-          />
-        </div>
+        <PasswordInput
+          label="Password"
+          value={formData.password}
+          onChange={(value) => setFormData({ ...formData, password: value })}
+          placeholder="Enter your password"
+          required
+          showRequirements={false}
+          showValidation={false}
+        />
 
         {/* Forgot password link */}
         <div>
-          <Link href="/auth/forgot-password" className="text-black text-xs font-medium underline">
+          <Link href={ROUTES.AUTH_FORGOT_PASSWORD} className="text-black text-xs font-medium underline">
             Forgot password?
           </Link>
         </div>
 
         {/* Submit Button */}
         <div className="pt-4">
-          <Button type="submit" className="bg-primary-black mx-auto block w-fit">
-            Sign In
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || !formData.email || !formData.password}
+            className="bg-primary-black mx-auto block w-fit"
+          >
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
           </Button>
         </div>
       </form>
