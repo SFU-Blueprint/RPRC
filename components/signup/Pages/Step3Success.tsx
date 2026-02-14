@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import '@/app/globals.css';
 import {
   inter,
   robotoCondensed,
@@ -14,11 +15,11 @@ import { SuccessInfoCard } from '../cards/SuccessInfoCard';
 export function Step3Success() {
   return (
     <div
-      className={`bg-[#f6f6f6] rounded-[25px] shadow-lg p-8 sm:p-10 md:p-12 lg:p-14 ${inter.className}`}
+      className={`bg-signup-neutral-100 rounded-[25px] shadow-lg p-8 sm:p-10 md:p-12 lg:p-14 ${inter.className}`}
     >
       {/* Dark Logo with Checkmark */}
       <div className="flex justify-center mb-6 sm:mb-8">
-        <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-[#383533] rounded-full flex items-center justify-center shadow-lg">
+        <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-signup-neutral-800 rounded-full flex items-center justify-center shadow-lg">
           <svg
             className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 text-white"
             fill="none"
@@ -56,7 +57,7 @@ export function Step3Success() {
         <SuccessInfoCard
           icon={
             <svg
-              className="w-16 h-16 sm:w-20 sm:h-20 text-[#B2DC93]"
+              className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -71,7 +72,7 @@ export function Step3Success() {
         <SuccessInfoCard
           icon={
             <svg
-              className="w-16 h-16 sm:w-20 sm:h-20 text-[#B2DC93]"
+              className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -86,7 +87,7 @@ export function Step3Success() {
         <SuccessInfoCard
           icon={
             <svg
-              className="w-16 h-16 sm:w-20 sm:h-20 text-[#B2DC93]"
+              className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -101,7 +102,7 @@ export function Step3Success() {
         <SuccessInfoCard
           icon={
             <svg
-              className="w-16 h-16 sm:w-20 sm:h-20 text-[#B2DC93]"
+              className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -119,9 +120,9 @@ export function Step3Success() {
         <Link
           href="/profile"
           className={`
-            bg-[#5EB42D]
-            hover:bg-[#2B8100]
-            active:bg-[#004E00]
+            bg-signup-primary-green-500
+            hover:bg-signup-primary-green-600
+            active:bg-signup-primary-green-700
             text-white font-semibold
             px-8 sm:px-10 py-2.5 sm:py-3
             rounded-lg
@@ -136,9 +137,9 @@ export function Step3Success() {
         <Link
           href="/"
           className={`
-            bg-[#383533]
-            hover:bg-[#2a2725]
-            active:bg-[#1a1816]
+            bg-signup-neutral-800
+            hover:bg-signup-neutral-900
+            active:bg-signup-neutral-950
             text-white font-semibold
             px-8 sm:px-10 py-2.5 sm:py-3
             rounded-lg

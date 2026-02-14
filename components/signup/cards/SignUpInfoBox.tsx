@@ -2,17 +2,17 @@
 
 import React from 'react';
 import { inter, robotoCondensed, bodyStyles } from '@/app/fonts';
-
+import "@/app/globals.css"
 export function SignUpInfoBox() {
   return (
     <div
-      className={`bg-[#403f39] rounded-[25px] text-white ${inter.className} min-h-[350px] md:min-h-[400px] lg:min-h-[450px] flex flex-col items-center justify-center relative overflow-hidden`}
+      className={`hidden lg:flex bg-signup-neutral-700 rounded-[25px] text-white ${inter.className} min-h-[250px] md:min-h-[300px] lg:min-h-[350px] flex flex-col items-center justify-center relative overflow-hidden`}
     >
       {/* Email Circle - Top Left Corner */}
-      <div className="absolute top-4 left-4 md:top-6 md:left-6 lg:top-8 lg:left-8">
-        <div className="w-30 h-30 md:w-36 md:h-36 lg:w-42 lg:h-42 rounded-full bg-[#25221a] flex items-center justify-center p-[20%]">
+      <div className="absolute top-1 left-1 md:top-2 md:left-2 lg:top-4 lg:left-4">
+        <div className="w-20 h-20 md:w-28 md:h-28 lg:w-36 lg:h-36 rounded-full bg-signup-neutral-750 flex items-center justify-center p-[20%]">
           <svg
-            className="w-full h-full text-[#b2dc93]"
+            className="w-full h-full text-signup-primary-green-300"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -22,10 +22,10 @@ export function SignUpInfoBox() {
       </div>
 
       {/* Bell Circle - Top Right Corner (slightly lower) */}
-      <div className="absolute top-8 right-4 md:top-10 md:right-6 lg:top-12 lg:right-8">
-        <div className="w-30 h-30 md:w-36 md:h-36 lg:w-42 lg:h-42 rounded-full bg-[#25221a] flex items-center justify-center p-[20%]">
+      <div className="absolute top-4 right-1 md:top-6 md:right-2 lg:top-8 lg:right-4">
+        <div className="w-20 h-20 md:w-28 md:h-28 lg:w-36 lg:h-36 rounded-full bg-signup-neutral-750 flex items-center justify-center p-[20%]">
           <svg
-            className="w-full h-full text-[#b2dc93]"
+            className="w-full h-full text-signup-primary-green-300"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -35,11 +35,11 @@ export function SignUpInfoBox() {
       </div>
 
       {/* Center Content - Person Circle + Text */}
-      <div className="flex flex-col items-center justify-center gap-4 md:gap-5 lg:gap-6">
+      <div className="flex flex-col items-center justify-center gap-2 md:gap-3 lg:gap-4">
         {/* Person Circle - Center (both horizontally and vertically) */}
-        <div className="w-60 h-60 md:w-72 md:h-72 lg:w-84 lg:h-84 rounded-full bg-[#25221a] flex items-center justify-center p-[20%]">
+        <div className="w-48 h-48 md:w-56 md:h-56 lg:w-72 lg:h-72 rounded-full bg-signup-neutral-750 flex items-center justify-center p-[20%]">
           <svg
-            className="w-full h-full text-[#b2dc93]"
+            className="w-full h-full text-signup-primary-green-300"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -48,8 +48,8 @@ export function SignUpInfoBox() {
         </div>
 
         {/* Text - Directly under person circle */}
-        <div className={`text-center px-6 ${robotoCondensed.className}`}>
-          <p className={`font-semibold ${bodyStyles.m}`}>
+        <div className={`text-center px-3 ${robotoCondensed.className}`}>
+          <p className={`font-semibold ${bodyStyles.lg}`}>
             Your membership portal is where you will
             <br />
             receive updates about membership,

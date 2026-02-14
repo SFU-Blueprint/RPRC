@@ -1,6 +1,6 @@
 'use client';
 
-import { Modal } from '@/components/Modal';
+import { Modal } from '@/components/Admin';
 import { Button } from '@/components/ui/Button';
 import { inter } from '@/app/fonts';
 

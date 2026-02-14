@@ -1,9 +1,10 @@
 'use client';
 
 import { inter } from '@/app/fonts';
-import { Input } from '@/components/ui/input';
+
 import { Label } from '@/components/ui/label';
-import { RadioGroup } from '@/components/RadioGroup';
+import { Input } from '@/components/ui/Input';
+import { RadioGroup } from '@/components/Admin';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { AdminSection } from './AdminSection';

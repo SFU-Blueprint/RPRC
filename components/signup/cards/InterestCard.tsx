@@ -24,21 +24,21 @@ export function InterestCard({
         rounded-full
         flex items-center justify-center gap-3
         transition-all duration-200
-        hover:border-[#90cd5f]
-        focus:outline-none focus:ring-2 focus:ring-[#90cd5f] focus:ring-offset-2
-        ${isSelected ? 'bg-[#e9e9e8]' : 'bg-[#fffdfa]'}
+        hover:border-signup-medium-green
+        focus:outline-none focus:ring-2 focus:ring-signup-medium-green focus:ring-offset-2
+        ${isSelected ? 'bg-signup-light-gray' : 'bg-signup-off-white'}
         ${inter.className}
       `}
       aria-pressed={isSelected}
       aria-label={`${isSelected ? 'Deselect' : 'Select'} ${label}`}
     >
       {/* Icon - Plus or X */}
-      <span className="text-[#90cd5f] text-[28px] font-bold leading-none">
+      <span className="text-signup-medium-green text-[28px] font-bold leading-none">
         {isSelected ? '×' : '+'}
       </span>
 
       {/* Label */}
-      <span className={`text-gray-800 font-medium ${bodyStyles.m}`}>
+      <span className={`text-gray-800 font-medium ${bodyStyles.lg}`}>
         {label}
       </span>
     </button>

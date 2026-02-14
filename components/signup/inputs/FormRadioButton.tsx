@@ -39,8 +39,8 @@ export function FormRadioButton({
             transition-all duration-200
             ${
               checked
-                ? 'bg-[#5EB42D] border-[#5EB42D]'
-                : 'bg-white border-gray-400 group-hover:border-[#90cd5f] group-hover:bg-[#e8f5e0]'
+                ? 'bg-signup-primary-green-500 border-signup-primary-green-500'
+                : 'bg-white border-gray-400 group-hover:border-signup-primary-green-400 group-hover:bg-signup-primary-green-100'
             }
           `}
         >
