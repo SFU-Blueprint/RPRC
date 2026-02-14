@@ -43,7 +43,7 @@ export function FormTextArea({
       return 'border-red-500 focus:border-red-500';
     }
     if (value && !error) {
-      return 'border-[#90cd5f] focus:border-[#90cd5f]';
+      return 'border-signup-primary-green-400 focus:border-signup-primary-green-400';
     }
     return 'border-gray-300 focus:border-blue-500';
   };

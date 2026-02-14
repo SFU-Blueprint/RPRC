@@ -51,7 +51,7 @@ export function FormSelect({
           bg-white
           text-gray-900 ${bodyStyles.m}
           border-2
-          focus:outline-none focus:ring-2 focus:ring-[#90cd5f]
+          focus:outline-none focus:ring-2 focus:ring-signup-primary-green-400
           transition-all
           ${getBorderColor()}
         `}

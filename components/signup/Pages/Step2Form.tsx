@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
 import {
@@ -65,7 +66,7 @@ export function Step2Form() {
 
   return (
     <div
-      className={`bg-[#f6f6f6] rounded-[25px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] p-6 sm:p-8 md:p-10 lg:p-12 w-full max-w-6xl mx-auto ${inter.className}`}
+      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] p-6 sm:p-8 md:p-10 lg:p-12 w-full max-w-6xl mx-auto ${inter.className}`}
     >
       {/* Dynamic Form Heading */}
       <h1
@@ -115,9 +116,9 @@ export function Step2Form() {
         <button
           onClick={handleSubmit}
           className={`
-            bg-[#5EB42D]
-            hover:bg-[#2B8100]
-            active:bg-[#004E00]
+            bg-signup-primary-green-500
+            hover:bg-signup-primary-green-600
+            active:bg-signup-primary-green-700
             text-white
             font-semibold
             px-12 sm:px-16 md:px-20

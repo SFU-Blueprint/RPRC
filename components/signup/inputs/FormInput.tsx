@@ -39,7 +39,7 @@ export function FormInput({
       return 'border-red-500 focus:border-red-500';
     }
     if (value && !error) {
-      return 'border-[#90cd5f] focus:border-[#90cd5f]';
+      return 'border-signup-primary-green-400 focus:border-signup-primary-green-400';
     }
     return 'border-gray-300 focus:border-blue-500';
   };
@@ -59,7 +59,7 @@ export function FormInput({
       {/* Label */}
       <label
         htmlFor={label}
-        className={`block text-gray-600 mb-1.5 ${bodyStyles.m}`}
+        className={`block text-gray-600 mb-1 ${bodyStyles.m}`}
       >
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
@@ -75,7 +75,7 @@ export function FormInput({
           placeholder={placeholder}
           disabled={disabled}
           className={`
-            w-full px-4 py-3 
+            w-full px-3 py-2 
             border rounded-lg
             ${bodyStyles.m}
             text-gray-900

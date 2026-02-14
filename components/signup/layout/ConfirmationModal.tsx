@@ -60,8 +60,8 @@ export function ConfirmationModal({
               onClick={onClose}
               className={`
                 px-6 py-2.5
-                bg-white border-2 border-[#383533]
-                text-[#383533] font-medium
+                bg-white border-2 border-signup-neutral-800
+                text-signup-neutral-800 font-medium
                 rounded-lg
                 hover:bg-gray-50
                 transition-colors
@@ -76,9 +76,9 @@ export function ConfirmationModal({
               onClick={onConfirm}
               className={`
                 px-6 py-2.5
-                bg-[#5EB42D]
-                hover:bg-[#2B8100]
-                active:bg-[#004E00]
+                bg-signup-primary-green-500
+                hover:bg-signup-primary-green-600
+                active:bg-signup-primary-green-700
                 text-white font-semibold
                 rounded-lg
                 transition-colors
