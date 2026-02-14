@@ -65,7 +65,7 @@ export const HomePageForm = () => {
 
         {/* Forgot password link */}
         <div>
-          <Link href="/auth/forgot-password" className="text-xs font-medium underline">
+          <Link href="/auth/forgot-password" className="text-black text-xs font-medium underline">
             Forgot password?
           </Link>
         </div>
@@ -73,20 +73,9 @@ export const HomePageForm = () => {
         {/* Submit Button */}
         <div className="pt-4">
           <Button type="submit" className="bg-primary-black mx-auto block w-fit">
-            Log In
+            Sign In
           </Button>
         </div>
-
-        {/* Sign up link */}
-        <p className='text-gray-700 text-center text-xs'>
-          Don&apos;t have an account?{' '}
-          <Link
-            href="/membership/signup"
-            className="text-primary hover:text-primary/80 font-medium underline"
-          >
-            Sign up here
-          </Link>
-        </p>
       </form>
     </div>
   );
