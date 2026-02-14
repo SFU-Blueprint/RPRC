@@ -31,7 +31,7 @@ export type PhoneType = (typeof PhoneType)[keyof typeof PhoneType];
  * Matches database: application_type enum ('individual','organization')
  */
 export const ApplicationType = {
-  MEMBER: 'member',
+  INDIVIDUAL: 'individual',
   ORGANIZATION: 'organization',
 } as const;
 
