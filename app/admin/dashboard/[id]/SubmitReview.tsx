@@ -1,7 +1,7 @@
 'use client';
 
 import { inter, robotoCondensed } from '@/app/fonts';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/Input';
 import { RadioGroup } from '@/components/RadioGroup';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';

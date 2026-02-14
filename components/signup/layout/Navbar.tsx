@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { inter, buttonStyles } from '@/app/fonts';
-import { Button } from '@/components/ui/Button';
 
 export function Navbar() {
   return (
@@ -122,10 +121,20 @@ export function Navbar() {
           {/* Right Side - Action Buttons */}
           <div className="flex items-center gap-3 md:gap-4">
             {/* Primary Button - Join Us */}
-            <Button asChild
-              >
-                <Link href="/membership">Join Us</Link>
-            </Button>
+            <Link
+              href="/membership"
+              className={`px-4 md:px-5 lg:px-6 py-2 md:py-2.5 
+                bg-[#5EB42D]
+                text-white
+                ${buttonStyles.text}
+                font-semibold 
+                rounded-lg 
+                hover:bg-[#2B8100]
+                active:bg-[#004E00]
+                transition-colors`}
+            >
+              Join Us
+            </Link>
 
             {/* Secondary Button - Donate */}
             <Link

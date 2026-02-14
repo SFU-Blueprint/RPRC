@@ -1,22 +1,47 @@
-import * as React from "react"
+import { inter } from '@/app/fonts';
 
-import { cn } from "@/lib/utils"
+type InputAdditionalClassesPropTypes = {
+  wrapper?: string;
+  label?: string;
+  input?: string;
+};
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
-    return (
+type InputComponentPropTypes = {
+  label?: string;
+  value?: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  additionalClasses?: InputAdditionalClassesPropTypes;
+  disabled?: boolean;
+  type?: string;
+  placeholder?: string;
+};
+
+export const Input = ({
+  label,
+  value,
+  onChange,
+  disabled = false,
+  additionalClasses,
+  type = 'text',
+  placeholder,
+}: Readonly<InputComponentPropTypes>) => {
+  return (
+    <div className={`${additionalClasses?.wrapper} ${inter.className}`}>
+      {label && (
+        <label
+          className={`block mb-2 font-medium ${additionalClasses?.label ?? ''}`}
+        >
+          {label}
+        </label>
+      )}
       <input
         type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive md:text-sm",
-          className
-        )}
-        ref={ref}
-        {...props}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className={`${additionalClasses?.input} border-2 border-[#D4D0C5] rounded-xl pl-4 py-3.5`}
       />
-    )
-  }
-)
-Input.displayName = "Input"
-
-export { Input }
+    </div>
+  );
+};

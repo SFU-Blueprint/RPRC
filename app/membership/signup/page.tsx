@@ -13,12 +13,12 @@ function SignUpContent() {
   const { currentStep } = useSignUp();
 
   return (
-    <div >
+    <div className={`min-h-screen bg-[#FFFDFA] ${inter.className}`}>
       {/* Progress Indicator */}
       <ProgressIndicator currentStep={currentStep} steps={SIGNUP_STEPS} />
 
       {/* Main Content Container - Responsive width with max-width cap */}
-      <div className="max-w-screen-2xl mx-auto pb-12 md:pb-16 lg:pb-20">
+      <div className="w-[90%] max-w-[1920px] mx-auto pb-12 md:pb-16 lg:pb-20">
         {/* Step 1: Two halves - InfoBox + Form */}
         {currentStep === 1 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 xl:gap-16">
