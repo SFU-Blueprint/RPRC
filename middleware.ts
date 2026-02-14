@@ -1,15 +1,29 @@
-import { type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/middleware';
 
 /**
  * Runs on every request. Refreshes the Supabase auth session so that
  * server components and API routes see an up-to-date user and cookies.
+ * Also protects authenticated routes.
  */
 export async function middleware(request: NextRequest) {
   const { supabase, response } = createClient(request);
 
   // Refreshes session if expired and updates cookies on the response
-  await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Define protected routes that require authentication
+  const protectedRoutes = ['/membership/form', '/membership/dashboard'];
+  const isProtectedRoute = protectedRoutes.some(route =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  // Redirect to signup if accessing protected route without session
+  if (isProtectedRoute && !user) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = '/membership/signup';
+    return NextResponse.redirect(redirectUrl);
+  }
 
   return response;
 }

@@ -4,8 +4,26 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { HomePageForm } from "@/components/homepage/HomePageForm";
+import { getUser, hasApplication } from "@/lib/auth/helpers";
+import { redirect } from "next/navigation";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Check if user is already logged in
+  const user = await getUser();
+
+  if (user) {
+    // User is logged in, check for application
+    const userHasApplication = await hasApplication(user.id);
+
+    if (userHasApplication) {
+      // Has application - redirect to dashboard
+      redirect('/membership/dashboard');
+    }
+
+    // No application - redirect to form
+    redirect('/membership/form');
+  }
+
   return (
     <div className="min-h-screen relative">
       <Image
