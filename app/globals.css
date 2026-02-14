@@ -5,6 +5,8 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-off-white: var(--background-off-white);
+  --color-primary-black: var(--primary-black);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -54,7 +56,9 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #5EB42D;
+  --background-off-white: #F5F4F2;
+  --primary-black: #28231A;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
