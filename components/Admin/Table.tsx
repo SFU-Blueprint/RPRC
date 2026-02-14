@@ -1,7 +1,9 @@
+'use client';
+
 import { inter } from '@/app/fonts';
 import { ReactNode, useState } from 'react';
 import { ColumnType } from '@/types/admin.types';
-import { Pagination } from './Pagination';
+import { Pagination } from '@/components/Pagination';
 
 type TableProps = {
   columnNames: ColumnType[];
@@ -14,6 +16,7 @@ type TableProps = {
     numberPerPage: number;
     usePagination?: boolean;
   };
+  activePage?: number;
   children: ReactNode;
   additionalClasses?: {
     wrapper?: string;
@@ -27,12 +30,14 @@ export default function Table({
   children,
   additionalClasses,
   pagination,
+  activePage: controlledPage,
   onPageChange,
 }: TableProps) {
-  const [activePage, setActivePage] = useState(1);
+  const [internalPage, setInternalPage] = useState(1);
+  const activePage = controlledPage ?? internalPage;
 
   const handlePageChange = (page: number) => {
-    setActivePage(page);
+    if (controlledPage == null) setInternalPage(page);
     onPageChange?.(page);
   };
 
@@ -43,7 +48,7 @@ export default function Table({
           className={`w-full table-fixed ${additionalClasses?.table ?? ''}`}
         >
           <thead>
-            <tr className="bg-[#E2F4D9] border-b-2 border-[#BAB7B2]">
+            <tr className="bg-[#E9E9E8] border-b-2 border-[#BAB7B2]">
               {columnNames.map((column, idx) => (
                 <th
                   key={column.value}

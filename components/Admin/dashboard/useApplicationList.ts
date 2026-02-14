@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react';
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
 import { ApplicationType } from '@/types/admin.types';
 
 type Tab = {
@@ -21,6 +23,10 @@ export function useApplicationList({
   pagination,
 }: UseApplicationListOptions) {
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [currentTab]);
 
   const filteredApplications = useMemo(() => {
     return applications.filter((app) =>

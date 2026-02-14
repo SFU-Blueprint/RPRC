@@ -1,8 +1,7 @@
 'use client';
 
-import Table from '@/components/Table';
+import { StatusChip } from '@/components/Admin';
 import { formatDateWithOrdinal } from '@/lib/utils';
-import StatusChip from '@/components/StatusChip';
 import { AdminDashboardMobileTablePropTypes } from '@/types/admin.types';
 import { Pagination } from '@/components/Pagination';
 import { useApplicationList } from './useApplicationList';

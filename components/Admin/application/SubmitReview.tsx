@@ -2,7 +2,7 @@
 
 import { inter } from '@/app/fonts';
 import { Input } from '@/components/ui/Input';
-import { RadioGroup } from '@/components/RadioGroup';
+import { RadioGroup } from '@/components/Admin';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { AdminSection } from './AdminSection';
@@ -19,19 +19,37 @@ export default function SubmitReview() {
 
   return (
     <AdminSection title="Submit Your Review">
-      <Input
-        label="Board Member Name"
-        placeholder="Enter your name"
-        value={boardMemberName}
-        onChange={(e) => setBoardMemberName(e.target.value)}
-        additionalClasses={{ input: 'w-[370px]' }}
-      />
-      <Input
-        label="Review Date"
-        value={reviewDate}
-        onChange={(e) => setReviewDate(e.target.value)}
-        additionalClasses={{ input: 'w-[384px]', wrapper: 'mt-5.5' }}
-      />
+      <div>
+        <label
+          htmlFor="board-member-name"
+          className={`${inter.className} block mb-2 font-medium`}
+        >
+          Board Member Name
+        </label>
+        <Input
+          id="board-member-name"
+          type="text"
+          placeholder="Enter your name"
+          value={boardMemberName}
+          onChange={(e) => setBoardMemberName(e.target.value)}
+          className="w-[370px] h-10 px-3 py-2 border-2 border-[#D4D0C5] rounded-xl"
+        />
+      </div>
+      <div className="mt-5.5">
+        <label
+          htmlFor="review-date"
+          className={`${inter.className} block mb-2 font-medium`}
+        >
+          Review Date
+        </label>
+        <Input
+          id="review-date"
+          type="text"
+          value={reviewDate}
+          onChange={(e) => setReviewDate(e.target.value)}
+          className="w-[384px] h-10 px-3 py-2 border-2 border-[#D4D0C5] rounded-xl"
+        />
+      </div>
       <RadioGroup
         label="Decision"
         name="decision"
@@ -64,12 +82,13 @@ export default function SubmitReview() {
       </div>
       <div className="flex justify-center mt-10">
         <Button
-          handleClick={() => {
-            console.log({ boardMemberName, reviewDate, decision, reason });
+          type="button"
+          onClick={() => {
+            // TODO: submit to API, then open modal
             setIsModalOpen(true);
           }}
           disabled={!isFormValid}
-          additionalClasses={{ button: ['bg-[#5EB42D] border-transparent'] }}
+          className="bg-[#5EB42D] border-transparent"
         >
           Submit Review
         </Button>
