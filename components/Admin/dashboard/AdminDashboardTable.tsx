@@ -1,8 +1,7 @@
 'use client';
 
-import Table from '@/components/Table';
+import { Table, StatusChip } from '@/components/Admin';
 import { formatDateWithOrdinal } from '@/lib/utils';
-import StatusChip from '@/components/StatusChip';
 import { AdminDashboardTablePropTypes } from '@/types/admin.types';
 import { useRouter } from 'next/navigation';
 import { useApplicationList } from './useApplicationList';
@@ -17,6 +16,7 @@ export default function AdminDashboardTable({
   const {
     filteredApplications,
     paginatedApplications,
+    currentPage,
     setCurrentPage,
   } = useApplicationList({
     applications,
@@ -31,6 +31,7 @@ export default function AdminDashboardTable({
   return (
     <Table
       columnNames={columns}
+      activePage={currentPage}
       additionalClasses={{
         wrapper: 'mt-4 md:mt-8',
       }}
@@ -50,7 +51,7 @@ export default function AdminDashboardTable({
         <tr
           key={app.id}
           onClick={() => handleRowClick(app.id)}
-          className="bg-[#F5F4F2] cursor-pointer not-last:border-b not-last:border-[#BAB7B2] leading-6 tracking-[-0.31px] text-[16px]"
+          className="bg-[#F6F6F6] hover:bg-[#E9E9E8] cursor-pointer not-last:border-b not-last:border-[#BAB7B2] leading-6 tracking-[-0.31px] text-[16px]"
         >
           <td className="p-6 font-bold">{app.applicantName}</td>
           <td className="p-6 font-normal">{app.type}</td>

@@ -1,72 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { inter } from '@/app/fonts';
-import AdminNavbar from '@/components/Admin/layout/AdminNavbar';
-import StatCard from '@/components/StatCard';
-import Tabs from '@/components/Tabs';
-import AdminSearchBar from '@/components/Admin/dashboard/AdminSearchBar';
-import { ADMIN_DASHBOARD_MOCK, ADMIN_DASHBOARD_CONST } from './const';
-import AdminDashboardTable from '@/components/Admin/dashboard/AdminDashboardTable';
-import AdminDashboardMobileTable from '@/components/Admin/dashboard/AdminDashboardMobileTable';
+import { AdminNavbar, ManageApplications, StatCard } from '@/components/Admin';
+import { robotoCondensed } from '@/app/fonts';
+import { ADMIN_DASHBOARD_MOCK } from './const';
 
 export default function AdminDashboard() {
-  const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
-
-  // Debounce the search query
-  // TODO: Use the debouncedSearchQuery to filter the applications in the backend
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300); // 300ms delay
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
   return (
     <>
       <AdminNavbar />
-      <div className="mx-auto">
-        <div className="md:px-7.25">
-          <Tabs
-            tabs={ADMIN_DASHBOARD_CONST.TABS}
-            currentTab={currentTab}
-            setCurrentTab={setCurrentTab}
-            additionalClasses={{
-              wrapper: 'md:mt-[43px] p-[10px] md:p-0',
-            }}
-          />
-        </div>
-        <div className="px-4 md:px-8 mt-5.75 md:mt-10.5 flex justify-around gap-x-4 md:gap-x-6 w-full">
-          {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
-            <StatCard key={card.label} label={card.label} value={card.value} />
-          ))}
-        </div>
-        <div className="px-4 md:px-8 mb-20">
-          <AdminSearchBar value={searchQuery} onChange={setSearchQuery} />
-          <div className="block md:hidden">
-            <AdminDashboardMobileTable
-              applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
-              currentTab={currentTab}
-              pagination={{
-                itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
-                numberPerPage: 5,
-              }}
-            />
+      <div className="mx-auto min-h-screen bg-[#FFFDFA]">
+        <div className="max-w-[90rem] mx-auto px-4 md:px-8">
+          <h1
+            className={`${robotoCondensed.className} mt-5.75 md:mt-10.5 mb-6 text-[28px] md:text-[32px] font-bold`}
+          >
+            Overview
+          </h1>
+          <div className="mb-16 md:mb-24 flex w-full gap-x-4 md:gap-x-6">
+            {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
+              <StatCard key={card.type} type={card.type} value={card.value} />
+            ))}
           </div>
-          <div className="hidden md:block">
-            <AdminDashboardTable
-              columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
-              applications={ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK}
-              currentTab={currentTab}
-              pagination={{
-                itemCount: ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK.length,
-                numberPerPage: 5,
-              }}
-            />
-          </div>
+          <ManageApplications />
         </div>
       </div>
     </>
