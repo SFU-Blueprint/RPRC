@@ -4,11 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import { inter, buttonStyles } from '@/app/fonts';
 import { Button } from '@/components/ui/Button';
+import '@/app/globals.css';
 
 export function Navbar() {
   return (
     <nav
-      className={`bg-[#383533] text-white ${inter.className}`}
+      className={`bg-signup-neutral-800 text-white ${inter.className}`}
       role="navigation"
       aria-label="Main navigation"
     >
@@ -18,13 +19,13 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-6 lg:gap-8 xl:gap-10">
             <Link
               href="/"
-              className={` ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+              className={` ${buttonStyles.text} font-medium hover:text-signup-primary-green-400 transition-colors`}
             >
               Home
             </Link>
 
             <button
-              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-signup-primary-green-400 transition-colors`}
             >
               About
               <svg
@@ -44,13 +45,13 @@ export function Navbar() {
 
             <Link
               href="/events"
-              className={` ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+              className={` ${buttonStyles.text} font-medium hover:text-signup-primary-green-400 transition-colors`}
             >
               Events
             </Link>
 
             <button
-              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-signup-primary-green-400 transition-colors`}
             >
               Policy Areas
               <svg
@@ -69,7 +70,7 @@ export function Navbar() {
             </button>
 
             <button
-              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+              className={`flex items-center gap-1 ${buttonStyles.text} font-medium hover:text-signup-primary-green-400 transition-colors`}
             >
               Resources
               <svg
@@ -89,7 +90,7 @@ export function Navbar() {
 
             <Link
               href="/contact"
-              className={` ${buttonStyles.text} font-medium hover:text-[#90cd5f] transition-colors`}
+              className={` ${buttonStyles.text} font-medium hover:text-signup-primary-green-400 transition-colors`}
             >
               Contact
             </Link>
@@ -131,12 +132,12 @@ export function Navbar() {
             <Link
               href="/donate"
               className={`px-4 md:px-5 lg:px-6 py-2 md:py-2.5 
-                bg-[#383533]
+                bg-signup-neutral-800
                 text-white
                 ${buttonStyles.text}
                 font-semibold 
                 rounded-lg 
-                hover:bg-[#4a4745]
+                hover:bg-signup-neutral-900
                 active:bg-black
                 transition-colors`}
             >

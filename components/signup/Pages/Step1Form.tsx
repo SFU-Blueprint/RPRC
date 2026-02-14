@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from '@/components/signup/inputs/FormInput';
 import {
@@ -45,11 +46,11 @@ export function Step1Form() {
 
   return (
     <div
-      className={`bg-[#f6f6f6] rounded-[25px] p-8 md:p-10 lg:p-12 shadow-[0_4px_20px_rgba(0,0,0,0.1)] ${inter.className}`}
+      className={`bg-signup-light-gray-bg rounded-[25px] p-5 md:p-6 lg:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.1)] ${inter.className}`}
     >
       {/* Heading */}
       <h2
-        className={`text-gray-900 mb-8 ${headerStyles.lResponsive} ${robotoCondensed.className}`}
+        className={`text-gray-900 mb-6 ${headerStyles.lResponsive} ${robotoCondensed.className}`}
       >
         Create an account
       </h2>
@@ -92,15 +93,14 @@ export function Step1Form() {
 
         {/* Select Membership Type Label */}
         <h3
-          className={`text-gray-900 mt-8 mb-4 ${headerStyles.xs} ${robotoCondensed.className}`}
+          className={`text-gray-900 mt-6 mb-4 ${headerStyles.xs} ${robotoCondensed.className}`}
         >
           Select membership type:
         </h3>
 
         {/* Membership Type Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-4 md:gap-5 lg:gap-6 xl:gap-8">
           <MembershipInfoCard
-            type="individual"
             title="Individual"
             price="$5/yr"
             description="This is the option for individuals who want to join the RPRC. the Membership fee may be waived in special cases. The $5 fee is due after application is approved."
@@ -109,7 +109,6 @@ export function Step1Form() {
           />
 
           <MembershipInfoCard
-            type="organization"
             title="Organization"
             price="$25/yr"
             description="This option is for organizations that want to join or work with the RPRC. The $25 organization fee is due after application is accepted."
@@ -123,14 +122,16 @@ export function Step1Form() {
           <button
             onClick={handleSubmit}
             className={`
-              max-w-xs px-8 py-3
-              bg-[#5EB42D]
-              hover:bg-[#2B8100]
-              active:bg-[#004E00]
+              max-w-md px-8 py-3
+              bg-signup-primary-green-500
+              hover:bg-signup-primary-green-600
+              active:bg-signup-primary-green-700
               text-white
               font-semibold
               rounded-lg
               transition-colors
+              cursor-pointer
+              text-lg
               ${buttonStyles.text}
             `}
           >
@@ -146,7 +147,7 @@ export function Step1Form() {
                 /* TODO: Add sign in navigation */
                 console.log('Sign in clicked');
               }}
-              className="text-[#5EB42D] hover:text-[#2B8100] font-medium underline"
+              className="text-signup-primary-green hover:text-signup-dark-green font-medium underline"
             >
               Sign in here
             </button>

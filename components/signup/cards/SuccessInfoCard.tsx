@@ -17,8 +17,8 @@ export function SuccessInfoCard({
   return (
     <div
       className={`
-        bg-[#FFFDFA] 
-        border border-[#28231a]
+        bg-signup-neutral-50 
+        border border-signup-neutral-800
         rounded-[20px] 
         p-6 sm:p-7 
         flex flex-col items-center text-center
