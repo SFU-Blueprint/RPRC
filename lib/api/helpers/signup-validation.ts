@@ -8,8 +8,8 @@ export const VALIDATION_PATTERNS = {
   // Email: standard email format
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
 
-  // Password: minimum 6 characters, any characters allowed
-  password: /^.{6,}$/,
+  // Password: minimum 8 characters (validated separately with individual checks)
+  password: /^.{8,}$/,
 
   // Phone: exactly 10 digits (after removing non-digits)
   phone: /^\d{10}$/,
@@ -35,14 +35,21 @@ export function validateEmail(email: string): string | undefined {
 
 /**
  * Validate password strength
+ * Requirements:
+ * - At least 8 characters
+ * - At least one symbol
  */
 export function validatePassword(password: string): string | undefined {
   if (!password) {
     return 'Password is required';
   }
 
-  if (password.length < 6) {
-    return 'Password must be at least 6 characters';
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters';
+  }
+
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    return 'Password must contain at least one symbol (!@#$%^&*)';
   }
 
   return undefined;

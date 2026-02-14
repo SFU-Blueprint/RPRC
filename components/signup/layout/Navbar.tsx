@@ -123,8 +123,7 @@ export function Navbar() {
           {/* Right Side - Action Buttons */}
           <div className="flex items-center gap-3 md:gap-4">
             {/* Primary Button - Join Us */}
-            <Button asChild
-              >
+            <Button asChild size="md">
                 <Link href="/membership">Join Us</Link>
             </Button>
 

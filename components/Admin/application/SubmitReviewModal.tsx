@@ -26,26 +26,22 @@ export default function SubmitReviewModal({
     >
       <div className={inter.className}>
         <div className="mt-10 px-8">
-          <p
-            className={`${inter.className} text-[12px] font-normal leading-1.6`}
-          >
+          <p className="text-xs font-normal leading-relaxed">
             Please confirm you want to submit this review as approved? This will
             be logged to the review history.
           </p>
         </div>
-        <div className="flex gap-4 justify-end pr-7 pb-6.25">
+        <div className="flex gap-4 justify-end pr-7 pb-6.25 mt-6">
           <Button
-            type="button"
-            onClick={() => setModalOpen(false)}
             variant="outline"
-            className="border font-normal hover:bg-transparent hover:border-[#BAB7B2] hover:text-black"
+            onClick={() => setModalOpen(false)}
+            className="font-normal"
           >
             Cancel
           </Button>
           <Button
-            type="button"
             onClick={() => setModalOpen(false)}
-            className="bg-black text-white border-transparent font-normal"
+            className="bg-black text-white border-transparent hover:bg-black/90 font-normal"
           >
             Confirm
           </Button>

@@ -1,4 +1,5 @@
 import { SignUpFormData, StepInfo } from '@/types/signup';
+import { ApplicationType } from '@/lib/constants/enums';
 
 /**
  * Step configuration for the 3-step signup process
@@ -54,10 +55,11 @@ export const MEMBERSHIP_INTERESTS: string[] = [
 
 /**
  * Membership type constants
+ * Re-export from centralized enums for backwards compatibility
  */
 export const MEMBERSHIP_TYPES = {
-  INDIVIDUAL: 'individual',
-  ORGANIZATION: 'organization',
+  INDIVIDUAL: ApplicationType.INDIVIDUAL,
+  ORGANIZATION: ApplicationType.ORGANIZATION,
 } as const;
 
 export const COUNTRIES: string[] = ['Canada', 'United States'];
