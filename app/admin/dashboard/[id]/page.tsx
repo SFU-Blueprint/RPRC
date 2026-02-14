@@ -2,9 +2,9 @@ import { inter, robotoCondensed } from '@/app/fonts';
 import Link from 'next/link';
 import { APPLICATION_DETAILS_MOCK, APPLICATION_DETAILS_CONST } from './const';
 import StatusChip from '@/components/StatusChip';
-import ApplicationDetails from './ApplicationDetails';
-import SubmitReview from './SubmitReview';
-import ReviewHistory from './ReviewHistory';
+import ApplicationDetails from '@/components/Admin/application/ApplicationDetails';
+import SubmitReview from '@/components/Admin/application/SubmitReview';
+import ReviewHistory from '@/components/Admin/application/ReviewHistory';
 
 type PageProps = {
   params: Promise<{
