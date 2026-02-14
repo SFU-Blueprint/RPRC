@@ -9,7 +9,7 @@ import {
   headerStyles,
   buttonStyles,
 } from '@/app/fonts';
-import { validateStep2, hasErrors } from '@/lib/signup-validation';
+import { validateStep2, hasErrors } from '@/lib/api/helpers/signup-validation';
 import { ConfirmationModal } from '@/components/signup/layout/ConfirmationModal';
 import { submitToAPI } from '@/lib/signup-mock-api';
 import { ContactInfoIndividual } from '../domain/ContactInfoIndividual';

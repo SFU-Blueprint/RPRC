@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FormInput } from './FormInput';
+import React, { useState, useMemo } from 'react';
+import { Check, Eye, EyeOff, X, XCircle, AlertCircle } from 'lucide-react';
+import { inter } from '@/app/fonts';
 
 interface PasswordInputProps {
   label: string;
@@ -12,7 +13,27 @@ interface PasswordInputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   required?: boolean;
+  showRequirements?: boolean;
 }
+
+type PasswordRequirement = {
+  id: string;
+  label: string;
+  test: (password: string) => boolean;
+};
+
+const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
+  {
+    id: 'length',
+    label: 'At least 8 characters',
+    test: (pwd) => pwd.length >= 8,
+  },
+  {
+    id: 'symbol',
+    label: 'At least one symbol (!@#$%^&*)',
+    test: (pwd) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd),
+  },
+];
 
 export function PasswordInput({
   label,
@@ -23,70 +44,125 @@ export function PasswordInput({
   onChange,
   placeholder = '',
   required = false,
+  showRequirements = true,
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  // Calculate which requirements are met
+  const requirementStatus = useMemo(() => {
+    return PASSWORD_REQUIREMENTS.map((req) => ({
+      ...req,
+      met: req.test(value),
+    }));
+  }, [value]);
+
+  const allRequirementsMet = requirementStatus.every((req) => req.met);
+  const showRequirementsList = showRequirements && (isFocused || value.length > 0);
 
   return (
-    <div className="relative">
-      <FormInput
-        label={label}
-        type={showPassword ? 'text' : 'password'}
-        value={value}
-        error={error}
-        helperText={helperText}
-        showValidation={showValidation}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-      />
+    <div className={`${inter.className}`}>
+      {/* Label */}
+      <label className="block mb-2 text-sm font-medium text-gray-900">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
 
-      {/* Eye Icon Toggle - Positioned to avoid error icon */}
-      <button
-        type="button"
-        onClick={() => setShowPassword(!showPassword)}
-        className={`absolute top-[45px] text-gray-500 hover:text-gray-700 focus:outline-none transition-colors ${
-          showValidation && error ? 'right-10' : 'right-3'
-        }`}
-        aria-label={showPassword ? 'Hide password' : 'Show password'}
-      >
-        {showPassword ? (
-          // Eye with slash (hide)
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-            />
-          </svg>
-        ) : (
-          // Eye (show)
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-            />
-          </svg>
+      {/* Input Container */}
+      <div className="relative">
+        <input
+          type={showPassword ? 'text' : 'password'}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
+          className={`
+            w-full px-4 py-3 pr-12
+            border-2 rounded-xl
+            text-gray-900 text-base
+            focus:outline-none focus:ring-2
+            transition-colors
+            ${
+              showValidation && error
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
+                : 'border-[#D4D0C5] focus:border-[#5EB42D] focus:ring-green-200'
+            }
+          `}
+        />
+
+        {/* Eye Icon Toggle */}
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className={`absolute top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors ${
+            showValidation && error ? 'right-10' : 'right-3'
+          }`}
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+        >
+          {showPassword ? (
+            <EyeOff/>
+          ) : (
+            <Eye />
+          )}
+        </button>
+
+        {/* Error Icon */}
+        {showValidation && error && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <XCircle className="w-5 h-5 text-red-500" />
+          </div>
         )}
-      </button>
+      </div>
+
+      {/* Password Requirements List */}
+      {showRequirementsList && (
+        <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="text-xs font-semibold text-gray-700 mb-2.5">
+            Password requirements:
+          </p>
+          <ul className="space-y-2">
+            {requirementStatus.map((req) => (
+              <li
+                key={req.id}
+                className={`flex items-start gap-2 text-xs transition-colors ${
+                  req.met ? 'text-green-600' : 'text-gray-600'
+                }`}
+              >
+                <span className="flex-shrink-0 mt-0.5">
+                  {req.met ? (
+                    <Check className="w-4 h-4" strokeWidth={2.5} />
+                  ) : (
+                    <X className="w-4 h-4" strokeWidth={2.5} />
+                  )}
+                </span>
+                <span className={req.met ? 'font-medium' : ''}>{req.label}</span>
+              </li>
+            ))}
+          </ul>
+          {allRequirementsMet && value.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <p className="text-xs font-semibold text-green-600 flex items-center gap-1.5">
+                <Check className="w-4 h-4" strokeWidth={2.5} />
+                All requirements met!
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Helper Text */}
+      {helperText && !error && !showRequirementsList && (
+        <p className="mt-2 text-sm text-gray-600">{helperText}</p>
+      )}
+
+      {/* Error Message */}
+      {showValidation && error && (
+        <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {error}
+        </p>
+      )}
     </div>
   );
 }

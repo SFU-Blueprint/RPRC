@@ -1,6 +1,7 @@
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from './ui/Button';
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
 
 type PaginationPropTypes = {
   activePage: number;
@@ -16,39 +17,29 @@ type usePaginationPropTypes = {
 };
 
 const usePagination = ({
-  numberItemsPerPage,
+  numberItemsPerPage = 10,
   itemCount,
   activePage,
 }: usePaginationPropTypes) => {
-  const [pageCount, setPageCount] = useState(1);
-  const [numberPerPage, setNumberPerPage] = useState(10);
+  const pageCount = useMemo(() => {
+    return Math.ceil(itemCount / numberItemsPerPage);
+  }, [itemCount, numberItemsPerPage]);
 
-  const windowSize = 5;
-  const maxPage = pageCount;
-  const shouldShift = activePage > windowSize;
+  const { windowStart, windowEnd } = useMemo(() => {
+    const windowSize = 5;
+    const maxPage = pageCount;
+    const shouldShift = activePage > windowSize;
 
-  const windowEnd = shouldShift ? Math.min(activePage, maxPage) : windowSize;
-  const windowStart = Math.max(windowEnd - (windowSize - 1), 1);
+    const end = shouldShift ? Math.min(activePage, maxPage) : windowSize;
+    const start = Math.max(end - (windowSize - 1), 1);
 
-  const setupPagination = (itemCount: number) => {
-    const numberOfPages = Math.ceil(itemCount / numberPerPage);
-    setPageCount(numberOfPages);
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (numberItemsPerPage) setNumberPerPage(numberItemsPerPage);
-  }, [numberItemsPerPage]);
-
-  useEffect(() => {
-    if (!itemCount) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setupPagination(itemCount);
-  }, [itemCount, numberPerPage]);
+    return { windowStart: start, windowEnd: end };
+  }, [activePage, pageCount]);
 
   return {
     pageCount,
     windowStart,
+    windowEnd,
   };
 };
 
@@ -66,11 +57,12 @@ export const Pagination = ({
     <div className="flex flex-wrap justify-center items-center py-6">
       <div className="flex items-center gap-1">
         <Button
-          name="paginationPage"
-          value={`${Math.max(activePage - 1, 1)}`}
+          variant="outline"
+          size="sm"
           disabled={activePage === 1}
-          handleClick={() => onPageChange(Math.max(activePage - 1, 1))}
+          onClick={() => onPageChange(Math.max(activePage - 1, 1))}
         >
+          <ChevronLeft className="mr-1" />
           Previous
         </Button>
 
@@ -83,10 +75,13 @@ export const Pagination = ({
               return (
                 <Button
                   key={`pagination-${pageNumber}`}
-                  name="paginationPage"
-                  value={`${pageNumber}`}
-                  handleClick={() => onPageChange(pageNumber)}
-                  isActive={isActive}
+                  variant={isActive ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => onPageChange(pageNumber)}
+                  className={cn(
+                    'min-w-[40px]',
+                    isActive && 'pointer-events-none'
+                  )}
                 >
                   {pageNumber}
                 </Button>
@@ -96,14 +91,15 @@ export const Pagination = ({
         </div>
 
         <Button
-          name="paginationPage"
-          value={`${Math.min(activePage + 1, hook.pageCount)}`}
+          variant="outline"
+          size="sm"
           disabled={activePage === hook.pageCount}
-          handleClick={() =>
+          onClick={() =>
             onPageChange(Math.min(activePage + 1, hook.pageCount))
           }
         >
           Next
+          <ChevronRight className="ml-1" />
         </Button>
       </div>
     </div>

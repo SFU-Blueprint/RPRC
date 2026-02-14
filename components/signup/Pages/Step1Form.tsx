@@ -10,9 +10,10 @@ import {
   bodyStyles,
   buttonStyles,
 } from '@/app/fonts';
-import { validateStep1, hasErrors } from '@/lib/signup-validation';
+import { validateStep1, hasErrors } from '@/lib/api/helpers/signup-validation';
 import { PasswordInput } from '../inputs/PasswordInput';
 import { MembershipInfoCard } from '../cards/MembershipInfoCard';
+import { UserRole } from '@/lib/constants/enums';
 
 export function Step1Form() {
   const {
@@ -25,21 +26,91 @@ export function Step1Form() {
     goToNextStep,
   } = useSignUp();
 
-  // Local state for confirm password
+  // Local state for confirm password and submission
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setHasAttemptedValidation(true);
+    setIsSubmitting(true);
 
-    // Pass confirmPassword as parameter
-    const validationErrors = validateStep1(formData, confirmPassword);
-    setErrors(validationErrors);
+    try {
+      // Client-side validation
+      const validationErrors = validateStep1(formData, confirmPassword);
+      
+      if (hasErrors(validationErrors)) {
+        setErrors(validationErrors);
+        console.log('Step 1 validation failed:', validationErrors);
+        return;
+      }
 
-    if (!hasErrors(validationErrors)) {
-      console.log('Step 1 validation passed');
+      // Check if email exists
+      const checkEmailResponse = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const checkEmailData = await checkEmailResponse.json();
+
+      if (!checkEmailResponse.ok) {
+        setErrors({ ...validationErrors, email: checkEmailData.error });
+        return;
+      }
+
+      if (checkEmailData.exists) {
+        setErrors({
+          ...validationErrors,
+          email: 'Email already exists. Please login instead.',
+        });
+        return;
+      }
+
+      // Determine role based on membership type
+      const role = formData.membershipType === 'individual' 
+        ? UserRole.INDIVIDUAL 
+        : UserRole.ORGANIZATION;
+
+      // Create user account
+      const signupResponse = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          role,
+        }),
+      });
+
+      const signupData = await signupResponse.json();
+
+      if (!signupResponse.ok) {
+        if (signupData.errorCode === 'EMAIL_EXISTS') {
+          setErrors({
+            ...validationErrors,
+            email: 'Email already exists. Please login instead.',
+          });
+        } else {
+          setErrors({
+            ...validationErrors,
+            email: signupData.error || 'Failed to create account. Please try again.',
+          });
+        }
+        return;
+      }
+
+      // Success! Store user ID and proceed
+      console.log('User created successfully:', signupData.userId);
+      updateFormData({ userId: signupData.userId });
+      setErrors({});
       goToNextStep();
-    } else {
-      console.log('Step 1 validation failed:', validationErrors);
+    } catch (error) {
+      console.error('Unexpected error during signup:', error);
+      setErrors({
+        email: 'An unexpected error occurred. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -77,6 +148,7 @@ export function Step1Form() {
           onChange={(value) => updateFormData({ password: value })}
           placeholder="Enter your password"
           required
+          showRequirements={true}
         />
 
         {/* Confirm Password */}
@@ -88,6 +160,7 @@ export function Step1Form() {
           onChange={(value) => setConfirmPassword(value)}
           placeholder="Re-enter your password"
           required
+          showRequirements={false}
         />
 
         {/* Select Membership Type Label */}
@@ -122,6 +195,7 @@ export function Step1Form() {
         <div className="flex flex-col items-center gap-3 mt-8">
           <button
             onClick={handleSubmit}
+            disabled={isSubmitting || !formData.membershipType}
             className={`
               max-w-xs px-8 py-3
               bg-[#5EB42D]
@@ -131,10 +205,12 @@ export function Step1Form() {
               font-semibold
               rounded-lg
               transition-colors
+              disabled:opacity-50
+              disabled:cursor-not-allowed
               ${buttonStyles.text}
             `}
           >
-            Sign up
+            {isSubmitting ? 'Creating account...' : 'Sign up'}
           </button>
 
           {/* Already have account text */}
