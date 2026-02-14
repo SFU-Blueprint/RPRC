@@ -1,6 +1,6 @@
 'use client';
 
-import { Modal } from '@/components/Modal';
+import { Modal } from '@/components/Admin';
 import { Button } from '@/components/ui/Button';
 import { inter } from '@/app/fonts';
 
@@ -35,22 +35,17 @@ export default function SubmitReviewModal({
         </div>
         <div className="flex gap-4 justify-end pr-7 pb-6.25">
           <Button
-            handleClick={() => setModalOpen(false)}
-            additionalClasses={{
-              button: [
-                'border-1! font-[400]! hover:bg-transparent! hover:border-[#BAB7B2]! hover:text-black! ',
-              ],
-            }}
+            type="button"
+            onClick={() => setModalOpen(false)}
+            variant="outline"
+            className="border font-normal hover:bg-transparent hover:border-[#BAB7B2] hover:text-black"
           >
             Cancel
           </Button>
           <Button
-            handleClick={() => setModalOpen(false)}
-            additionalClasses={{
-              button: [
-                'bg-black! text-white! border-transparent! font-[400]!',
-              ],
-            }}
+            type="button"
+            onClick={() => setModalOpen(false)}
+            className="bg-black text-white border-transparent font-normal"
           >
             Confirm
           </Button>
