@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/Button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
