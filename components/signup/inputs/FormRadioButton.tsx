@@ -51,7 +51,7 @@ export function FormRadioButton({
 
       {/* Label Text */}
       <span
-        className={`ml-3 text-gray-900 select-none ${bodyStyles.m} ${inter.className}`}
+        className={`ml-3 text-gray-900 select-none ${bodyStyles.lg} ${inter.className}`}
       >
         {label}
       </span>

@@ -23,12 +23,11 @@ export function ProgressIndicator({
   return (
     <div className="w-full bg-signup-neutral-50 py-3 md:py-4">
       <h1
-        className={`${robotoCondensed.className} mb-4 md:mb-6 ${headerStyles.lResponsive} text-left`}
+        className={`${robotoCondensed.className} mb-4 md:mb-6 ${headerStyles.lResponsive} text-left px-6 md:px-12 lg:px-24 pt-6`}
       >
         {title}
       </h1>
-      <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24 items-center justify-center">    
-
+      <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24 items-center justify-center">
         {/* Progress Indicator - Centered */}
         <div className="flex items-center justify-center">
           {steps.map((step, index) => {
@@ -57,7 +56,6 @@ export function ProgressIndicator({
                         <span>
                           <LockIcon className="w-6 h-6 md:w-8 md:h-8" />
                         </span>
-                        
                       )}
                       {stepNumber === 2 && (
                         // Form/pencil icon for form completion

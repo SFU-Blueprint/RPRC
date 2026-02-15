@@ -5,7 +5,7 @@ import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   inter,
@@ -66,8 +66,13 @@ export function Step1Form() {
       const result = await resendConfirmationEmail(formDataObj);
 
       if ('error' in result) {
-        console.error('Resend email error:', result.error, 'Code:', result.code);
-        
+        console.error(
+          'Resend email error:',
+          result.error,
+          'Code:',
+          result.code,
+        );
+
         // Show user-friendly error message based on error code
         if (result.code === AuthErrorCode.RATE_LIMITED) {
           alert(result.error); // Could replace with a toast notification
@@ -94,7 +99,7 @@ export function Step1Form() {
     try {
       // Client-side validation
       const validationErrors = validateStep1(formData, confirmPassword);
-      
+
       if (hasErrors(validationErrors)) {
         setErrors(validationErrors);
         console.log('Step 1 validation failed:', validationErrors);
@@ -102,9 +107,10 @@ export function Step1Form() {
       }
 
       // Determine role based on membership type
-      const role = formData.membershipType === 'individual' 
-        ? UserRole.INDIVIDUAL 
-        : UserRole.ORGANIZATION;
+      const role =
+        formData.membershipType === 'individual'
+          ? UserRole.INDIVIDUAL
+          : UserRole.ORGANIZATION;
 
       // Create FormData for server action
       const formDataObj = new FormData();
@@ -117,7 +123,7 @@ export function Step1Form() {
 
       if ('error' in result) {
         console.error('Signup error:', result.error, 'Code:', result.code);
-        
+
         // Handle specific errors by code
         if (result.code === AuthErrorCode.VALIDATION_ERROR) {
           setErrors({
@@ -127,7 +133,8 @@ export function Step1Form() {
         } else {
           setErrors({
             ...validationErrors,
-            email: result.error || 'Failed to create account. Please try again.',
+            email:
+              result.error || 'Failed to create account. Please try again.',
           });
         }
         return;
@@ -174,11 +181,13 @@ export function Step1Form() {
             {userEmail}
           </p>
           <p className={`text-gray-700 ${bodyStyles.m}`}>
-            Please click the link in the email to verify your account and complete your registration.
+            Please click the link in the email to verify your account and
+            complete your registration.
           </p>
           <Alert variant="info" className="mt-6">
             <AlertDescription>
-              <strong>Note:</strong> The link will expire in 24 hours. If you don&apos;t see the email, check your spam folder.
+              <strong>Note:</strong> The link will expire in 24 hours. If you
+              don&apos;t see the email, check your spam folder.
             </AlertDescription>
           </Alert>
 
@@ -193,8 +202,8 @@ export function Step1Form() {
               {isResending
                 ? 'Resending...'
                 : resendCountdown > 0
-                ? `Resend email in ${resendCountdown}s`
-                : 'Resend email'}
+                  ? `Resend email in ${resendCountdown}s`
+                  : 'Resend email'}
             </Button>
             {resendCountdown === 0 && !isResending && (
               <p className="text-xs text-muted-foreground pl-1">
@@ -223,7 +232,10 @@ export function Step1Form() {
         <Alert variant="destructive" className="mb-6 w-fit">
           <AlertDescription>
             This email is already registered. Please sign in instead.
-            <Link href={ROUTES.HOME} className="font-semibold underline hover:text-destructive/90">
+            <Link
+              href={ROUTES.HOME}
+              className="font-semibold underline hover:text-destructive/90"
+            >
               Sign in here
             </Link>
           </AlertDescription>
@@ -246,7 +258,9 @@ export function Step1Form() {
               setShowEmailExistsError(false); // Clear error when user types
             }}
             placeholder="your.email@example.com"
-            className={hasAttemptedValidation && errors.email ? 'border-destructive' : ''}
+            className={
+              hasAttemptedValidation && errors.email ? 'border-destructive' : ''
+            }
             aria-invalid={hasAttemptedValidation && !!errors.email}
           />
           {hasAttemptedValidation && errors.email && (

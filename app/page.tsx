@@ -2,7 +2,7 @@
 import { inter, headerStyles, subheaderStyles, bodyStyles, buttonStyles } from "@/app/fonts";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { HomePageForm } from "@/components/homepage/HomePageForm";
 import { getUser, hasApplication } from "@/lib/auth/helpers";
 import { redirect } from "next/navigation";

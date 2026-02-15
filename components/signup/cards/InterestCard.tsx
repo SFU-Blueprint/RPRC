@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { inter, bodyStyles } from '@/app/fonts';
 
 type InterestCardProps = {
@@ -20,20 +19,21 @@ export function InterestCard({
       onClick={onToggle}
       className={`
         w-full px-6 py-4
-        border-2 border-gray-800
+        border border-interactive-feature-stroke
         rounded-full
         flex items-center justify-center gap-3
         transition-all duration-200
-        hover:border-signup-medium-green
-        focus:outline-none focus:ring-2 focus:ring-signup-medium-green focus:ring-offset-2
-        ${isSelected ? 'bg-signup-light-gray' : 'bg-signup-off-white'}
+        hover:border-signup-primary-green-500
+        focus:outline-none focus:ring-2 focus:ring-signup-primary-green-500 focus:ring-offset-2
+        cursor-pointer
+        ${isSelected ? 'bg-signup-neutral-200' : 'bg-signup-neutral-50'}
         ${inter.className}
       `}
       aria-pressed={isSelected}
       aria-label={`${isSelected ? 'Deselect' : 'Select'} ${label}`}
     >
       {/* Icon - Plus or X */}
-      <span className="text-signup-medium-green text-[28px] font-bold leading-none">
+      <span className="text-signup-primary-green-500 text-[28px] font-normal leading-none">
         {isSelected ? '×' : '+'}
       </span>
 

@@ -54,7 +54,12 @@
   --color-signup-neutral-800: var(--signup-neutral-800);
   --color-signup-neutral-900: var(--signup-neutral-900);
   --color-signup-neutral-950: var(--signup-neutral-950);
-  --color-signup-membership-option-selected: var(--signup-membership-option-selected);
+  --color-signup-membership-option-selected: var(
+    --signup-membership-option-selected
+  );
+  --color-interactive-feature-stroke: var(--interactive-feature-stroke);
+  --color-feedback-info: var(--feedback-info);
+  --color-feedback-info-accent: var(--feedback-info-accent);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -62,7 +67,7 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  
+
   --breakpoint-stack-membership-options: 72.5rem; /* 1160px */
 }
 
@@ -74,24 +79,25 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #5EB42D;
-  --card-background-gray: #F6F6F6;
-  --background-off-white: #F5F4F2;
-  --primary-black: #28231A;
+  --primary: #5eb42d;
+  --card-background-gray: #f6f6f6;
+  --background-off-white: #f5f4f2;
+  --primary-black: #28231a;
   --primary-foreground: oklch(0.985 0 0);
+  --interactive-feature-stroke: #534f48;
   /* Signup Design Tokens */
   --signup-primary-green-100: #e8f5e0;
-  --signup-primary-green-300: #B2DC93;
+  --signup-primary-green-300: #b2dc93;
   --signup-primary-green-400: #90cd5f;
-  --signup-primary-green-500: #5EB42D;
-  --signup-primary-green-600: #2B8100;
-  --signup-primary-green-700: #004E00;
+  --signup-primary-green-500: #5eb42d;
+  --signup-primary-green-600: #2b8100;
+  --signup-primary-green-700: #004e00;
   --signup-neutral-50: #fffdfa;
   --signup-neutral-100: #f6f6f6;
   --signup-neutral-200: #e9e9e8;
   --signup-neutral-700: #403f39;
   --signup-neutral-750: #25221a;
-  --signup-neutral-800: #28231A;
+  --signup-neutral-800: #28231a;
   --signup-neutral-900: #2a2725;
   --signup-neutral-950: #1a1816;
   --signup-membership-option-selected: #d6d9f0;
@@ -118,6 +124,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --feedback-info: #d5d9f0;
+  --feedback-info-accent: #6c78ca;
 }
 
 .dark {
@@ -160,5 +168,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
   }
 }

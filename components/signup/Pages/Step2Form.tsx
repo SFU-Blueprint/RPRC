@@ -1,15 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
-import {
-  inter,
-  robotoCondensed,
-  headerStyles,
-  buttonStyles,
-} from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/api/helpers/signup-validation';
 import { ConfirmationModal } from '@/components/signup/layout/ConfirmationModal';
 import { submitToAPI } from '@/lib/signup-mock-api';
@@ -20,6 +15,7 @@ import { MembershipInterests } from '../cards/MembershipInterests';
 import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
 import { PleaseNoteBox } from '../cards/PleaseNoteBox';
+import { scrollToFirstError } from '@/lib/utils';
 
 export function Step2Form() {
   const {
@@ -41,10 +37,10 @@ export function Step2Form() {
     setErrors(validationErrors);
 
     if (!hasErrors(validationErrors)) {
-      console.log('Step 2 validation passed');
       setShowConfirmModal(true);
     } else {
-      console.log('Step 2 validation failed:', validationErrors);
+      console.error('Step 2 validation failed:', validationErrors);
+      scrollToFirstError(validationErrors);
     }
   };
 
@@ -66,7 +62,7 @@ export function Step2Form() {
 
   return (
     <div
-      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] p-6 sm:p-8 md:p-10 lg:p-12 w-full max-w-6xl mx-auto ${inter.className}`}
+      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0px_-1px_2px_-1px_rgba(0,0,0,0.15),0px_1px_3px_1px_rgba(0,0,0,0.15)] p-6 sm:p-8 md:p-10 lg:p-12 w-full max-w-6xl mx-auto ${inter.className}`}
     >
       {/* Dynamic Form Heading */}
       <h1
@@ -111,33 +107,15 @@ export function Step2Form() {
       {/* Please Note - Info Box */}
       <PleaseNoteBox />
 
-      {/* Submit Application Button */}
+      {/* Submit button + Confirmation Modal */}
       <div className="flex justify-center">
-        <button
-          onClick={handleSubmit}
-          className={`
-            bg-signup-primary-green-500
-            hover:bg-signup-primary-green-600
-            active:bg-signup-primary-green-700
-            text-white
-            font-semibold
-            px-12 sm:px-16 md:px-20
-            py-3 md:py-4
-            rounded-lg
-            transition-colors
-            ${buttonStyles.text}
-          `}
-        >
-          Submit Application
-        </button>
+        <ConfirmationModal
+          isOpen={showConfirmModal}
+          onClose={() => setShowConfirmModal(false)}
+          onConfirm={handleConfirmSubmit}
+          handleSubmit={handleSubmit}
+        />
       </div>
-
-      {/* Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
-        onConfirm={handleConfirmSubmit}
-      />
     </div>
   );
 }

@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
 import { inter, bodyStyles } from '@/app/fonts';
 
 type FormInputProps = {
   label: string;
+  name: string;
   type?: 'text' | 'email' | 'password' | 'tel';
   value: string;
   onChange: (value: string) => void;
@@ -18,6 +18,7 @@ type FormInputProps = {
 
 export function FormInput({
   label,
+  name,
   type = 'text',
   value,
   onChange,
@@ -69,6 +70,7 @@ export function FormInput({
       <div className="relative">
         <input
           id={label}
+          name={name}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -110,7 +112,7 @@ export function FormInput({
       {showValidation && error ? (
         <p
           id={`${label}-error`}
-          className="text-red-400 ${bodyStyles.s} mt-1"
+          className={`text-red-400 ${bodyStyles.s} mt-1`}
           role="alert"
         >
           {error}
@@ -119,7 +121,7 @@ export function FormInput({
         helperText && (
           <p
             id={`${label}-helper`}
-            className="text-red-400 ${bodyStyles.s} mt-1"
+            className={`text-red-400 ${bodyStyles.s} mt-1`}
           >
             {helperText}
           </p>

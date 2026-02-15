@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { inter, robotoCondensed, bodyStyles } from '@/app/fonts';
-import "@/app/globals.css"
+import '@/app/globals.css';
 export function SignUpInfoBox() {
   return (
     <div
