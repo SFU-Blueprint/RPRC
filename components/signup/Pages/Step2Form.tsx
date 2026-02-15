@@ -20,6 +20,7 @@ import { MembershipInterests } from '../cards/MembershipInterests';
 import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
 import { PleaseNoteBox } from '../cards/PleaseNoteBox';
+import { Button } from '@/components/ui/Button';
 
 export function Step2Form() {
   const {
@@ -113,23 +114,12 @@ export function Step2Form() {
 
       {/* Submit Application Button */}
       <div className="flex justify-center">
-        <button
+        <Button
           onClick={handleSubmit}
-          className={`
-            bg-signup-primary-green-500
-            hover:bg-signup-primary-green-600
-            active:bg-signup-primary-green-700
-            text-white
-            font-semibold
-            px-12 sm:px-16 md:px-20
-            py-3 md:py-4
-            rounded-lg
-            transition-colors
-            ${buttonStyles.text}
-          `}
+          size="lg"
         >
           Submit Application
-        </button>
+        </Button>
       </div>
 
       {/* Confirmation Modal */}

@@ -15,7 +15,7 @@ export function AddressInformation() {
     <div className="mb-8 md:mb-10">
       {/* Section Heading */}
       <h2
-        className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.sResponsive} ${robotoCondensed.className}`}
+        className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
       >
         Address Information
       </h2>

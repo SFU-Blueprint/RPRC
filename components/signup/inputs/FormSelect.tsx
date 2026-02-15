@@ -1,7 +1,15 @@
 'use client';
 
 import React from 'react';
-import { inter, bodyStyles } from '@/app/fonts';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 type FormSelectProps = {
   label: string;
@@ -24,53 +32,39 @@ export function FormSelect({
   required = false,
   showValidation = false,
 }: FormSelectProps) {
-  const getBorderColor = () => {
-    if (!showValidation) {
-      return 'border-gray-300';
-    }
-    if (error) {
-      return 'border-red-500';
-    }
-    if (value && !error) {
-      return 'border-green-500';
-    }
-    return 'border-gray-300';
-  };
-
   return (
-    <div className={`w-full ${inter.className}`}>
-      <label className={`block text-gray-700 mb-2 ${bodyStyles.m}`}>
+    <div className="w-full space-y-2">
+      <Label htmlFor={label} className="text-gray-700">
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`
-          w-full px-4 py-3 rounded-lg 
-          bg-white
-          text-gray-900 ${bodyStyles.m}
-          border-2
-          focus:outline-none focus:ring-2 focus:ring-signup-primary-green-400
-          transition-all
-          ${getBorderColor()}
-        `}
-        aria-invalid={error ? 'true' : 'false'}
-        aria-describedby={error ? `${label}-error` : undefined}
-      >
-        <option value="" disabled>
-          {placeholder}
-        </option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+        {required && <span className="text-destructive ml-1">*</span>}
+      </Label>
+      
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger
+          id={label}
+          className={cn(
+            "w-full",
+            showValidation && error && "border-destructive bg-destructive/5",
+            showValidation && value && !error && "border-green-500"
+          )}
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={error ? `${label}-error` : undefined}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
       {showValidation && error && (
         <p
           id={`${label}-error`}
-          className="text-red-500 ${bodyStyles.s}] mt-1"
+          className="text-sm text-destructive"
           role="alert"
         >
           {error}

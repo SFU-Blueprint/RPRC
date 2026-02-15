@@ -43,6 +43,13 @@ function ErrorContent() {
           </AlertDescription>
         </Alert>
 
+        {/* Back to Home Button */}
+        <Link href={ROUTES.HOME} className="block">
+          <Button className="w-full" size="md">
+            Back to Home
+          </Button>
+        </Link>
+
         {/* Support link */}
         <div className="mt-8 text-center">
           <p className={`text-gray-600 text-sm ${bodyStyles.s}`}>
