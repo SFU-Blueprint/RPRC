@@ -242,16 +242,15 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
   }
 
   /* CODE FOR VALIDATING REASON FOR JOINING WAS REMOVED AS THIS FIELD IS OPTIONAL
-  TO MAKE IT REQUIRED, UNCOMMENT THIS CODE.
+  TO MAKE IT REQUIRED, UNCOMMENT THIS CODE. */
   // Validate reason for joining (whyrpcmember)
   const whyRPRCError = validateRequired(
     data.whyrpcmember,
-    'Why do you want to be an RPRC member',
+    'Reason',
   );
   if (whyRPRCError) {
     errors.whyrpcmember = whyRPRCError;
   }
-  */
 
   // Note: Interests are optional, no validation needed
   // Note: membershipwaiver is boolean, no validation needed

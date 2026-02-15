@@ -7,7 +7,6 @@ import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
 import { inter, robotoCondensed, headerStyles } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/api/helpers/signup-validation';
 import { ConfirmationModal } from '@/components/signup/layout/ConfirmationModal';
-import { submitToAPI } from '@/lib/signup-mock-api';
 import { ContactInfoIndividual } from '../domain/ContactInfoIndividual';
 import { ContactInfoOrganization } from '../domain/ContactInfoOrganization';
 import { AddressInformation } from '../inputs/AddressInformation';
@@ -16,6 +15,8 @@ import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
 import { PleaseNoteBox } from '../cards/PleaseNoteBox';
 import { scrollToFirstError } from '@/lib/utils';
+import { submitApplication } from '@/app/actions/application';
+import { toast } from 'sonner';
 
 export function Step2Form() {
   const {
@@ -29,27 +30,40 @@ export function Step2Form() {
   } = useSignUp();
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = () => {
     setHasAttemptedValidation(true);
+    setIsSubmitting(true);
 
     const validationErrors = validateStep2(formData);
-    setErrors(validationErrors);
-
-    if (!hasErrors(validationErrors)) {
-      setShowConfirmModal(true);
-    } else {
+    if (hasErrors(validationErrors)) {
+      setErrors(validationErrors);
       console.error('Step 2 validation failed:', validationErrors);
       scrollToFirstError(validationErrors);
+      return;
     }
+    setShowConfirmModal(true);
   };
 
-  const handleConfirmSubmit = () => {
-    // Call mock API to submit data
-    const response = submitToAPI(formData);
-    console.log('API Response:', response);
+  const handleConfirmSubmit = async () => {
+    const formDataObj = new FormData();
 
-    // Close modal and proceed to success page
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        formDataObj.append(key, JSON.stringify(value));
+      } else if (value !== undefined && value !== null) {
+        formDataObj.append(key, String(value));
+      }
+    });
+    const result = await submitApplication(formDataObj);
+    if (!result.success) {
+      toast.error('Failed to submit your application, please try again', {
+        description: `Error: ${result.error}`
+      });
+    }
+
+    // Close modal
     setShowConfirmModal(false);
     goToNextStep();
   };
@@ -62,7 +76,7 @@ export function Step2Form() {
 
   return (
     <div
-      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0px_-1px_2px_-1px_rgba(0,0,0,0.15),0px_1px_3px_1px_rgba(0,0,0,0.15)] p-6 sm:p-8 md:p-10 lg:p-12 w-full max-w-6xl mx-auto ${inter.className}`}
+      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0px_-1px_2px_-1px_rgba(0,0,0,0.15),0px_1px_3px_1px_rgba(0,0,0,0.15)] p-6 sm:p-8 md:p-10 lg:p-12 w-full mx-auto ${inter.className}`}
     >
       {/* Dynamic Form Heading */}
       <h1
@@ -94,6 +108,7 @@ export function Step2Form() {
           placeholder=""
           rows={6}
           showValidation={hasAttemptedValidation}
+          required
         />
       </div>
 

@@ -50,6 +50,7 @@ export function AddressInformation() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
         <FormSelect
           label="Country"
+          name='country'
           options={COUNTRIES}
           value={formData.country}
           onChange={(val) => updateFormData({ country: val })}
@@ -60,6 +61,7 @@ export function AddressInformation() {
         />
         <FormSelect
           label="Province"
+          name='province'
           options={CANADIAN_PROVINCES}
           value={formData.province}
           onChange={(val) => updateFormData({ province: val })}

@@ -4,6 +4,7 @@ import { inter, bodyStyles } from '@/app/fonts';
 
 type FormSelectProps = {
   label: string;
+  name: string;
   value: string;
   onChange: (value: string) => void;
   options: string[];
@@ -15,6 +16,7 @@ type FormSelectProps = {
 
 export function FormSelect({
   label,
+  name,
   value,
   onChange,
   options,
@@ -43,6 +45,7 @@ export function FormSelect({
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <select
+        name={name}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`

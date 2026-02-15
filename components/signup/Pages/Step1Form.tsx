@@ -23,6 +23,7 @@ import Link from 'next/link';
 import { signup, resendConfirmationEmail } from '@/app/actions/auth';
 import { AuthErrorCode } from '@/lib/constants/auth-errors';
 import { ROUTES } from '@/lib/constants/routes';
+import { scrollToFirstError } from '@/lib/utils';
 
 export function Step1Form() {
   const {
@@ -103,6 +104,7 @@ export function Step1Form() {
       if (hasErrors(validationErrors)) {
         setErrors(validationErrors);
         console.log('Step 1 validation failed:', validationErrors);
+        scrollToFirstError(validationErrors);
         return;
       }
 
