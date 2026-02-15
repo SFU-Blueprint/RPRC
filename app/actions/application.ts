@@ -4,8 +4,6 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import {
-  ApplicationStatus,
-  ApplicationType,
   PhoneType,
   UserRole,
 } from '@/lib/constants/enums';
@@ -61,9 +59,7 @@ export async function submitApplication(
     'whyrpcmember',
   ];
 
-  if (
-    requiredFields.some((field) => !data[field as keyof typeof data])
-  ) {
+  if (requiredFields.some((field) => !data[field as keyof typeof data])) {
     return {
       success: false,
       error: 'Missing one or more required fields',
@@ -86,12 +82,12 @@ export async function submitApplication(
     // Validation logic for individual applications
     // **Database updates for individual applications**
   } else {
-    // Check if organization already exists (by name, phone, OR user_id) or if user has already submitted an application
+    // Check if organization already exists by phone or if user has already submitted an application
     const { data: existing } = await supabase
       .from('organization_profiles')
       .select('*')
       .or(
-        `org_name.eq.${data.fullName},phone_num.eq.${data.phoneNumber},user_id.eq.${user.id}`,
+        `phone_num.eq.${data.phoneNumber},user_id.eq.${user.id}`,
       )
       .maybeSingle();
 
@@ -99,8 +95,6 @@ export async function submitApplication(
       let errorMessage = 'Organization already exists';
       if (existing.user_id === user.id) {
         errorMessage = 'You have already submitted an application';
-      } else if (existing.org_name === data.fullName) {
-        errorMessage = 'An organization with this name already exists';
       } else if (existing.phone_num === data.phoneNumber) {
         errorMessage = 'An organization with this phone number already exists';
       }
@@ -112,95 +106,31 @@ export async function submitApplication(
       };
     }
 
-    // **Database updates for organization applications**
-    // TODO: This logic should be handled in a DB transaction to prevent partial writes
+    // **Database updates for organization applications in a transaction to avoid partial writes**
     try {
-      // 1. Create organization profile
-      const { error: orgProfileError } = await supabase
-        .from('organization_profiles')
-        .insert({
-          user_id: user.id,
-          org_name: data.fullName,
-          org_rep_name: data.representativeName ?? null,
-          org_rep_email: data.representativeEmail ?? null,
-          phone_num: data.phoneNumber,
-          phone_type: data.phoneType,
-        });
+      const { error: rpcError } = await supabase.rpc(
+        'create_organization_application',
+        {
+          p_user_id: user.id,
+          p_org_name: data.fullName,
+          p_org_rep_name: data.representativeName || null,
+          p_org_rep_email: data.representativeEmail || null,
+          p_phone_num: data.phoneNumber,
+          p_phone_type: data.phoneType,
+          p_mailing_address: data.mailingAddress,
+          p_city: data.city,
+          p_country: data.country,
+          p_province: data.province,
+          p_postal_code: data.postalCode,
+          p_reason: data.whyrpcmember,
+          p_org_services: data.organisationservices || '',
+          p_interests: data.interests,
+        },
+      );
 
-      if (orgProfileError)
-        throw new Error(
-          `Organization profile creation failed: ${orgProfileError.message}`,
-        );
-
-      // 2. Create organization address
-      const { error: orgAddressError } = await supabase
-        .from('user_addresses')
-        .insert({
-          user_id: user.id,
-          mailing_address: data.mailingAddress,
-          city: data.city,
-          country: data.country,
-          province: data.province,
-          postal_code: data.postalCode,
-        });
-
-      if (orgAddressError)
-        throw new Error(
-          `Organization address creation failed: ${orgAddressError.message}`,
-        );
-
-      // 3. Create organization application
-      const { data: orgAppData, error: orgAppError } = await supabase
-        .from('applications')
-        .insert({
-          user_id: user.id,
-          type: ApplicationType.ORGANIZATION,
-          status: ApplicationStatus.TO_REVIEW,
-        })
-        .select()
-        .single();
-
-      if (orgAppError)
-        throw new Error(
-          `Organization application creation failed: ${orgAppError.message}`,
-        );
-
-      const applicationId = orgAppData?.id;
-
-      // 4. Create organization application details
-      const { error: orgAppDetailsError } = await supabase
-        .from('organization_application_details')
-        .insert({
-          application_id: applicationId,
-          reason: data.whyrpcmember,
-          org_services: data.organisationservices ?? null,
-        });
-
-      if (orgAppDetailsError)
-        throw new Error(
-          `Organization application details creation failed: ${orgAppDetailsError.message}`,
-        );
-
-      // 5. Create organization application interests
-      // Get interest IDs for the selected interest names
-      const { data: selectedInterests } = await supabase
-        .from('membership_interests')
-        .select('id')
-        .in('name', data.interests);
-
-      const { error: orgInterestsError } = await supabase
-        .from('application_interests')
-        .insert(
-          selectedInterests?.map((interest) => ({
-            application_id: applicationId,
-            interest_id: interest.id,
-          })) || [],
-        );
-
-      if (orgInterestsError)
-        throw new Error(
-          `Organization interests creation failed: ${orgInterestsError.message}`,
-        );
+      if (rpcError) {
+        throw new Error(`DB transaction failed: ${rpcError.message}`);
+      }
     } catch (error) {
       console.error('Application submission error:', error);
       return {
@@ -213,7 +143,7 @@ export async function submitApplication(
       };
     }
   }
-  revalidatePath(ROUTES.MEMBERSHIP_FORM, 'layout')
-  revalidatePath(ROUTES.MEMBERSHIP_DASHBOARD, 'layout')
+  revalidatePath(ROUTES.MEMBERSHIP_FORM, 'layout');
+  revalidatePath(ROUTES.MEMBERSHIP_DASHBOARD, 'layout');
   redirect(ROUTES.MEMBERSHIP_CONFIRMATION);
 }
