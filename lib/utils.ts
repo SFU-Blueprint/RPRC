@@ -35,8 +35,6 @@ export function scrollToFirstError(errors: Record<string, string | undefined>) {
     (key) => errors[key] !== undefined,
   );
 
-  console.log(errors);
-
   if (!firstErrorKey) return; // No errors to scroll to
 
   const cleanKey = firstErrorKey.replace('Id', '');
