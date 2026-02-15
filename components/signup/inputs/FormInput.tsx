@@ -32,7 +32,7 @@ export function FormInput({
   showValidation = false,
 }: FormInputProps) {
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full flex flex-col gap-2">
       {/* Label */}
       <Label htmlFor={label} className="text-gray-700">
         {label}
