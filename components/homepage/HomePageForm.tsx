@@ -10,7 +10,7 @@ import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
 import { subheaderStyles, bodyStyles } from '@/app/fonts';
 import { ROUTES } from '@/lib/constants/routes';
 import { login } from '@/app/actions/auth';
-import { AuthErrorCode } from '@/lib/constants/auth-errors';
+import { AuthErrorCode } from '@/lib/constants/error-types';
 
 export const HomePageForm = () => {
   const [formData, setFormData] = useState({

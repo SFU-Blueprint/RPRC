@@ -21,7 +21,7 @@ import { UserRole } from '@/lib/constants/enums';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signup, resendConfirmationEmail } from '@/app/actions/auth';
-import { AuthErrorCode } from '@/lib/constants/auth-errors';
+import { AuthErrorCode } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 
 export function Step1Form() {
