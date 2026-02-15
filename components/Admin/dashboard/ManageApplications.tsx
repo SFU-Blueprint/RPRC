@@ -28,7 +28,7 @@ export default function ManageApplications() {
   const paginationDesktop = useMemo(() => getPagination(10), []);
 
   return (
-    <div className="mb-20">
+    <div className="mb-20 px-4 md:px-8">
       <BackdropContainer>
         {/* Title and Search row */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6 first:mt-0">
@@ -44,7 +44,7 @@ export default function ManageApplications() {
 
       {/* Filter Tabs */}
       <div
-        className={`${inter.className} flex gap-x-2 overflow-x-auto scrollbar-hide rounded-3xl md:rounded-none bg-background-off-white md:bg-transparent mt-6 p-0`}
+        className={`${inter.className} flex gap-x-4 overflow-x-auto scrollbar-hide rounded-3xl md:rounded-none bg-background-off-white md:bg-transparent mt-6 p-0`}
       >
         {ADMIN_DASHBOARD_CONST.TABS.map((tab) => {
           const isActive = tab.value === currentTab.value;
@@ -55,7 +55,7 @@ export default function ManageApplications() {
               onClick={() => setCurrentTab(tab)}
               variant="outline"
               className={`
-                h-auto font-semibold text-[14px] md:text-[16px] px-4.25 md:px-6.75 py-3.25 md:py-3.5 rounded-lg border-2 border-gray-400 text-nowrap leading-5
+                cursor-pointer h-auto font-semibold text-[14px] md:text-[16px] px-4.25 md:px-6.75 py-3.25 md:py-3.5 rounded-lg border-2 border-gray-400 text-nowrap leading-5
                 ${
                   isActive
                     ? 'bg-primary-black text-primary-foreground border-primary-black hover:bg-primary-black hover:text-primary-foreground'

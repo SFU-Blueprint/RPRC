@@ -1,0 +1,1 @@
+export const APPLICATION_DETAIL_ICON_SIZE = 30;

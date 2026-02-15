@@ -59,7 +59,7 @@ export default async function HomePage() {
               </p>
             </div>
             <Link className="mx-auto block pt-4 w-fit" href={ROUTES.MEMBERSHIP_SIGNUP}>
-                <Button size="sm" className="text-xs">Sign Up</Button>
+                <Button size="sm" className="text-xs cursor-pointer">Sign Up</Button>
             </Link>
           </div>
 

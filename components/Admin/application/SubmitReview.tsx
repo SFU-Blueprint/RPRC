@@ -4,13 +4,19 @@ import { inter } from '@/app/fonts';
 
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { RadioGroup } from '@/components/Admin';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { AdminSection } from './AdminSection';
 import SubmitReviewModal from './SubmitReviewModal';
+import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { robotoCondensed } from '@/app/fonts';
+import "@/app/globals.css";
+import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group';
 
-export default function SubmitReview() {
+import { ReviewHistoryMockType } from '@/types/review-history-mock';
+
+export default function SubmitReview({ reviewHistory }: { reviewHistory: ReviewHistoryMockType[] }) {
+
   const [boardMemberName, setBoardMemberName] = useState('');
   const [reviewDate, setReviewDate] = useState('');
   const [decision, setDecision] = useState('');
@@ -20,49 +26,52 @@ export default function SubmitReview() {
   const isFormValid = boardMemberName && reviewDate && decision && reason;
 
   return (
-    <AdminSection title="Submit Your Review">
-      <div>
-        <Label htmlFor="boardMemberName">Board Member Name</Label>
-        <Input
-          id="boardMemberName"
-          placeholder="Enter your name"
-          value={boardMemberName}
-          onChange={(e) => setBoardMemberName(e.target.value)}
-          className="w-[370px] mt-2"
-        />
-      </div>
-      
-      <div className="mt-5.5">
-        <Label htmlFor="reviewDate">Review Date</Label>
-        <Input
-          id="reviewDate"
-          type="date"
-          value={reviewDate}
-          onChange={(e) => setReviewDate(e.target.value)}
-          className="w-[384px] mt-2"
-        />
+    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-lg flex flex-col gap-y-6 mt-6 w-full" >
+      <p className={`${robotoCondensed.className} text-[32px] font-bold`}>
+        Submit Review
+      </p>
+      <div className="flex flex-col md:flex-row gap-x-6">
+        <div className="flex-2">
+          <Label htmlFor="boardMemberName" className='text-application-detail-text-secondary text-md'>Board Member Name</Label>
+          <br />
+          <Input
+            id="boardMemberName"
+            placeholder="Enter your name"
+            value={boardMemberName}
+            onChange={(e) => setBoardMemberName(e.target.value)}
+            className="mt-2 w-full"
+          />
+        </div>
+
+        <div className="flex-1 mt-4 md:mt-0">
+          <Label htmlFor="reviewDate" className='text-application-detail-text-secondary text-md'>Review Date</Label>
+          <br />
+          <Input
+            id="reviewDate"
+            type="date"
+            value={reviewDate}
+            onChange={(e) => setReviewDate(e.target.value)}
+            className="mt-2 w-full"
+          />
+        </div>
       </div>
 
-      <RadioGroup
-        label="Decision"
-        name="decision"
-        options={[
-          { label: 'Approve', value: 'approve' },
-          { label: 'Reject', value: 'reject' },
-        ]}
-        selectedValue={decision}
-        onChange={setDecision}
-        additionalClasses={{
-          wrapper: 'mt-[22px]',
-          optionsContainer: 'gap-x-[13px]',
-          option:
-            'border-2 border-[#D4D0C5] rounded-xl w-[356px] py-3.5 flex items-center justify-center',
-          radioLabel: 'text-base',
-        }}
-      />
+      <Label className='text-application-detail-text-secondary text-md'>Decision</Label>
+      <div className="flex justify-center w-full">
+        <RadioGroup defaultValue="" className='w-[75%] flex flex-row justify-between ' onValueChange={setDecision}>
+          <div className="flex items-center gap-3">
+            <RadioGroupItem value="approve" id="approve" className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer" />
+            <Label htmlFor="approve" className='text-application-detail-text-primary text-md sm:text-xs cursor-pointer'>Approve</Label>
+          </div>
+          <div className="flex items-center gap-3">
+            <RadioGroupItem value="reject" id="reject" className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer" />
+            <Label htmlFor="reject" className='text-application-detail-text-primary text-md sm:text-sm cursor-pointer'>Reject</Label>
+          </div>
+        </RadioGroup>
+      </div>
 
       <div className="mt-5.5">
-        <Label htmlFor="reason">Reason</Label>
+        <Label htmlFor="reason" className='text-application-detail-text-secondary text-md'>Reason</Label>
         <textarea
           name="reason"
           id="reason"
@@ -80,12 +89,12 @@ export default function SubmitReview() {
             setIsModalOpen(true);
           }}
           disabled={!isFormValid}
-          className="bg-[#5EB42D] border-transparent hover:bg-[#4da327]"
+          className="bg-primary hover:bg-primary/10 cursor-pointer"
         >
           Submit Review
         </Button>
       </div>
-      <SubmitReviewModal isOpen={isModalOpen} setModalOpen={setIsModalOpen} />
-    </AdminSection>
+      <SubmitReviewModal isOpen={isModalOpen} reviewHistory={reviewHistory} action={decision as 'approve' | 'reject'} setModalOpen={setIsModalOpen} />
+    </BackdropContainer >
   );
 }

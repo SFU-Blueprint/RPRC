@@ -62,8 +62,25 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  
-  --breakpoint-stack-membership-options: 72.5rem; /* 1160px */
+
+  --color-application-detail-blue-500: var(--application-detail-blue-500);
+  --color-application-detail-blue-100: var(--application-detail-blue-100);
+  --color-application-detail-accent-green: var(--application-detail-accent-green);
+  --color-application-detail-text-primary: var(--application-detail-text-primary);
+  --color-application-detail-text-secondary: var(--application-detail-text-secondary);
+  --color-application-detail-border-100: var(--application-detail-border-100);
+  --color-application-detail-border-50: var(--application-detail-border-50);
+  --color-application-detail-background: var(--application-detail-background);
+  --color-application-approved: var(--application-approved);
+  --color-application-approved-border: var(--application-approved-border);
+  --color-application-rejected: var(--application-rejected);
+  --color-application-rejected-border: var(--application-rejected-border);
+  --color-application-rejected-icon-background: var(--application-rejected-icon-background);
+
+  --breakpoint-stack-membership-options: 72.5rem;
+  /* 1160px */
+  --breakpoint-xs: 30rem;
+  /* 480px */
 }
 
 :root {
@@ -118,6 +135,22 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --application-detail-blue-500: #2D3FB4;
+  --application-detail-blue-100: #D5D9F0;
+  --application-detail-accent-green: #AED996;
+  --application-detail-text-primary: #28231A;
+  --application-detail-text-secondary: #68655F;
+  --application-detail-border-100: #93918C;
+  --application-detail-border-50: #BEBDBA;
+  --application-detail-background: #F9FAFB;
+  --application-approved: #EFF7EA;
+  --application-approved-border: #004E00;
+
+  --application-rejected: #FBEAEA;
+  --application-rejected-border: #AA2628;
+
+  --application-rejected-icon-background: #962123;
 }
 
 .dark {
@@ -158,6 +191,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

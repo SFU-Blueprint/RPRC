@@ -110,7 +110,7 @@ export const HomePageForm = () => {
           <Button 
             type="submit" 
             disabled={isSubmitting || !formData.email || !formData.password}
-            className="bg-primary-black mx-auto block w-fit"
+            className="bg-primary-black mx-auto block w-fit cursor-pointer"
           >
             {isSubmitting ? 'Signing in...' : 'Sign In'}
           </Button>
