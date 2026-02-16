@@ -6,7 +6,7 @@ import { AuthErrorCode } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 import Link from 'next/link';

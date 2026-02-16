@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import '@/app/globals.css';
 import {
@@ -11,11 +10,12 @@ import {
   buttonStyles,
 } from '@/app/fonts';
 import { SuccessInfoCard } from '../cards/SuccessInfoCard';
+import { INFO_CARDS } from '@/lib/constants/membership';
 
 export function Step3Success() {
   return (
     <div
-      className={`bg-signup-neutral-100 rounded-[25px] shadow-lg p-8 sm:p-10 md:p-12 lg:p-14 ${inter.className}`}
+      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0px_-1px_2px_-1px_rgba(0,0,0,0.15),0px_1px_3px_1px_rgba(0,0,0,0.15)] p-6 sm:p-8 md:p-10 lg:p-12 w-full mx-auto ${inter.className} mt-16.25`}
     >
       {/* Dark Logo with Checkmark */}
       <div className="flex justify-center mb-6 sm:mb-8">
@@ -45,7 +45,7 @@ export function Step3Success() {
 
       {/* Thank You Text */}
       <p
-        className={`text-center text-gray-700 mb-10 sm:mb-12 md:mb-14 leading-relaxed ${bodyStyles.m}`}
+        className={`text-center text-gray-700 mb-10 sm:mb-12 md:mb-14 leading-relaxed ${bodyStyles.lg}`}
       >
         Thank you for applying to become a member of the Richmond Poverty
         Reduction Coalition.
@@ -53,65 +53,19 @@ export function Step3Success() {
 
       {/* Info Cards - 4 columns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 mb-10 sm:mb-12">
-        {/* Card 1: Check Your Email */}
-        <SuccessInfoCard
-          icon={
-            <svg
-              className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
-          }
-          heading="Check Your Email"
-          description="A confirmation email has been sent to your registered email address, further about your application status will bw sent here."
-        />
-
-        {/* Card 2: View Your Profile */}
-        <SuccessInfoCard
-          icon={
-            <svg
-              className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
-          }
-          heading="View Your Profile"
-          description="All following steps will be done through the applicant profile including viewing membership status ."
-        />
-
-        {/* Card 3: Review Period */}
-        <SuccessInfoCard
-          icon={
-            <svg
-              className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z" />
-            </svg>
-          }
-          heading="Review Period"
-          description="Our team will review your application within 14 business days."
-        />
-
-        {/* Card 4: Next Steps */}
-        <SuccessInfoCard
-          icon={
-            <svg
-              className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          }
-          heading="Next Steps"
-          description="Once approved, you'll receive payment instructions. After confirmation, your membership will be activated."
-        />
+        {INFO_CARDS.map((card) => {
+          const Icon = card.ICON;
+          return (
+            <SuccessInfoCard
+              key={card.ID}
+              icon={
+                <Icon className="w-16 h-16 sm:w-20 sm:h-20 text-signup-primary-green-300" />
+              }
+              heading={card.HEADING}
+              description={card.DESCRIPTION}
+            />
+          );
+        })}
       </div>
 
       {/* Buttons - Centered */}

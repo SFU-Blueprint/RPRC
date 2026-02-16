@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { resetPassword } from '@/app/actions/auth';
 import { AuthErrorCode, ErrorType } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';

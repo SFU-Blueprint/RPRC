@@ -1,7 +1,7 @@
 import { inter } from '@/app/fonts';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 type AdminSearchBarProps = {
   value: string;

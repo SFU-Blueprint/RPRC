@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { inter, bodyStyles } from '@/app/fonts';
 import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,7 +18,6 @@ export function InterestCard({
 }: InterestCardProps) {
   return (
     <Button
-      type="button"
       variant="outline"
       onClick={onToggle}
       className={cn(

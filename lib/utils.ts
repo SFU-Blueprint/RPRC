@@ -28,3 +28,24 @@ export function formatDateWithOrdinal(date: string | Date) {
 
   return `${day}${getOrdinal(day)} ${month} ${year}`;
 }
+
+export function scrollToFirstError(errors: Record<string, string | undefined>) {
+  // Get first key that has an actual error
+  const firstErrorKey = Object.keys(errors).find(
+    (key) => errors[key] !== undefined,
+  );
+
+  if (!firstErrorKey) return; // No errors to scroll to
+
+  const cleanKey = firstErrorKey.replace('Id', '');
+
+  // Find element to scroll to by name
+  let elements = Array.from(document.getElementsByName(cleanKey));
+  let element = elements.find((el) => !el.hidden);
+
+  if (!element) {
+    element = document.getElementById(cleanKey)!;
+  }
+
+  element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}

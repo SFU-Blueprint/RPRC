@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -80,9 +80,11 @@ export const HomePageForm = () => {
             id="email"
             type="email"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             placeholder="your.email@example.com"
-            className='mt-1'
+            className="mt-1"
             required
           />
         </div>
@@ -100,15 +102,18 @@ export const HomePageForm = () => {
 
         {/* Forgot password link */}
         <div>
-          <Link href={ROUTES.AUTH_FORGOT_PASSWORD} className="text-black text-xs font-medium underline">
+          <Link
+            href={ROUTES.AUTH_FORGOT_PASSWORD}
+            className="text-black text-xs font-medium underline"
+          >
             Forgot password?
           </Link>
         </div>
 
         {/* Submit Button */}
         <div className="pt-4">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isSubmitting || !formData.email || !formData.password}
             className="bg-primary-black mx-auto block w-fit"
           >

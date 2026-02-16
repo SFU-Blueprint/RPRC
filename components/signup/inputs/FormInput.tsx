@@ -8,6 +8,7 @@ import { AlertCircle } from 'lucide-react';
 
 type FormInputProps = {
   label: string;
+  name: string;
   type?: 'text' | 'email' | 'password' | 'tel';
   value: string;
   onChange: (value: string) => void;
@@ -21,6 +22,7 @@ type FormInputProps = {
 
 export function FormInput({
   label,
+  name,
   type = 'text',
   value,
   onChange,
@@ -43,6 +45,7 @@ export function FormInput({
       <div className="relative">
         <Input
           id={label}
+          name={name}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}

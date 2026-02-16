@@ -17,6 +17,7 @@ type FormTextAreaProps = {
   rows?: number;
   disabled?: boolean;
   showValidation?: boolean;
+  required?: boolean;
 };
 
 export function FormTextArea({
@@ -29,6 +30,7 @@ export function FormTextArea({
   rows = 5,
   disabled = false,
   showValidation = false,
+  required = false
 }: FormTextAreaProps) {
   return (
     <div className="w-full flex flex-col gap-2">

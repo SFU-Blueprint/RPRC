@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 
 type FormSelectProps = {
   label: string;
+  name: string;
   value: string;
   onChange: (value: string) => void;
   options: string[];
@@ -24,6 +25,7 @@ type FormSelectProps = {
 
 export function FormSelect({
   label,
+  name,
   value,
   onChange,
   options,

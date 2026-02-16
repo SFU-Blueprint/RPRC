@@ -14,6 +14,7 @@ export const ROUTES = {
   // Membership
   MEMBERSHIP_SIGNUP: '/membership/signup',
   MEMBERSHIP_FORM: '/membership/form',
+  MEMBERSHIP_CONFIRMATION: '/membership/confirmation',
   MEMBERSHIP_DASHBOARD: '/membership/dashboard',
   
   // Auth
@@ -34,6 +35,7 @@ export const ROUTES = {
 // Protected routes that require authentication
 export const PROTECTED_ROUTES = [
   ROUTES.MEMBERSHIP_FORM,
+  ROUTES.MEMBERSHIP_CONFIRMATION,
   ROUTES.MEMBERSHIP_DASHBOARD,
 ] as const
 
