@@ -1,9 +1,17 @@
-'use client';
-
 import { AdminNavbar, ManageApplications, StatCards } from '@/components/Admin';
 import { robotoCondensed } from '@/app/fonts';
+import { getAdminApplicationList, getAdminDashboardStats } from '@/lib/admin/applications';
+import { toStatCardsData } from '@/lib/constants/admin';
 
-export default function AdminDashboard() {
+// Server-side data fetching  
+export default async function AdminDashboard() {
+  const [applications, stats] = await Promise.all([
+    getAdminApplicationList(),
+    getAdminDashboardStats(),
+  ]);
+
+  const statCardsData = toStatCardsData(stats);
+
   return (
     <div className="">
       <AdminNavbar />
@@ -14,8 +22,10 @@ export default function AdminDashboard() {
           >
             Overview
           </h1>
-          <StatCards />
-          <ManageApplications />
+          <StatCards stats={statCardsData} />
+        </div>
+        <div className="max-w-[100rem] mx-auto px-4 md:px-8">
+          <ManageApplications applications={applications} />
         </div>
       </div>
     </div>

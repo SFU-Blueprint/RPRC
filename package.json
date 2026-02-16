@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "types": "dotenv -e .env.local -- supabase gen types typescript --project-id jxvpwuyzthaetqydjmgv > types/database.ts",
+    "types": "npx dotenv -e .env.local -- npx supabase gen types typescript --project-id jxvpwuyzthaetqydjmgv > types/database.ts",
     "lint": "eslint",
     "format": "prettier . --write",
     "test": "vitest"

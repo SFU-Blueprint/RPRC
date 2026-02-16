@@ -1,14 +1,25 @@
-import { ApplicationType } from '@/types/admin.types';
+import { ApplicationType, type AdminDashboardStats } from '@/types/admin.types';
 
-/**
- * Single source of truth for application status types.
- * Used to derive filter tabs and keep UI in sync with status values.
- */
+/* Stat card types. */
+export const STAT_CARD_TYPES = ['independent', 'organization', 'applications'] as const;
+
+export type StatCardType = (typeof STAT_CARD_TYPES)[number];
+
+/** Stats for the three overview cards: independent, organization, applications */
+export type StatCardsData = Array<{ type: StatCardType; value: number }>;
+
+/* Build stat cards array from AdminDashboardStats using STAT_CARD_TYPES order. */
+export function toStatCardsData(stats: AdminDashboardStats): StatCardsData {
+  return STAT_CARD_TYPES.map((type) => ({ type, value: stats[type] }));
+}
+
+/* Single source of truth for application status types.  */
 export const APPLICATION_STATUS_TYPES = [
   { value: 'toReview', label: 'To Review' },
   { value: 'paymentPending', label: 'Payment Pending' },
   { value: 'active', label: 'Active' },
   { value: 'expired', label: 'Expired' },
+  { value: 'conflict', label: 'Conflict' },
   { value: 'rejected', label: 'Rejected' },
 ] as const;
 
@@ -16,6 +27,7 @@ const ALL_TAB = { value: 'all', label: 'All' } as const;
 
 export const ADMIN_DASHBOARD_CONST = {
   PAGE_TITLE: 'Admin Dashboard',
+
   /** Filter tabs: "All" plus one tab per application status type */
   TABS: [ALL_TAB, ...APPLICATION_STATUS_TYPES],
   TABLE_COLUMNS: [
@@ -28,284 +40,3 @@ export const ADMIN_DASHBOARD_CONST = {
   ],
 };
 
-export const ADMIN_DASHBOARD_MOCK = {
-  ADMIN_NAME: 'John Doe',
-  PROFILE_PICTURE_URL: undefined,
-  STAT_CARDS: [
-    { type: 'independent', value: 30 },
-    { type: 'organization', value: 20 },
-    { type: 'applications', value: 30 },
-  ],
-  APPLICATIONS_MOCK: [
-    {
-      id: 'APP01',
-      applicantName: 'Leighton Kramer',
-      type: 'individual',
-      dateReceived: '2026-01-06',
-      status: 'to_review',
-      reviewer1: '',
-      reviewer2: '',
-    },
-    {
-      id: 'APP02',
-      applicantName: 'Marceline Avila',
-      type: 'organization',
-      dateReceived: '2025-12-18',
-      status: 'to_review',
-      reviewer1: 'Jane Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP03',
-      applicantName: 'Jensen Vang',
-      type: 'organization',
-      dateReceived: '2025-11-11',
-      status: 'rejected',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP04',
-      applicantName: 'Linda Wu',
-      type: 'individual',
-      dateReceived: '2025-11-11',
-      status: 'payment_pending',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP05',
-      applicantName: 'Carter Higgins',
-      type: 'organization',
-      dateReceived: '2025-11-05',
-      status: 'active',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP06',
-      applicantName: 'Sarah Johnson',
-      type: 'individual',
-      dateReceived: '2025-11-10',
-      status: 'active',
-      reviewer1: 'Jane Doe',
-      reviewer2: 'John Doe',
-    },
-    {
-      id: 'APP07',
-      applicantName: 'Michael Chen',
-      type: 'organization',
-      dateReceived: '2025-11-09',
-      status: 'expired',
-      reviewer1: 'John Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP08',
-      applicantName: 'Emma Thompson',
-      type: 'individual',
-      dateReceived: '2026-02-01',
-      status: 'to_review',
-      reviewer1: '',
-      reviewer2: '',
-    },
-    {
-      id: 'APP09',
-      applicantName: 'Riverdale Community Center',
-      type: 'organization',
-      dateReceived: '2026-01-28',
-      status: 'to_review',
-      reviewer1: 'Jane Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP10',
-      applicantName: 'James Wilson',
-      type: 'individual',
-      dateReceived: '2026-01-25',
-      status: 'to_review',
-      reviewer1: '',
-      reviewer2: '',
-    },
-    {
-      id: 'APP11',
-      applicantName: 'Olivia Martinez',
-      type: 'individual',
-      dateReceived: '2026-01-20',
-      status: 'payment_pending',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP12',
-      applicantName: 'Green Valley Food Bank',
-      type: 'organization',
-      dateReceived: '2026-01-18',
-      status: 'payment_pending',
-      reviewer1: 'John Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP13',
-      applicantName: 'David Kim',
-      type: 'individual',
-      dateReceived: '2026-01-15',
-      status: 'active',
-      reviewer1: 'Jane Doe',
-      reviewer2: 'John Doe',
-    },
-    {
-      id: 'APP14',
-      applicantName: 'Sunrise Arts Collective',
-      type: 'organization',
-      dateReceived: '2026-01-12',
-      status: 'active',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP15',
-      applicantName: 'Rachel Green',
-      type: 'individual',
-      dateReceived: '2026-01-10',
-      status: 'active',
-      reviewer1: 'Jane Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP16',
-      applicantName: 'Amanda Foster',
-      type: 'individual',
-      dateReceived: '2026-01-08',
-      status: 'expired',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP17',
-      applicantName: 'Bridge Housing Society',
-      type: 'organization',
-      dateReceived: '2026-01-05',
-      status: 'expired',
-      reviewer1: 'John Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP18',
-      applicantName: 'Thomas Reed',
-      type: 'individual',
-      dateReceived: '2025-12-28',
-      status: 'rejected',
-      reviewer1: 'Jane Doe',
-      reviewer2: 'John Doe',
-    },
-    {
-      id: 'APP19',
-      applicantName: 'Patricia Nguyen',
-      type: 'individual',
-      dateReceived: '2025-12-22',
-      status: 'to_review',
-      reviewer1: '',
-      reviewer2: '',
-    },
-    {
-      id: 'APP20',
-      applicantName: 'Downtown Health Clinic',
-      type: 'organization',
-      dateReceived: '2025-12-18',
-      status: 'payment_pending',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP21',
-      applicantName: 'Kevin Brown',
-      type: 'individual',
-      dateReceived: '2025-12-15',
-      status: 'active',
-      reviewer1: 'Jane Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP22',
-      applicantName: 'Lisa Park',
-      type: 'individual',
-      dateReceived: '2025-12-10',
-      status: 'active',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP23',
-      applicantName: 'Youth Empowerment Network',
-      type: 'organization',
-      dateReceived: '2025-12-05',
-      status: 'expired',
-      reviewer1: 'Jane Doe',
-      reviewer2: 'John Doe',
-    },
-    {
-      id: 'APP24',
-      applicantName: 'Nathan Scott',
-      type: 'individual',
-      dateReceived: '2025-11-28',
-      status: 'rejected',
-      reviewer1: 'John Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP25',
-      applicantName: 'Megan Taylor',
-      type: 'individual',
-      dateReceived: '2025-11-25',
-      status: 'to_review',
-      reviewer1: '',
-      reviewer2: '',
-    },
-    {
-      id: 'APP26',
-      applicantName: 'Community Garden Project',
-      type: 'organization',
-      dateReceived: '2025-11-20',
-      status: 'payment_pending',
-      reviewer1: 'Jane Doe',
-      reviewer2: 'John Doe',
-    },
-    {
-      id: 'APP27',
-      applicantName: 'Daniel Lee',
-      type: 'individual',
-      dateReceived: '2025-11-15',
-      status: 'active',
-      reviewer1: 'John Doe',
-      reviewer2: '',
-    },
-    {
-      id: 'APP28',
-      applicantName: 'Jennifer Adams',
-      type: 'individual',
-      dateReceived: '2025-11-12',
-      status: 'active',
-      reviewer1: 'Jane Doe',
-      reviewer2: 'John Doe',
-    },
-    {
-      id: 'APP29',
-      applicantName: 'Family Support Services',
-      type: 'organization',
-      dateReceived: '2025-11-08',
-      status: 'expired',
-      reviewer1: 'John Doe',
-      reviewer2: 'Jane Doe',
-    },
-    {
-      id: 'APP30',
-      applicantName: 'Christopher Moore',
-      type: 'individual',
-      dateReceived: '2025-11-01',
-      status: 'rejected',
-      reviewer1: 'Jane Doe',
-      reviewer2: '',
-    },
-  ] as ApplicationType[],
-};
