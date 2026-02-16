@@ -46,7 +46,7 @@ export default async function HomePage() {
       <div className="relative bg-none max-w-screen-2xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16">
           <div className="bg-background-off-white rounded-3xl p-8 md:p-10 lg:p-12 h-fit">
-            <h2 className={`${subheaderStyles.s} mb-6 text-gray-900`}>
+            <h2 className={`${subheaderStyles.m} mb-6 text-gray-900`}>
               Interested in becoming a member?
             </h2>
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
 import { inter, robotoCondensed, headerStyles } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/api/helpers/signup-validation';
@@ -14,10 +15,11 @@ import { MembershipInterests } from '../cards/MembershipInterests';
 import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
 import { PleaseNoteBox } from '../cards/PleaseNoteBox';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { scrollToFirstError } from '@/lib/utils';
-import { submitApplication } from '@/app/actions/application';
+import { submitIndividualApplication, submitOrganizationApplication } from '@/app/actions/application';
 import { toast } from 'sonner';
+import { UserRole } from '@/lib/constants/enums';
 
 export function Step2Form() {
   const {
@@ -29,6 +31,9 @@ export function Step2Form() {
     setHasAttemptedValidation,
     goToNextStep,
   } = useSignUp();
+  
+  const { user } = useAuth();
+  const userRole = user?.user_metadata?.role;
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +42,7 @@ export function Step2Form() {
     setHasAttemptedValidation(true);
     setIsSubmitting(true);
 
-    const validationErrors = validateStep2(formData);
+    const validationErrors = validateStep2(formData, userRole);
     if (hasErrors(validationErrors)) {
       setErrors(validationErrors);
       console.error('Step 2 validation failed:', validationErrors);
@@ -57,7 +62,13 @@ export function Step2Form() {
         formDataObj.append(key, String(value));
       }
     });
-    const result = await submitApplication(formDataObj);
+    
+    // Call appropriate submission function based on user role
+    const submitFunction = isIndividual 
+      ? submitIndividualApplication 
+      : submitOrganizationApplication;
+    
+    const result = await submitFunction(formDataObj);
     if (!result.success) {
       toast.error('Failed to submit your application, please try again', {
         description: `Error: ${result.error}`
@@ -69,11 +80,11 @@ export function Step2Form() {
     goToNextStep();
   };
 
-  // Dynamic form heading based on membership type
-  const formHeading =
-    formData.membershipType === 'individual'
-      ? 'Individual Membership Application Form'
-      : 'Organization Membership Application Form';
+  // Dynamic form heading based on user role
+  const isIndividual = userRole === UserRole.INDIVIDUAL;
+  const formHeading = isIndividual
+    ? 'Individual Membership Application Form'
+    : 'Organization Membership Application Form';
 
   return (
     <div
@@ -86,8 +97,8 @@ export function Step2Form() {
         {formHeading}
       </h1>
 
-      {/* Contact Information - Conditional based on membership type */}
-      {formData.membershipType === 'individual' ? (
+      {/* Contact Information - Conditional based on user role */}
+      {isIndividual ? (
         <ContactInfoIndividual />
       ) : (
         <ContactInfoOrganization />
@@ -114,7 +125,7 @@ export function Step2Form() {
       </div>
 
       {/* Conditional Individual/Organization Sections */}
-      {formData.membershipType === 'individual' ? (
+      {isIndividual ? (
         <MembershipWaiverSection />
       ) : (
         <OrganizationServicesSection />
@@ -125,12 +136,6 @@ export function Step2Form() {
 
       {/* Submit button + Confirmation Modal */}
       <div className="flex justify-center">
-        <Button
-          onClick={handleSubmit}
-          size="lg"
-        >
-          Submit Application
-        </Button>
         <ConfirmationModal
           isOpen={showConfirmModal}
           onClose={() => setShowConfirmModal(false)}

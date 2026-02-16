@@ -335,7 +335,7 @@ export function Step1Form() {
             Already have an account?{' '}
             <Link
               href={ROUTES.HOME}
-              className="text-[#5EB42D] hover:text-[#2B8100] font-medium underline"
+              className="font-medium underline"
             >
               Sign in here
             </Link>

@@ -40,10 +40,11 @@ export function ContactInfoOrganization() {
           label="Organization Email Address"
           type="email"
           value={formData.email}
-          onChange={(val) => updateFormData({ email: val })}
+          onChange={() => {}} // No-op since it's disabled
           error={errors.email}
           placeholder=""
           required
+          disabled
           showValidation={hasAttemptedValidation}
         />
       </div>
