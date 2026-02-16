@@ -4,63 +4,58 @@ import { Modal } from '@/components/Admin';
 import { Button } from '@/components/ui/Button';
 import { inter, robotoCondensed } from '@/app/fonts';
 import { ReviewHistoryMockType } from '@/types/review-history-mock';
+import { CONFIRM_REVIEW_TEXT } from './const';
+import { ReviewDecision } from '@/lib/constants';
 
 type SubmitReviewModalProps = {
   isOpen: boolean;
   reviewHistory: ReviewHistoryMockType[];
-  action: 'approve' | 'reject';
+  action: ReviewDecision;
   setModalOpen: (isOpen: boolean) => void;
 };
 
-const getModalText = (reviewHistory: ReviewHistoryMockType[], action: 'approve' | 'reject') => {
+const getModalText = (reviewHistory: ReviewHistoryMockType[], action: ReviewDecision) => {
   const numberOfReviews = reviewHistory.length;
-  const numberApproved = reviewHistory.filter(review => review.decision === 'approve').length;
-  const numberRejected = reviewHistory.filter(review => review.decision === 'reject').length;
+  const numberApproved = reviewHistory.filter(review => review.decision === ReviewDecision.APPROVE).length;
+  const numberRejected = reviewHistory.filter(review => review.decision === ReviewDecision.REJECT).length;
 
-  if (action === 'approve') {
-
-    // first approval
+  if (action === ReviewDecision.APPROVE) {
     if (numberOfReviews === 0) {
       return {
-        title: "Submit First Approval",
-        description: "You're submitting an approval for this application. This review will be recorded. "
-      }
+        title: CONFIRM_REVIEW_TEXT.FIRST_APPROVAL_TITLE,
+        description: CONFIRM_REVIEW_TEXT.FIRST_APPROVAL_DESCRIPTION
+      };
     }
 
-    // second and final approval (regardless of previous conflicts)
-    if (numberApproved + 1 == 2) {
-
+    if (numberApproved + 1 === 2) {
       return {
-        title: "Submit Final Approval",
-        description: "You're submitting an approval for this application. This is the second approval from your team and will finalize the approval for this application."
-      }
+        title: CONFIRM_REVIEW_TEXT.FINAL_APPROVAL_TITLE,
+        description: CONFIRM_REVIEW_TEXT.FINAL_APPROVAL_DESCRIPTION
+      };
     }
   }
 
-  if (action === 'reject') {
-    // first rejection
+  if (action === ReviewDecision.REJECT) {
     if (numberOfReviews === 0) {
       return {
-        title: "Submit First Rejection",
-        description: "You're submitting a rejection for this application. This review will be recorded. "
-      }
+        title: CONFIRM_REVIEW_TEXT.FIRST_REJECTION_TITLE,
+        description: CONFIRM_REVIEW_TEXT.FIRST_REJECTION_DESCRIPTION
+      };
     }
 
-    // second and final rejection (regardless of previous conflicts)
-    if (numberRejected + 1 == 2) {
+    if (numberRejected + 1 === 2) {
       return {
-        title: "Submit Final Rejection",
-        description: "You're submitting a rejection for this application. This is the second rejection from your team and will finalize the rejection for this application."
-      }
+        title: CONFIRM_REVIEW_TEXT.FINAL_REJECTION_TITLE,
+        description: CONFIRM_REVIEW_TEXT.FINAL_REJECTION_DESCRIPTION
+      };
     }
   }
 
-  // include a case for mixed reviews (e.g. one approval, one rejection)
   return {
-    title: "Submit a Different Decision",
-    description: "You’re submitting a decision that is different from another decision made on this application. Applications with conflicting decisions will require team discussion."
+    title: CONFIRM_REVIEW_TEXT.MIXED_DECISION_TITLE,
+    description: CONFIRM_REVIEW_TEXT.MIXED_DECISION_DESCRIPTION
   };
-}
+};
 
 
 export default function SubmitReviewModal({

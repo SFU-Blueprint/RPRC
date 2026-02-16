@@ -1,7 +1,7 @@
 'use client';
 import { inter, robotoCondensed } from '@/app/fonts';
 import Link from 'next/link';
-import { APPLICATION_DETAILS_MOCK, APPLICATION_DETAILS_CONST, REVIEW_HISTORY_MOCK_ONE_APPROVAL, REVIEW_HISTORY_MOCK_ONE_REJECT, REVIEW_HISTORY_MOCK_APPROVAL, REVIEW_HISTORY_MOCK_NO_APPROVAL, REVIEW_HISTORY_MOCK_CONFLICT } from './const';
+import { APPLICATIONS_MOCK, APPLICATION_DETAILS_CONST, REVIEW_HISTORY_MOCK_ONE_APPROVAL, REVIEW_HISTORY_MOCK_ONE_REJECT, REVIEW_HISTORY_MOCK_APPROVAL, REVIEW_HISTORY_MOCK_NO_APPROVAL, REVIEW_HISTORY_MOCK_CONFLICT, USERS_MOCK, USER_ADDRESSES_MOCK, INDIVIDUAL_PROFILES_MOCK, INDIVIDUAL_APPLICATION_DETAILS_MOCK } from './const';
 import { StatusChip } from '@/components/Admin';
 import ApplicationDetails from '@/components/Admin/application/ApplicationDetails';
 import SubmitReview from '@/components/Admin/application/SubmitReview';
@@ -14,36 +14,44 @@ import { ReviewHistoryMockType } from '@/types/review-history-mock';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Activity } from 'react';
-
-function determineReviewStatus(reviews: ReviewHistoryMockType[]): 'approved' | 'rejected' | 'pending' {
-  const approvals = reviews.filter(review => review.decision === 'approve').length;
-  const rejections = reviews.filter(review => review.decision === 'reject').length;
-
-  if (approvals >= 2) {
-    return 'approved';
-  }
-
-  if (rejections >= 2) {
-    return 'rejected';
-  }
-
-  return 'pending';
-}
+import { ApplicationStatus, ApplicationType, ReviewDecision } from '@/lib/constants/enums';
 
 export default function Application() {
-  // TODO: Fetch application details u  sing appId, using mock for now
+  // TODO: Fetch application details using appId, using mock for now
   const params = useParams();
   const { id } = params;
   console.log('Application ID from URL:', id); // Log the application ID
-  const application = APPLICATION_DETAILS_MOCK;
-  const reviewHistory = REVIEW_HISTORY_MOCK_CONFLICT;
 
-  // should be a stateful variable in useEffect when fetching from supabase
-  const reviewStatus = determineReviewStatus(reviewHistory);
+  // replace left side of equals with supabase queries in but not anything else or it will break
+  // (w/ state variables and useeffect)
+  // also i did not do application organization type yet cuz there wasnt a design for it
+  const application = APPLICATIONS_MOCK.find(app => app.id === id);
+  const user = USERS_MOCK.find(user => user.id === application?.user_id);
+  const userAddress = USER_ADDRESSES_MOCK.find(address => address.user_id === application?.user_id);
+  const userProfile = INDIVIDUAL_PROFILES_MOCK.find(profile => profile.user_id === application?.user_id);
+  const applicationDetails = INDIVIDUAL_APPLICATION_DETAILS_MOCK.find(details => details.application_id === application?.id);
+  const reviewHistory = REVIEW_HISTORY_MOCK_APPROVAL.filter(review => review.application_id === application?.id) || [];
+
+  // did not figure out how the membership interests / application interest tables worked
+  const applicationInterests = ['Health', 'Environment', 'Arts + Culture'];
 
   const [showDetails, setShowDetails] = React.useState(true);
   const [showSubmitReview, setShowSubmitReview] = React.useState(true);
   const [showReviewHistory, setShowReviewHistory] = React.useState(true);
+
+  // to maintain compatbility with ApplicationDetails component prop type
+  const contactInfo = {
+    email: user?.email!,
+    phone: userProfile?.phone_number!,
+    address: `${userAddress?.mailing_address}, ${userAddress?.city}, ${userAddress?.province}, ${userAddress?.country} ${userAddress?.postal_code}`
+  };
+
+  const ableToReview =
+    application?.status === ApplicationStatus.TO_REVIEW ||
+    application?.status === ApplicationStatus.CONFLICT ||
+    application?.status === ApplicationStatus.ACTIVE;
+
+  const isReviewFinalized = application?.status === ApplicationStatus.PAYMENT_PENDING || application?.status === ApplicationStatus.REJECTED;
 
   return (
     <div className="overflow-hidden flex justify-center items-center">
@@ -63,9 +71,9 @@ export default function Application() {
             <h1
               className={`text-[32px] sm:text-[48px] font-semibold leading-[110%] ${robotoCondensed.className}`}
             >
-              {application.name}
+              {userProfile?.name}
             </h1>
-            <StatusChip theme={application.status} />
+            <StatusChip theme={application?.status as ApplicationStatus | ReviewDecision} />
           </div>
 
           <div className="mt-5 lg:hidden w-full flex flex-row items-center justify-center">
@@ -105,21 +113,21 @@ export default function Application() {
         <div className="p-5 bg-white mt-40 xs:mt-45 flex flex-col z-0">
           <Activity mode={showDetails ? "visible" : "hidden"}>
             <ApplicationDetails
-              type={application.type}
-              interests={application.interests}
-              reason={application.reason}
-              contact={application.contact}
-              dateReceived={application.dateReceived}
+              type={application?.type as ApplicationType}
+              interests={applicationInterests}
+              reason={applicationDetails?.reason!}
+              contact={contactInfo}
+              dateReceived={application?.created_at!}
             />
           </Activity>
 
 
           <div className="flex flex-col lg:flex-row gap-x-10 xs:mt-[25px] justify-between items-start">
-            <Activity mode={showSubmitReview && reviewStatus === 'pending' ? "visible" : "hidden"}>
+            <Activity mode={showSubmitReview && ableToReview ? "visible" : "hidden"}>
               <SubmitReview reviewHistory={reviewHistory} />
             </Activity>
-            <Activity mode={showSubmitReview && (reviewStatus === 'approved' || reviewStatus === 'rejected') ? "visible" : "hidden"}>
-              <ApplicationResult result={reviewStatus as 'approved' | 'rejected'} />
+            <Activity mode={showSubmitReview && isReviewFinalized ? "visible" : "hidden"}>
+              <ApplicationResult result={application?.status as ApplicationStatus} />
             </Activity>
             <Activity mode={showReviewHistory ? "visible" : "hidden"}>
               <ReviewHistory reviewHistory={reviewHistory} />

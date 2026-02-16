@@ -1,10 +1,11 @@
 import { inter } from '@/app/fonts';
 import { Mail, Phone, MapPin, Calendar, User, Building } from 'lucide-react';
 import { BackdropContainer } from '@/components/ui/BackdropContainer';
-import { APPLICATION_DETAIL_ICON_SIZE } from './const';
+import { APPLICATION_DETAIL_ICON_SIZES } from './const';
+import { ApplicationType } from '@/lib/constants';
 
 type ApplicationDetailsProps = {
-  type: string;
+  type: ApplicationType;
   interests: string[];
   reason: string;
   contact: {
@@ -55,14 +56,17 @@ export default function ApplicationDetails({
   dateReceived,
 }: ApplicationDetailsProps) {
 
-  const typeIcon = type === 'individual' ? <User size={APPLICATION_DETAIL_ICON_SIZE} /> : <Building size={APPLICATION_DETAIL_ICON_SIZE} />;
-  const typeText = type === 'individual' ? 'Individual' : 'Organization';
+  const typeIcon = type === ApplicationType.INDIVIDUAL
+    ? <User size={APPLICATION_DETAIL_ICON_SIZES.LARGE} />
+    : <Building size={APPLICATION_DETAIL_ICON_SIZES.LARGE} />;
+
+  const typeText = type === ApplicationType.INDIVIDUAL ? 'Individual' : 'Organization';
   return (
     <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-lg flex flex-col gap-y-6 mt-6">
       {/* Top Row */}
       <div className="grid grid-cols-2 gap-6">
         <DetailField label="Type" value={typeText} icon={typeIcon} />
-        <DetailField label="Date Received" value={dateReceived} icon={<Calendar size={APPLICATION_DETAIL_ICON_SIZE} />} />
+        <DetailField label="Date Received" value={dateReceived} icon={<Calendar size={APPLICATION_DETAIL_ICON_SIZES.LARGE} />} />
       </div>
 
       {/* Bottom Row */}
@@ -91,9 +95,9 @@ export default function ApplicationDetails({
           <BackdropContainer className="bg-white border border-1 border-application-detail-border-100 shadow-none">
             <p className="text-application-detail-text-primary font-bold mb-2">Contact Information</p>
             <div className="flex flex-col gap-y-4">
-              <ContactItem icon={<Mail size={20} />} text={contact.email} />
-              <ContactItem icon={<Phone size={20} />} text={contact.phone} />
-              <ContactItem icon={<MapPin size={20} />} text={contact.address} />
+              <ContactItem icon={<Mail size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />} text={contact.email} />
+              <ContactItem icon={<Phone size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />} text={contact.phone} />
+              <ContactItem icon={<MapPin size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />} text={contact.address} />
             </div>
           </BackdropContainer>
         </div>

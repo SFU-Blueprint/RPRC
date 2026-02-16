@@ -1,21 +1,41 @@
 import { ReviewHistoryMockType } from "@/types/review-history-mock";
-import { date } from "zod";
 
-export const APPLICATION_DETAILS_MOCK = {
-  name: 'Leighton Kramer',
-  status: 'to_review',
+export const APPLICATIONS_MOCK = [{
+  id: 'APP01',
+  user_id: 'USER01',
   type: 'individual',
-  interests: ['Health', 'Education', 'Arts+Culture'],
-  reason:
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquiP. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea.',
-  contact: {
-    email: 'leighton.kramer@gmail.com',
-    phone: '+1 (123) 456-7890',
-    address: '2007-258 Nelsons Court, New Westminster, BC, V3J09S',
-  },
-  dateReceived: '2024-05-01',
+  status: 'payment_pending',
+  created_at: '2024-05-01',
+}];
 
-};
+export const USERS_MOCK = [{
+  id: 'USER01',
+  role: 'individual',
+  email: "leighton.kramer@gmail.com",
+  created_at: '2024-01-01',
+  updated_at: '2024-01-01',
+}];
+
+export const USER_ADDRESSES_MOCK = [{
+  user_id: 'USER01',
+  mailing_address: "2007-258 Nelsons Court",
+  city: "New Westminster",
+  province: "BC",
+  country: "Canada",
+  postal_code: "V3M 6J8",
+}];
+
+export const INDIVIDUAL_PROFILES_MOCK = [{
+  user_id: 'USER01',
+  name: "Leighton Kramer",
+  phone_number: "604-555-1234",
+  phone_type: "cell",
+}];
+
+export const INDIVIDUAL_APPLICATION_DETAILS_MOCK = [{
+  application_id: 'APP01',
+  reason: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+}];
 
 export const APPLICATION_DETAILS_CONST = {
   breadcrumbs: 'Back to All Applications',

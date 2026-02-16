@@ -9,11 +9,11 @@ export const ADMIN_DASHBOARD_CONST = {
     },
     {
       label: 'To Review',
-      value: 'toReview',
+      value: 'to_review',
     },
     {
       label: 'Payment Pending',
-      value: 'paymentPending',
+      value: 'payment_pending',
     },
     {
       label: 'Active',

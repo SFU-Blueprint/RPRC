@@ -1,22 +1,24 @@
 import { inter } from '@/app/fonts';
+import { ApplicationStatus, ReviewDecision } from '@/lib/constants';
 
 type StatusChipType = {
   color: string;
   label: string;
-  theme: string;
+  theme: ApplicationStatus | ReviewDecision;
 };
 
 const STATUS_CHIPS: StatusChipType[] = [
-  { color: '#00519F', label: 'To Review', theme: 'to_review' },
-  { color: '#393533', label: 'Rejected', theme: 'rejected' },
-  { color: '#C67D38', label: 'Payment Pending', theme: 'payment_pending' },
-  { color: '#5EB42D', label: 'Active', theme: 'active' },
-  { color: '#2B8100', label: 'Approved', theme: 'approved' },
-  { color: '#BE282B', label: 'Expired', theme: 'expired' },
+  { color: '#00519F', label: 'To Review', theme: ApplicationStatus.TO_REVIEW },
+  { color: '#393533', label: 'Rejected', theme: ApplicationStatus.REJECTED },
+  { color: '#393533', label: 'Rejected', theme: ReviewDecision.REJECT },
+  { color: '#C67D38', label: 'Payment Pending', theme: ApplicationStatus.PAYMENT_PENDING },
+  { color: '#5EB42D', label: 'Active', theme: ApplicationStatus.ACTIVE },
+  { color: '#2B8100', label: 'Approved', theme: ReviewDecision.APPROVE },
+  { color: '#BE282B', label: 'Expired', theme: ApplicationStatus.EXPIRED },
 ];
 
 type StatusChipProps = {
-  theme: string;
+  theme: ApplicationStatus | ReviewDecision;
 };
 
 export default function StatusChip({ theme }: StatusChipProps) {

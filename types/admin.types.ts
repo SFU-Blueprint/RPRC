@@ -1,3 +1,5 @@
+import { ReviewDecision } from "@/lib/constants";
+
 export type ColumnType = {
   label: string;
   value: string;
@@ -42,7 +44,7 @@ export type AdminDashboardMobileTablePropTypes = {
 export type AdminReviewProps = {
   createdAt: string;
   reviewerName: string;
-  decision: string;
+  decision: ReviewDecision
   reason: string;
   isFinalDecision: boolean;
 };

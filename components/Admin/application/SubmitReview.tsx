@@ -14,12 +14,13 @@ import "@/app/globals.css";
 import { RadioGroupItem, RadioGroup } from '@/components/ui/radio-group';
 
 import { ReviewHistoryMockType } from '@/types/review-history-mock';
+import { ReviewDecision } from '@/lib/constants/enums';
 
 export default function SubmitReview({ reviewHistory }: { reviewHistory: ReviewHistoryMockType[] }) {
 
   const [boardMemberName, setBoardMemberName] = useState('');
   const [reviewDate, setReviewDate] = useState('');
-  const [decision, setDecision] = useState('');
+  const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -58,13 +59,13 @@ export default function SubmitReview({ reviewHistory }: { reviewHistory: ReviewH
 
       <Label className='text-application-detail-text-secondary text-md'>Decision</Label>
       <div className="flex justify-center w-full">
-        <RadioGroup defaultValue="" className='w-[75%] flex flex-row justify-between ' onValueChange={setDecision}>
+        <RadioGroup defaultValue="" className='w-[75%] flex flex-row justify-between ' onValueChange={val => setDecision(val as ReviewDecision)}>
           <div className="flex items-center gap-3">
-            <RadioGroupItem value="approve" id="approve" className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer" />
+            <RadioGroupItem value={ReviewDecision.APPROVE} id="approve" className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer" />
             <Label htmlFor="approve" className='text-application-detail-text-primary text-md sm:text-xs cursor-pointer'>Approve</Label>
           </div>
           <div className="flex items-center gap-3">
-            <RadioGroupItem value="reject" id="reject" className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer" />
+            <RadioGroupItem value={ReviewDecision.REJECT} id="reject" className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer" />
             <Label htmlFor="reject" className='text-application-detail-text-primary text-md sm:text-sm cursor-pointer'>Reject</Label>
           </div>
         </RadioGroup>
@@ -94,7 +95,7 @@ export default function SubmitReview({ reviewHistory }: { reviewHistory: ReviewH
           Submit Review
         </Button>
       </div>
-      <SubmitReviewModal isOpen={isModalOpen} reviewHistory={reviewHistory} action={decision as 'approve' | 'reject'} setModalOpen={setIsModalOpen} />
+      <SubmitReviewModal isOpen={isModalOpen} reviewHistory={reviewHistory} action={decision as ReviewDecision} setModalOpen={setIsModalOpen} />
     </BackdropContainer >
   );
 }
