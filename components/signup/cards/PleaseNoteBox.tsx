@@ -6,12 +6,12 @@ import { inter, bodyStyles } from '@/app/fonts';
 export function PleaseNoteBox() {
   return (
     <div
-      className={`mb-8 md:mb-10 bg-blue-50 border-l-4 border-blue-500 p-3 sm:p-4 rounded-r-lg flex gap-2 ${inter.className}`}
+      className={`mb-8 md:mb-10 bg-feedback-info border-l-8 border-feedback-info-accent sm:p-4 rounded-lg flex gap-2 ${inter.className}`}
     >
       {/* Info Icon */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <svg
-          className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500"
+          className="w-4 h-4 sm:w-5 sm:h-5 text-feedback-info-accent"
           fill="currentColor"
           viewBox="0 0 20 20"
         >

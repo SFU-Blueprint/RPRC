@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { inter, buttonStyles } from '@/app/fonts';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import '@/app/globals.css';
 
 export function Navbar() {
@@ -124,7 +124,7 @@ export function Navbar() {
           <div className="flex items-center gap-3 md:gap-4">
             {/* Primary Button - Join Us */}
             <Button asChild size="md">
-                <Link href="/membership">Join Us</Link>
+              <Link href="/membership">Join Us</Link>
             </Button>
 
             {/* Secondary Button - Donate */}

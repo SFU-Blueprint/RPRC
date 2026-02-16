@@ -1,13 +1,35 @@
 'use client';
 
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { InterestCard } from './InterestCard';
 import { robotoCondensed, headerStyles } from '@/app/fonts';
-import { MEMBERSHIP_INTERESTS } from '@/app/membership/signup/const';
+import { createClient } from '@/lib/supabase/client';
 
 export function MembershipInterests() {
   const { formData, updateFormData } = useSignUp();
+  const supabase = createClient();
+  const [membershipInterests, setMembershipInterests] = useState<
+    {
+      id: number;
+      name: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchInterests = async () => {
+      const { data, error } = await supabase
+        .from('membership_interests')
+        .select('*');
+
+      if (error) {
+        console.error('Error fetching interests:', error);
+      } else {
+        setMembershipInterests(data || []);
+      }
+    };
+    fetchInterests();
+  }, []);
 
   const toggleInterest = (interest: string) => {
     const currentInterests = formData.interests || [];
@@ -29,12 +51,12 @@ export function MembershipInterests() {
 
       {/* Interest Cards - 3 columns grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-        {MEMBERSHIP_INTERESTS.map((interest) => (
+        {membershipInterests.map((interest) => (
           <InterestCard
-            key={interest}
-            label={interest}
-            isSelected={formData.interests?.includes(interest) || false}
-            onToggle={() => toggleInterest(interest)}
+            key={interest.id}
+            label={interest.name}
+            isSelected={formData.interests?.includes(interest.name) || false}
+            onToggle={() => toggleInterest(interest.name)}
           />
         ))}
       </div>

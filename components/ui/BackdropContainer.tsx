@@ -5,7 +5,10 @@ type BackdropContainerProps = {
   className?: string;
 };
 
-export function BackdropContainer({ children, className }: BackdropContainerProps) {
+export function BackdropContainer({
+  children,
+  className,
+}: BackdropContainerProps) {
   return (
     <div
       className={cn(

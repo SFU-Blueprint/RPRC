@@ -23,6 +23,7 @@ export function ContactInfoIndividual() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
         {/* Name */}
         <FormInput
+          name="fullName"
           label="Name"
           type="text"
           value={formData.fullName}
@@ -36,6 +37,7 @@ export function ContactInfoIndividual() {
         {/* Email Address - Pre-filled and disabled */}
         <FormInput
           label="Email Address"
+          name="email"
           type="email"
           value={formData.email}
           onChange={() => {}} // No-op since it's disabled
@@ -53,6 +55,7 @@ export function ContactInfoIndividual() {
         <FormInput
           label="Phone Number"
           type="tel"
+          name="phoneNumber"
           value={formData.phoneNumber}
           onChange={(val) => updateFormData({ phoneNumber: val })}
           error={errors.phoneNumber}

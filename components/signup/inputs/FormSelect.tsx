@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
 import { inter, bodyStyles } from '@/app/fonts';
 
 type FormSelectProps = {
   label: string;
+  name: string;
   value: string;
   onChange: (value: string) => void;
   options: string[];
@@ -16,6 +16,7 @@ type FormSelectProps = {
 
 export function FormSelect({
   label,
+  name,
   value,
   onChange,
   options,
@@ -44,10 +45,11 @@ export function FormSelect({
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <select
+        name={name}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`
-          w-full px-4 py-3 rounded-lg 
+          w-full px-2 py-3 rounded-lg 
           bg-white
           text-gray-900 ${bodyStyles.m}
           border-2
@@ -70,7 +72,7 @@ export function FormSelect({
       {showValidation && error && (
         <p
           id={`${label}-error`}
-          className="text-red-500 ${bodyStyles.s}] mt-1"
+          className={`text-red-500 ${bodyStyles.s}] mt-1`}
           role="alert"
         >
           {error}

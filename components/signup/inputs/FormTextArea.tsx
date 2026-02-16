@@ -1,13 +1,6 @@
 'use client';
 
-import React from 'react';
-import {
-  inter,
-  robotoCondensed,
-  headerStyles,
-  bodyStyles,
-  buttonStyles,
-} from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 
 type FormTextAreaProps = {
   label: string;
@@ -19,6 +12,7 @@ type FormTextAreaProps = {
   rows?: number;
   disabled?: boolean;
   showValidation?: boolean;
+  required?: boolean;
 };
 
 export function FormTextArea({
@@ -31,6 +25,7 @@ export function FormTextArea({
   rows = 5,
   disabled = false,
   showValidation = false,
+  required = false
 }: FormTextAreaProps) {
   const getBorderClass = () => {
     if (disabled) {
@@ -63,9 +58,10 @@ export function FormTextArea({
       {/* Label - Bold with Roboto Condensed */}
       <label
         htmlFor={label}
-        className={`block text-gray-900 mb-2 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
+        className={`block text-gray-900 mb-2 ${headerStyles.sResponsive} ${robotoCondensed.className}`}
       >
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
 
       {/* Textarea Field */}
@@ -79,7 +75,7 @@ export function FormTextArea({
           disabled={disabled}
           className={`
             w-full px-4 py-3 
-            border rounded-[20px]
+            border rounded-4xl
             ${bodyStyles.m}
             text-gray-900
             placeholder:text-gray-400
@@ -114,7 +110,7 @@ export function FormTextArea({
       {showValidation && error ? (
         <p
           id={`${label}-error`}
-          className="text-red-500 ${bodyStyles.s} mt-1"
+          className={`text-red-500 ${bodyStyles.s} mt-1`}
           role="alert"
         >
           {error}
@@ -123,7 +119,7 @@ export function FormTextArea({
         helperText && (
           <p
             id={`${label}-helper`}
-            className="text-gray-400 ${bodyStyles.s} mt-1"
+            className={`text-gray-400 ${bodyStyles.s} mt-1`}
           >
             {helperText}
           </p>

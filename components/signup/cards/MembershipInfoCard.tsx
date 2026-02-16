@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 
 type MembershipInfoCardProps = {

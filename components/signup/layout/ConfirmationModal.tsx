@@ -1,95 +1,59 @@
 'use client';
 
-import React from 'react';
+import { buttonStyles } from '@/app/fonts';
 import {
-  inter,
-  robotoCondensed,
-  headerStyles,
-  bodyStyles,
-  buttonStyles,
-} from '@/app/fonts';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  handleSubmit: () => void;
 }
 
 export function ConfirmationModal({
   isOpen,
   onClose,
   onConfirm,
+  handleSubmit,
 }: ConfirmationModalProps) {
-  if (!isOpen) return null;
-
   return (
-    <>
-      {/* Backdrop - shaded overlay */}
-      <div
-        className="fixed inset-0 bg-black/60 z-40 transition-opacity"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Modal */}
-      <div
-        className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${inter.className}`}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-      >
-        <div className="bg-white rounded-[20px] w-full max-w-lg p-6 sm:p-8 relative shadow-2xl">
-          {/* Heading */}
-          <h2
-            id="modal-title"
-            className={`text-gray-900 mb-4 ${headerStyles.sResponsive} ${robotoCondensed.className}`}
-          >
-            Confirm Submission
-          </h2>
-
-          {/* Description Text */}
-          <p className={`text-gray-700 mb-6 leading-relaxed ${bodyStyles.m}`}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogTrigger asChild>
+        <Button onClick={handleSubmit}>Submit Application</Button>
+      </DialogTrigger>
+      <DialogContent showCloseButton={false}>
+        <DialogHeader>
+          <DialogTitle>Confirm Submission</DialogTitle>
+          <DialogDescription>
             Please review all information carefully before submitting. You
             won&apos;t be able to make changes after submission
-          </p>
-
-          {/* Buttons - Right aligned */}
-          <div className="flex justify-end gap-3">
-            {/* Cancel Button */}
-            <button
-              onClick={onClose}
-              className={`
-                px-6 py-2.5
-                bg-white border-2 border-signup-neutral-800
-                text-signup-neutral-800 font-medium
-                rounded-lg
-                hover:bg-gray-50
-                transition-colors
-                ${buttonStyles.text}
-              `}
-            >
-              Cancel
-            </button>
-
-            {/* Confirm Button */}
-            <button
-              onClick={onConfirm}
-              className={`
-                px-6 py-2.5
-                bg-signup-primary-green-500
-                hover:bg-signup-primary-green-600
-                active:bg-signup-primary-green-700
-                text-white font-semibold
-                rounded-lg
-                transition-colors
-                ${buttonStyles.text}
-              `}
-            >
-              Confirm
-            </button>
-          </div>
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-end gap-3">
+          {/* Cancel Button */}
+          <Button
+            className={`px-6 py-4 bg-white border-2 border-signup-neutral-800
+                text-signup-neutral-800 font-medium hover:bg-gray-50 ${buttonStyles.text}`}
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            className={`px-6 py-4 ${buttonStyles.text}`}
+            onClick={onConfirm}
+          >
+            Confirm
+          </Button>
         </div>
-      </div>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }

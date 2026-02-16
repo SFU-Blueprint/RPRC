@@ -1,7 +1,7 @@
 'use client';
 
 import { Modal } from '@/components/Admin';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { inter } from '@/app/fonts';
 
 type SubmitReviewModalProps = {
