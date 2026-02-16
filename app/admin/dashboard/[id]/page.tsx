@@ -1,6 +1,6 @@
 import { inter, robotoCondensed } from '@/app/fonts';
 import Link from 'next/link';
-import { APPLICATION_DETAILS_MOCK, APPLICATION_DETAILS_CONST } from './const';
+import { APPLICATION_DETAILS_MOCK, APPLICATION_DETAILS_CONST } from '@/lib/constants/admin';
 import { StatusChip } from '@/components/Admin';
 import ApplicationDetails from '@/components/Admin/application/ApplicationDetails';
 import SubmitReview from '@/components/Admin/application/SubmitReview';

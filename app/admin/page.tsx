@@ -1,8 +1,7 @@
 'use client';
 
-import { AdminNavbar, ManageApplications, StatCard } from '@/components/Admin';
+import { AdminNavbar, ManageApplications, StatCards } from '@/components/Admin';
 import { robotoCondensed } from '@/app/fonts';
-import { ADMIN_DASHBOARD_MOCK } from './const';
 
 export default function AdminDashboard() {
   return (
@@ -15,11 +14,7 @@ export default function AdminDashboard() {
           >
             Overview
           </h1>
-          <div className="mb-16 md:mb-24 flex w-full gap-x-4 md:gap-x-6">
-            {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
-              <StatCard key={card.type} type={card.type} value={card.value} />
-            ))}
-          </div>
+          <StatCards />
           <ManageApplications />
         </div>
       </div>

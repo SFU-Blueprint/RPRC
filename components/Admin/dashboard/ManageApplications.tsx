@@ -9,23 +9,23 @@ import {
 import { Button } from '@/components/ui/Button';
 import { BackdropContainer } from '@/components/ui/BackdropContainer';
 import { inter, robotoCondensed } from '@/app/fonts';
-import { ADMIN_DASHBOARD_MOCK, ADMIN_DASHBOARD_CONST } from '@/app/admin/const';
+import { ADMIN_DASHBOARD_MOCK, ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
+import { getPagination } from '@/lib/admin/utils';
 
 const applications = ADMIN_DASHBOARD_MOCK.APPLICATIONS_MOCK;
-
-function getPagination(numberPerPage: number) {
-  return {
-    itemCount: applications.length,
-    numberPerPage,
-  };
-}
 
 export default function ManageApplications() {
   const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const paginationMobile = useMemo(() => getPagination(5), []);
-  const paginationDesktop = useMemo(() => getPagination(10), []);
+  const paginationMobile = useMemo(
+    () => getPagination(applications.length, 5),
+    [applications.length]
+  );
+  const paginationDesktop = useMemo(
+    () => getPagination(applications.length, 10),
+    [applications.length]
+  );
 
   return (
     <div className="mb-20">

@@ -1,33 +1,23 @@
 import { ApplicationType } from '@/types/admin.types';
 
+/**
+ * Single source of truth for application status types.
+ * Used to derive filter tabs and keep UI in sync with status values.
+ */
+export const APPLICATION_STATUS_TYPES = [
+  { value: 'toReview', label: 'To Review' },
+  { value: 'paymentPending', label: 'Payment Pending' },
+  { value: 'active', label: 'Active' },
+  { value: 'expired', label: 'Expired' },
+  { value: 'rejected', label: 'Rejected' },
+] as const;
+
+const ALL_TAB = { value: 'all', label: 'All' } as const;
+
 export const ADMIN_DASHBOARD_CONST = {
   PAGE_TITLE: 'Admin Dashboard',
-  TABS: [
-    {
-      label: 'All',
-      value: 'all',
-    },
-    {
-      label: 'To Review',
-      value: 'toReview',
-    },
-    {
-      label: 'Payment Pending',
-      value: 'paymentPending',
-    },
-    {
-      label: 'Active',
-      value: 'active',
-    },
-    {
-      label: 'Expired',
-      value: 'expired',
-    },
-    {
-      label: 'Rejected',
-      value: 'rejected',
-    },
-  ],
+  /** Filter tabs: "All" plus one tab per application status type */
+  TABS: [ALL_TAB, ...APPLICATION_STATUS_TYPES],
   TABLE_COLUMNS: [
     { label: 'Applicant Name', value: 'applicantName' },
     { label: 'Application Type', value: 'type' },

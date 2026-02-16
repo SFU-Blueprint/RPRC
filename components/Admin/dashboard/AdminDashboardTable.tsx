@@ -28,6 +28,13 @@ export default function AdminDashboardTable({
     router.push(`/admin/dashboard/${appId}`);
   };
 
+  const displayedCount = paginatedApplications.length;
+  const totalCount = filteredApplications.length;
+  const footerText =
+    totalCount > 0
+      ? `Showing ${displayedCount} of ${totalCount} application${totalCount === 1 ? '' : 's'}`
+      : 'No applications to display';
+
   return (
     <Table
       columnNames={columns}
@@ -46,6 +53,7 @@ export default function AdminDashboardTable({
           : undefined
       }
       onPageChange={setCurrentPage}
+      footer={footerText}
     >
       {paginatedApplications.map((app) => (
         <tr

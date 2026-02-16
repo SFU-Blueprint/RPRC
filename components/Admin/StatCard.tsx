@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { inter } from '@/app/fonts';
 import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { ADMIN_DASHBOARD_MOCK } from '@/lib/constants/admin';
 
 const STAT_CARD_CONFIG: Record<
   string,
@@ -27,7 +28,7 @@ type StatCardProps = {
   value: number;
 };
 
-export default function StatCard({ type, value }: StatCardProps) {
+function StatCard({ type, value }: StatCardProps) {
   const { label, image: iconSrc } =
     STAT_CARD_CONFIG[type] ?? STAT_CARD_CONFIG.independent;
 
@@ -54,3 +55,15 @@ export default function StatCard({ type, value }: StatCardProps) {
     </BackdropContainer>
   );
 }
+
+export function StatCards() {
+  return (
+    <div className="mb-16 md:mb-24 flex w-full gap-x-4 md:gap-x-6">
+      {ADMIN_DASHBOARD_MOCK.STAT_CARDS.map((card) => (
+        <StatCard key={card.type} type={card.type} value={card.value} />
+      ))}
+    </div>
+  );
+}
+
+export default StatCard;
