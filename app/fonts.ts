@@ -35,7 +35,7 @@ export const headerStyles = {
   mResponsive:
     'text-md md:text-xl font-normal md:font-medium leading-[1] md:leading-[1.1]',
   lResponsive:
-    'text-[22px] md:text-[38px] font-medium md:font-semibold leading-[1] md:leading-[1.1]',
+    'text-xl md:text-2xl font-medium md:font-semibold leading-[1] md:leading-[1.1]',
   xlResponsive:
     'text-[28px] md:text-[50px] font-medium md:font-semibold leading-[1.1] md:leading-[1.2]',
 };

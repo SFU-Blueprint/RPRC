@@ -53,7 +53,8 @@ export function FormInput({
           disabled={disabled}
           className={cn(
             showValidation && error && "border-destructive bg-destructive/5",
-            showValidation && value && !error && "border-green-500"
+            showValidation && value && !error && "border-green-500",
+            "bg-white"
           )}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={

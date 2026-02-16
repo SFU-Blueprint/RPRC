@@ -3,7 +3,7 @@
 import { inter, bodyStyles } from '@/app/fonts';
 import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 type InterestCardProps = {
   label: string;
@@ -25,7 +25,7 @@ export function InterestCard({
         "border-1 border-gray-600",
         "rounded-full",
         "flex items-center justify-center gap-3",
-        "hover:border-primary",
+        "hover:hover:bg-signup-neutral-200",
         isSelected ? "bg-signup-neutral-200" : "bg-signup-off-white",
       )}
       aria-pressed={isSelected}

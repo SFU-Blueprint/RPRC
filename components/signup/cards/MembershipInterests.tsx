@@ -29,7 +29,7 @@ export function MembershipInterests() {
       }
     };
     fetchInterests();
-  }, []);
+  }, [ supabase ]);
 
   const toggleInterest = (interest: string) => {
     const currentInterests = formData.interests || [];
