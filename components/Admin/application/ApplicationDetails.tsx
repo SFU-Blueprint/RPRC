@@ -1,28 +1,36 @@
 import { inter } from '@/app/fonts';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, User, Building } from 'lucide-react';
+import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { APPLICATION_DETAIL_ICON_SIZES } from './const';
+import { ApplicationType } from '@/lib/constants';
 
 type ApplicationDetailsProps = {
-  type: string;
-  interests: string;
+  type: ApplicationType;
+  interests: string[];
   reason: string;
   contact: {
     email: string;
     phone: string;
     address: string;
   };
+  dateReceived: string;
 };
 
 type DetailFieldProps = {
   label: string;
   value: string;
+  icon?: React.ReactNode;
 };
 
-function DetailField({ label, value }: DetailFieldProps) {
+function DetailField({ label, value, icon }: DetailFieldProps) {
   return (
-    <div className="flex flex-col gap-y-4">
-      <p className="text-[20px] leading-1.5 font-bold">{label}</p>
-      <p>{value}</p>
-    </div>
+    <BackdropContainer className="flex flex-col sm:flex-row justify-center items-center gap-x-4 border border-application-detail-blue-500 bg-application-detail-blue-100 shadow-none">
+      {icon && <div className="bg-application-detail-blue-500 p-2 rounded-full text-white h-10 w-10 sm:h-15 sm:w-15 flex items-center justify-center">{icon}</div>}
+      <div className="flex flex-col ">
+        <p className="text-application-detail-text-secondary font-bold text-xs sm:text-lg text-center sm:text-left mt-4 sm:mt-0">{label}</p>
+        <p className="text-application-detail-text-primary font-bold text-2xs sm:text-xl text-center sm:text-left mt-2 sm:mt-0">{value}</p>
+      </div>
+    </BackdropContainer>
   );
 }
 
@@ -33,9 +41,9 @@ type ContactItemProps = {
 
 function ContactItem({ icon, text }: ContactItemProps) {
   return (
-    <div className="flex gap-x-3.25">
-      {icon}
-      <p>{text}</p>
+    <div className="flex justify-left items-center gap-x-3">
+      <div className="text-application-detail-accent-green">{icon}</div>
+      <p className="text-application-detail-text-primary break-words">{text}</p>
     </div>
   );
 }
@@ -45,39 +53,57 @@ export default function ApplicationDetails({
   interests,
   reason,
   contact,
+  dateReceived,
 }: ApplicationDetailsProps) {
+
+  const typeIcon = type === ApplicationType.INDIVIDUAL
+    ? <User size={APPLICATION_DETAIL_ICON_SIZES.LARGE} />
+    : <Building size={APPLICATION_DETAIL_ICON_SIZES.LARGE} />;
+
+  const typeText = type === ApplicationType.INDIVIDUAL ? 'Individual' : 'Organization';
   return (
-    <div
-      className={`bg-[#EFEBE0] rounded-4xl border-4 border-[#E6E3DA] p-12.5 mt-5 flex gap-x-15 ${inter.className}`}
-    >
-      {/* Left Column - Application Details */}
-      <div className="flex-1 flex flex-col gap-y-6">
-        <DetailField label="Membership Type:" value={type} />
-        <DetailField label="Membership Interests:" value={interests} />
-        <DetailField
-          label="Why do you want to be an RPRC member?"
-          value={reason}
-        />
+    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-lg flex flex-col gap-y-6 mt-6">
+      {/* Top Row */}
+      <div className="grid grid-cols-2 gap-6">
+        <DetailField label="Type" value={typeText} icon={typeIcon} />
+        <DetailField label="Date Received" value={dateReceived} icon={<Calendar size={APPLICATION_DETAIL_ICON_SIZES.LARGE} />} />
       </div>
 
-      {/* Right Column - Contact Information */}
-      <div className="flex-1">
-        <p className="text-[20px] leading-1.5 font-bold">Contact Information</p>
-        <div className="flex flex-col gap-y-4 mt-6">
-          <ContactItem
-            icon={<Mail size={27} strokeWidth={1} />}
-            text={contact.email}
-          />
-          <ContactItem
-            icon={<Phone size={27} strokeWidth={1} />}
-            text={contact.phone}
-          />
-          <ContactItem
-            icon={<MapPin size={27} strokeWidth={1} />}
-            text={contact.address}
-          />
+      {/* Bottom Row */}
+      <div className="flex flex-col sm:flex-row gap-x-6 gap-y-6 justify-center">
+        <BackdropContainer className="bg-white border border-1 border-application-detail-border-100 shadow-none">
+          <div>
+            <p className="text-application-detail-text-primary font-bold mb-4">Why do you want to be an RPRC member?</p>
+            <p className="text-application-detail-text-secondary">{reason}</p>
+          </div>
+        </BackdropContainer>
+
+        <div className="flex flex-col gap-y-6">
+          <BackdropContainer className="bg-white border border-1 border-application-detail-border-100 shadow-none">
+            <p className="text-application-detail-text-primary font-bold mb-2">Membership Interests</p>
+            <div className="flex flex-wrap gap-2">
+              {interests.map((interest, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 border border-application-detail-border-100 rounded-full text-application-detail-text-primary"
+                >
+                  {interest}
+                </span>
+              ))}
+            </div>
+          </BackdropContainer>
+          <BackdropContainer className="bg-white border border-1 border-application-detail-border-100 shadow-none">
+            <p className="text-application-detail-text-primary font-bold mb-2">Contact Information</p>
+            <div className="flex flex-col gap-y-4">
+              <ContactItem icon={<Mail size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />} text={contact.email} />
+              <ContactItem icon={<Phone size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />} text={contact.phone} />
+              <ContactItem icon={<MapPin size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />} text={contact.address} />
+            </div>
+          </BackdropContainer>
         </div>
+
+
       </div>
-    </div>
+    </BackdropContainer>
   );
 }

@@ -1,3 +1,5 @@
+import { ReviewDecision } from "@/lib/constants";
+
 export type ColumnType = {
   label: string;
   value: string;
@@ -7,9 +9,9 @@ export type ColumnType = {
 export type ApplicationType = {
   id: string;
   applicantName: string;
-  type: 'Individual' | 'Organization';
+  type: 'individual' | 'organization';
   dateReceived: string | Date;
-  status: 'toReview' | 'rejected' | 'paymentPending' | 'active' | 'expired';
+  status: 'to_review' | 'rejected' | 'payment_pending' | 'active' | 'expired';
   reviewer1: string;
   reviewer2: string;
 };
@@ -37,4 +39,12 @@ export type AdminDashboardMobileTablePropTypes = {
     itemCount: number;
     numberPerPage: number;
   };
+};
+
+export type AdminReviewProps = {
+  createdAt: string;
+  reviewerName: string;
+  decision: ReviewDecision
+  reason: string;
+  isFinalDecision: boolean;
 };
