@@ -9,6 +9,7 @@
 export const ROUTES = {
   // Home & Auth
   HOME: '/',
+  ERROR: '/error',
   
   // Membership
   MEMBERSHIP_SIGNUP: '/membership/signup',
@@ -46,6 +47,7 @@ export const ADMIN_ROUTES = [
 // Public routes accessible without authentication
 export const PUBLIC_ROUTES = [
   ROUTES.HOME,
+  ROUTES.ERROR,
   ROUTES.MEMBERSHIP_SIGNUP,
   ROUTES.AUTH_CALLBACK,
   ROUTES.AUTH_FORGOT_PASSWORD,

@@ -14,6 +14,7 @@ import { MembershipInterests } from '../cards/MembershipInterests';
 import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
 import { PleaseNoteBox } from '../cards/PleaseNoteBox';
+import { Button } from '@/components/ui/Button';
 import { scrollToFirstError } from '@/lib/utils';
 import { submitApplication } from '@/app/actions/application';
 import { toast } from 'sonner';
@@ -124,6 +125,12 @@ export function Step2Form() {
 
       {/* Submit button + Confirmation Modal */}
       <div className="flex justify-center">
+        <Button
+          onClick={handleSubmit}
+          size="lg"
+        >
+          Submit Application
+        </Button>
         <ConfirmationModal
           isOpen={showConfirmModal}
           onClose={() => setShowConfirmModal(false)}

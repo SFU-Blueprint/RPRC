@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { inter, bodyStyles } from '@/app/fonts';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 type RadioButtonProps = {
   label: string;
@@ -19,7 +20,7 @@ export function FormRadioButton({
   name,
 }: RadioButtonProps) {
   return (
-    <label className="flex items-center cursor-pointer group">
+    <label className="flex items-center cursor-pointer group space-x-2">
       {/* Custom Radio Button */}
       <div className="relative flex items-center justify-center">
         {/* Hidden native radio */}
@@ -34,27 +35,22 @@ export function FormRadioButton({
 
         {/* Custom Radio Circle */}
         <div
-          className={`
-            w-6 h-6 rounded-full border-2 flex items-center justify-center
-            transition-all duration-200
-            ${
-              checked
-                ? 'bg-signup-primary-green-500 border-signup-primary-green-500'
-                : 'bg-white border-gray-400 group-hover:border-signup-primary-green-400 group-hover:bg-signup-primary-green-100'
-            }
-          `}
+          className={cn(
+            "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200",
+            checked
+              ? "bg-primary border-primary"
+              : "bg-background border-input group-hover:border-primary/50"
+          )}
         >
           {/* Inner white dot when selected */}
-          {checked && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+          {checked && <div className="w-2.5 h-2.5 bg-primary-foreground rounded-full" />}
         </div>
       </div>
 
       {/* Label Text */}
-      <span
-        className={`ml-3 text-gray-900 select-none ${bodyStyles.lg} ${inter.className}`}
-      >
+      <Label className="text-foreground select-none cursor-pointer font-normal">
         {label}
-      </span>
+      </Label>
     </label>
   );
 }

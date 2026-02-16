@@ -1,6 +1,9 @@
 'use client';
 
 import { inter, bodyStyles } from '@/app/fonts';
+import { Plus, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 
 type InterestCardProps = {
   label: string;
@@ -14,33 +17,31 @@ export function InterestCard({
   onToggle,
 }: InterestCardProps) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="outline"
       onClick={onToggle}
-      className={`
-        w-full px-6 py-4
-        border border-interactive-feature-stroke
-        rounded-full
-        flex items-center justify-center gap-3
-        transition-all duration-200
-        hover:border-signup-primary-green-500
-        focus:outline-none focus:ring-2 focus:ring-signup-primary-green-500 focus:ring-offset-2
-        cursor-pointer
-        ${isSelected ? 'bg-signup-neutral-200' : 'bg-signup-neutral-50'}
-        ${inter.className}
-      `}
+      className={cn(
+        "w-full px-4 py-2 h-auto",
+        "border-1 border-gray-600",
+        "rounded-full",
+        "flex items-center justify-center gap-3",
+        "hover:border-primary",
+        isSelected ? "bg-signup-neutral-200" : "bg-signup-off-white",
+      )}
       aria-pressed={isSelected}
       aria-label={`${isSelected ? 'Deselect' : 'Select'} ${label}`}
     >
       {/* Icon - Plus or X */}
-      <span className="text-signup-primary-green-500 text-[28px] font-normal leading-none">
-        {isSelected ? '×' : '+'}
-      </span>
+      {isSelected ? (
+        <X className="w-7 h-7 text-primary" strokeWidth={2.5} />
+      ) : (
+        <Plus className="w-7 h-7 text-primary" strokeWidth={2.5} />
+      )}
 
       {/* Label */}
-      <span className={`text-content-secondary font-medium ${bodyStyles.lg}`}>
+      <span className={cn("text-gray-800 font-medium", bodyStyles.lg)}>
         {label}
       </span>
-    </button>
+    </Button>
   );
 }

@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { UserRole } from '@/lib/constants/enums'
-import { AuthErrorCode, type SignupResponse, type LoginResponse, type ForgotPasswordResponse, type ResetPasswordResponse, type ResendConfirmationResponse } from '@/lib/constants/auth-errors'
+import { AuthErrorCode, type SignupResponse, type LoginResponse, type ForgotPasswordResponse, type ResetPasswordResponse, type ResendConfirmationResponse } from '@/lib/constants/error-types'
 import { ROUTES } from '@/lib/constants/routes'
 
 export async function signup(formData: FormData): Promise<SignupResponse> {
@@ -175,6 +175,15 @@ export async function forgotPassword(formData: FormData): Promise<ForgotPassword
 
   if (error) {
     console.error('Forgot password error:', error)
+    
+    // Handle rate limiting
+    if (error.message?.includes('rate limit') || error.message?.includes('too many')) {
+      return { 
+        error: 'Please wait before requesting another email. Try again in 1 minute.',
+        code: AuthErrorCode.RATE_LIMITED 
+      }
+    }
+    
     return { 
       error: error.message || 'Failed to send reset email',
       code: AuthErrorCode.SERVER_ERROR 
