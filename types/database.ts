@@ -14,181 +14,232 @@ export type Database = {
   }
   public: {
     Tables: {
-      applications_individual: {
+      application_interests: {
         Row: {
-          approvalstatus: Database["public"]["Enums"]["approval_status"]
-          approveddate: string | null
-          city: string
-          country: string
-          datesubmitted: string | null
-          id: string
-          mailingAddress: string
-          membershipFeeWaiverReason: string | null
-          membershipinterest: Database["public"]["Enums"]["membership_interest"]
-          membershipreason: string
-          paymentstatus: Database["public"]["Enums"]["payment_status"]
-          phoneNumber: string
-          phoneType: Database["public"]["Enums"]["phone_type"]
-          postalCode: string
-          province: string
-          reviewedby1: string | null
-          reviewedby2: string | null
-          userid: string
+          application_id: string
+          interest_id: number
         }
         Insert: {
-          approvalstatus?: Database["public"]["Enums"]["approval_status"]
-          approveddate?: string | null
-          city: string
-          country: string
-          datesubmitted?: string | null
-          id?: string
-          mailingAddress: string
-          membershipFeeWaiverReason?: string | null
-          membershipinterest: Database["public"]["Enums"]["membership_interest"]
-          membershipreason: string
-          paymentstatus?: Database["public"]["Enums"]["payment_status"]
-          phoneNumber: string
-          phoneType: Database["public"]["Enums"]["phone_type"]
-          postalCode: string
-          province: string
-          reviewedby1?: string | null
-          reviewedby2?: string | null
-          userid: string
+          application_id: string
+          interest_id: number
         }
         Update: {
-          approvalstatus?: Database["public"]["Enums"]["approval_status"]
-          approveddate?: string | null
-          city?: string
-          country?: string
-          datesubmitted?: string | null
-          id?: string
-          mailingAddress?: string
-          membershipFeeWaiverReason?: string | null
-          membershipinterest?: Database["public"]["Enums"]["membership_interest"]
-          membershipreason?: string
-          paymentstatus?: Database["public"]["Enums"]["payment_status"]
-          phoneNumber?: string
-          phoneType?: Database["public"]["Enums"]["phone_type"]
-          postalCode?: string
-          province?: string
-          reviewedby1?: string | null
-          reviewedby2?: string | null
-          userid?: string
+          application_id?: string
+          interest_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "applications_individual_userid_fkey"
-            columns: ["userid"]
+            foreignKeyName: "application_interests_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "application_interests_interest_id_fkey"
+            columns: ["interest_id"]
+            isOneToOne: false
+            referencedRelation: "membership_interests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      application_reviews: {
+        Row: {
+          application_id: string
+          created_at: string
+          decision: Database["public"]["Enums"]["review_decision"]
+          id: string
+          reason: string
+          reviewer_name: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          decision: Database["public"]["Enums"]["review_decision"]
+          id?: string
+          reason: string
+          reviewer_name: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          decision?: Database["public"]["Enums"]["review_decision"]
+          id?: string
+          reason?: string
+          reviewer_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_reviews_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      applications: {
+        Row: {
+          created_at: string
+          finalized_at: string | null
+          id: string
+          status: Database["public"]["Enums"]["application_status"]
+          type: Database["public"]["Enums"]["application_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          finalized_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["application_status"]
+          type: Database["public"]["Enums"]["application_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          finalized_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["application_status"]
+          type?: Database["public"]["Enums"]["application_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
       }
-      applications_organization: {
+      individual_application_details: {
         Row: {
-          approveddate: string | null
-          city: string
-          country: string
-          datesubmitted: string | null
-          id: string
-          mailingAdress: string
-          membershipinterest: Database["public"]["Enums"]["membership_interest"]
-          memershipreason: string
-          paymentstatus: Database["public"]["Enums"]["payment_status"]
-          phoneNumber: string
-          phoneType: Database["public"]["Enums"]["phone_type"] | null
-          postalCode: string
-          programsorservices: string[] | null
-          province: string
-          representativeEmail: string | null
-          reviewedby1: string | null
-          reviewedby2: string | null
-          userid: string
+          application_id: string
+          fee_waiver_reason: string | null
+          reason: string
         }
         Insert: {
-          approveddate?: string | null
-          city: string
-          country: string
-          datesubmitted?: string | null
-          id?: string
-          mailingAdress: string
-          membershipinterest: Database["public"]["Enums"]["membership_interest"]
-          memershipreason: string
-          paymentstatus?: Database["public"]["Enums"]["payment_status"]
-          phoneNumber: string
-          phoneType?: Database["public"]["Enums"]["phone_type"] | null
-          postalCode: string
-          programsorservices?: string[] | null
-          province: string
-          representativeEmail?: string | null
-          reviewedby1?: string | null
-          reviewedby2?: string | null
-          userid: string
+          application_id: string
+          fee_waiver_reason?: string | null
+          reason: string
         }
         Update: {
-          approveddate?: string | null
-          city?: string
-          country?: string
-          datesubmitted?: string | null
-          id?: string
-          mailingAdress?: string
-          membershipinterest?: Database["public"]["Enums"]["membership_interest"]
-          memershipreason?: string
-          paymentstatus?: Database["public"]["Enums"]["payment_status"]
-          phoneNumber?: string
-          phoneType?: Database["public"]["Enums"]["phone_type"] | null
-          postalCode?: string
-          programsorservices?: string[] | null
-          province?: string
-          representativeEmail?: string | null
-          reviewedby1?: string | null
-          reviewedby2?: string | null
-          userid?: string
+          application_id?: string
+          fee_waiver_reason?: string | null
+          reason?: string
         }
         Relationships: [
           {
-            foreignKeyName: "applications_organization_userid_fkey"
-            columns: ["userid"]
-            isOneToOne: false
+            foreignKeyName: "individual_application_details_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      individual_profiles: {
+        Row: {
+          name: string
+          phone_num: string
+          phone_type: Database["public"]["Enums"]["phone_type"]
+          user_id: string
+        }
+        Insert: {
+          name: string
+          phone_num: string
+          phone_type: Database["public"]["Enums"]["phone_type"]
+          user_id: string
+        }
+        Update: {
+          name?: string
+          phone_num?: string
+          phone_type?: Database["public"]["Enums"]["phone_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "individual_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
       }
-      approvals: {
+      membership_interests: {
         Row: {
-          applicationid: string
-          approverid: string
-          comments: string | null
-          decision: Database["public"]["Enums"]["approval_decision"]
-          decisiondate: string | null
-          id: string
-          signatureuri: string | null
+          id: number
+          name: string
         }
         Insert: {
-          applicationid: string
-          approverid: string
-          comments?: string | null
-          decision: Database["public"]["Enums"]["approval_decision"]
-          decisiondate?: string | null
-          id?: string
-          signatureuri?: string | null
+          id?: number
+          name: string
         }
         Update: {
-          applicationid?: string
-          approverid?: string
-          comments?: string | null
-          decision?: Database["public"]["Enums"]["approval_decision"]
-          decisiondate?: string | null
-          id?: string
-          signatureuri?: string | null
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      organization_application_details: {
+        Row: {
+          application_id: string
+          org_services: string
+          reason: string
+        }
+        Insert: {
+          application_id: string
+          org_services: string
+          reason: string
+        }
+        Update: {
+          application_id?: string
+          org_services?: string
+          reason?: string
         }
         Relationships: [
           {
-            foreignKeyName: "approvals_approverid_fkey"
-            columns: ["approverid"]
-            isOneToOne: false
+            foreignKeyName: "organization_application_details_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_profiles: {
+        Row: {
+          org_name: string
+          org_rep_email: string | null
+          org_rep_name: string
+          phone_num: string
+          phone_type: Database["public"]["Enums"]["phone_type"]
+          user_id: string
+        }
+        Insert: {
+          org_name: string
+          org_rep_email?: string | null
+          org_rep_name: string
+          phone_num: string
+          phone_type: Database["public"]["Enums"]["phone_type"]
+          user_id: string
+        }
+        Update: {
+          org_name?: string
+          org_rep_email?: string | null
+          org_rep_name?: string
+          phone_num?: string
+          phone_type?: Database["public"]["Enums"]["phone_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -197,42 +248,87 @@ export type Database = {
       payments: {
         Row: {
           amount: number
-          createdat: string | null
+          application_id: string | null
+          created_at: string
           currency: string
           id: string
           status: Database["public"]["Enums"]["payment_transaction_status"]
-          stripepaymentintentid: string | null
-          stripesessionid: string | null
-          updatedat: string | null
-          userid: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string
         }
         Insert: {
           amount: number
-          createdat?: string | null
-          currency?: string
+          application_id?: string | null
+          created_at?: string
+          currency: string
           id?: string
           status?: Database["public"]["Enums"]["payment_transaction_status"]
-          stripepaymentintentid?: string | null
-          stripesessionid?: string | null
-          updatedat?: string | null
-          userid: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id: string
         }
         Update: {
           amount?: number
-          createdat?: string | null
+          application_id?: string | null
+          created_at?: string
           currency?: string
           id?: string
           status?: Database["public"]["Enums"]["payment_transaction_status"]
-          stripepaymentintentid?: string | null
-          stripesessionid?: string | null
-          updatedat?: string | null
-          userid?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "payments_userid_fkey"
-            columns: ["userid"]
+            foreignKeyName: "payments_application_id_fkey"
+            columns: ["application_id"]
             isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_addresses: {
+        Row: {
+          city: string
+          country: string
+          mailing_address: string
+          postal_code: string
+          province: string
+          user_id: string
+        }
+        Insert: {
+          city: string
+          country: string
+          mailing_address: string
+          postal_code: string
+          province: string
+          user_id: string
+        }
+        Update: {
+          city?: string
+          country?: string
+          mailing_address?: string
+          postal_code?: string
+          province?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_addresses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -240,40 +336,25 @@ export type Database = {
       }
       users: {
         Row: {
-          createdat: string | null
+          created_at: string
           email: string
           id: string
-          name: string
-          orgcontacttitle: string | null
-          orgname: string | null
-          orgwebsite: string | null
-          password_hash: string
           role: Database["public"]["Enums"]["user_role"]
-          status: Database["public"]["Enums"]["user_status"]
+          updated_at: string
         }
         Insert: {
-          createdat?: string | null
+          created_at?: string
           email: string
           id?: string
-          name: string
-          orgcontacttitle?: string | null
-          orgname?: string | null
-          orgwebsite?: string | null
-          password_hash: string
           role: Database["public"]["Enums"]["user_role"]
-          status?: Database["public"]["Enums"]["user_status"]
+          updated_at?: string
         }
         Update: {
-          createdat?: string | null
+          created_at?: string
           email?: string
           id?: string
-          name?: string
-          orgcontacttitle?: string | null
-          orgname?: string | null
-          orgwebsite?: string | null
-          password_hash?: string
           role?: Database["public"]["Enums"]["user_role"]
-          status?: Database["public"]["Enums"]["user_status"]
+          updated_at?: string
         }
         Relationships: []
       }
@@ -282,9 +363,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_individual_application: {
+        Args: {
+          p_city: string
+          p_country: string
+          p_fee_waiver_reason: string
+          p_interests: string[]
+          p_mailing_address: string
+          p_name: string
+          p_phone_num: string
+          p_phone_type: Database["public"]["Enums"]["phone_type"]
+          p_postal_code: string
+          p_province: string
+          p_reason: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
+      application_status:
+        | "to_review"
+        | "payment_pending"
+        | "active"
+        | "expired"
+        | "conflict"
+        | "rejected"
+      application_type: "individual" | "organization"
       approval_decision: "approved" | "rejected"
       approval_status: "to_review" | "completed" | "rejected"
       membership_interest:
@@ -295,9 +400,17 @@ export type Database = {
         | "Housing"
         | "Other"
       payment_status: "pending" | "approved" | "rejected"
-      payment_transaction_status: "pending" | "paid" | "failed" | "refunded"
-      phone_type: "Home" | "Cell"
-      user_role: "admin" | "member" | "organization"
+      payment_transaction_status:
+        | "requires_payment_method"
+        | "requires_confirmation"
+        | "requires_action"
+        | "processing"
+        | "succeeded"
+        | "canceled"
+        | "failed"
+      phone_type: "home" | "cell"
+      review_decision: "approve" | "reject"
+      user_role: "admin" | "individual" | "organization"
       user_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -426,6 +539,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      application_status: [
+        "to_review",
+        "payment_pending",
+        "active",
+        "expired",
+        "conflict",
+        "rejected",
+      ],
+      application_type: ["individual", "organization"],
       approval_decision: ["approved", "rejected"],
       approval_status: ["to_review", "completed", "rejected"],
       membership_interest: [
@@ -437,9 +559,18 @@ export const Constants = {
         "Other",
       ],
       payment_status: ["pending", "approved", "rejected"],
-      payment_transaction_status: ["pending", "paid", "failed", "refunded"],
-      phone_type: ["Home", "Cell"],
-      user_role: ["admin", "member", "organization"],
+      payment_transaction_status: [
+        "requires_payment_method",
+        "requires_confirmation",
+        "requires_action",
+        "processing",
+        "succeeded",
+        "canceled",
+        "failed",
+      ],
+      phone_type: ["home", "cell"],
+      review_decision: ["approve", "reject"],
+      user_role: ["admin", "individual", "organization"],
       user_status: ["pending", "approved", "rejected"],
     },
   },

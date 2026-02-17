@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import { inter } from '@/app/fonts';
 import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { type StatCardType, type StatCardsData } from '@/lib/constants/admin/dashboard';
 
-const STAT_CARD_CONFIG: Record<
-  string,
-  { label: string; image: string }
-> = {
+export type { StatCardsData };
+
+const STAT_CARD_CONFIG: Record<StatCardType, { label: string; image: string }> = {
   independent: {
     label: 'Independent Members',
     image: '/Adminpage/AdminIndependentMemebers.png',
@@ -20,14 +20,12 @@ const STAT_CARD_CONFIG: Record<
   },
 };
 
-type StatCardType = keyof typeof STAT_CARD_CONFIG;
-
 type StatCardProps = {
   type: StatCardType;
   value: number;
 };
 
-export default function StatCard({ type, value }: StatCardProps) {
+function StatCard({ type, value }: StatCardProps) {
   const { label, image: iconSrc } =
     STAT_CARD_CONFIG[type] ?? STAT_CARD_CONFIG.independent;
 
@@ -54,3 +52,21 @@ export default function StatCard({ type, value }: StatCardProps) {
     </BackdropContainer>
   );
 }
+
+type StatCardsProps = {
+  /** When provided, used instead of mock data */
+  stats?: StatCardsData;
+};
+
+export function StatCards({ stats }: StatCardsProps) {
+  const cards = stats ?? [];
+  return (
+    <div className="mb-16 md:mb-24 flex w-full gap-x-4 md:gap-x-6">
+      {cards.map((card) => (
+        <StatCard key={card.type} type={card.type} value={card.value} />
+      ))}
+    </div>
+  );
+}
+
+export default StatCard;

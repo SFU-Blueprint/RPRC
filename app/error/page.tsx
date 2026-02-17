@@ -3,7 +3,7 @@
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ErrorType, ERROR_MESSAGES, type ErrorTypeValue } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';

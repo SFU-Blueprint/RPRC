@@ -18,7 +18,7 @@ function SignUpContent() {
 
       {/* Main Content Container - Responsive width with max-width cap */}
       <div className="max-w-screen-2xl mx-auto px-8 md:px-10 lg:px-12 pb-12 md:pb-16 lg:pb-20 mt-2">
-      <ProgressIndicator currentStep={currentStep} steps={SIGNUP_STEPS} />
+        <ProgressIndicator currentStep={currentStep} steps={SIGNUP_STEPS} />
 
         {/* Step 1: Two halves - InfoBox + Form */}
         {currentStep === 1 && (

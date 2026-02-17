@@ -34,7 +34,7 @@ export const HomePageForm = () => {
 
       if ('error' in result) {
         console.error('Login error:', result.error, 'Code:', result.code);
-        
+
         // Show user-friendly error messages
         if (result.code === AuthErrorCode.INVALID_CREDENTIALS) {
           setError('Invalid email or password. Please try again.');
@@ -115,7 +115,7 @@ export const HomePageForm = () => {
           <Button
             type="submit"
             disabled={isSubmitting || !formData.email || !formData.password}
-            className="bg-primary-black mx-auto block w-fit"
+            className="bg-primary-black mx-auto block w-fit cursor-pointer"
           >
             {isSubmitting ? 'Signing in...' : 'Sign In'}
           </Button>

@@ -1,21 +1,9 @@
 import { inter } from '@/app/fonts';
-
-type StatusChipType = {
-  color: string;
-  label: string;
-  theme: string;
-};
-
-const STATUS_CHIPS: StatusChipType[] = [
-  { color: '#00519F', label: 'To Review', theme: 'toReview' },
-  { color: '#393533', label: 'Rejected', theme: 'rejected' },
-  { color: '#C67D38', label: 'Payment Pending', theme: 'paymentPending' },
-  { color: '#5EB42D', label: 'Active', theme: 'active' },
-  { color: '#BE282B', label: 'Expired', theme: 'expired' },
-];
+import { ApplicationStatus, ReviewDecision } from '@/lib/constants';
+import { STATUS_CHIPS } from '@/lib/constants/admin';
 
 type StatusChipProps = {
-  theme: string;
+  theme: ApplicationStatus | ReviewDecision;
 };
 
 export default function StatusChip({ theme }: StatusChipProps) {
@@ -28,9 +16,9 @@ export default function StatusChip({ theme }: StatusChipProps) {
       className={`${inter.className} rounded-full flex justify-center items-center gap-x-2 py-1 px-2.75 w-fit`}
       style={{ backgroundColor: status.color }}
     >
-      <div className="rounded-full w-2 h-2 bg-[#FFFDFA]"></div>
+      <div className="rounded-full w-2 h-2 bg-white"></div>
 
-      <p className="text-[14px] text-[#FFFDFA]">{status.label}</p>
+      <p className="text-[10px] sm:text-[14px] text-white">{status.label}</p>
     </div>
   );
 }

@@ -23,6 +23,7 @@ type TableProps = {
     table?: string;
   };
   onPageChange?: (page: number) => void;
+  footer?: ReactNode;
 };
 
 export default function Table({
@@ -32,6 +33,7 @@ export default function Table({
   pagination,
   activePage: controlledPage,
   onPageChange,
+  footer,
 }: TableProps) {
   const [internalPage, setInternalPage] = useState(1);
   const activePage = controlledPage ?? internalPage;
@@ -66,6 +68,18 @@ export default function Table({
           </thead>
 
           <tbody>{children}</tbody>
+          {footer && (
+            <tfoot>
+              <tr className="bg-[#E9E9E8] border-t-2 border-[#BAB7B2]">
+                <td
+                  colSpan={columnNames.length}
+                  className="p-6 text-[16px] leading-6 tracking-[-0.31px] text-gray-600 rounded-b-4xl"
+                >
+                  {footer}
+                </td>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
 

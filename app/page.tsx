@@ -28,11 +28,11 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen relative">
       <Image
-          src="/homepage/hero-background.png"
-          alt="Hero background"
-          fill={true}
-          priority
-        />
+        src="/homepage/hero-background.png"
+        alt="Hero background"
+        fill={true}
+        priority
+      />
       <div className="relative py-8 md:py-12 lg:py-16">
         <div className="bg-none max-w-screen-2xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24">
           <h1 className={`text-left ${headerStyles.mResponsive} text-gray-900`}>
@@ -55,11 +55,11 @@ export default async function HomePage() {
                 Create an account and join the Richmond Poverty Reduction Coalition to vote at our Annual General Meeting, and be the first to receive news, advocacy updates, event invitations, and project involvement opportunities.
               </p>
               <p className={`${bodyStyles.s} leading-relaxed`}>
-                After account creation you will need to fill out an application form. 
+                After account creation you will need to fill out an application form.
               </p>
             </div>
             <Link className="mx-auto block pt-4 w-fit" href={ROUTES.MEMBERSHIP_SIGNUP}>
-                <Button size="sm" className="text-xs">Sign Up</Button>
+              <Button size="sm" className="text-xs cursor-pointer">Sign Up</Button>
             </Link>
           </div>
 

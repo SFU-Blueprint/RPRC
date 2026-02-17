@@ -1,9 +1,41 @@
+import { BackdropContainer } from '@/components/ui/BackdropContainer';
 import { AdminSection } from './AdminSection';
+import { robotoCondensed } from '@/app/fonts';
+import { Clock } from 'lucide-react';
 
-export default function ReviewHistory() {
+import { ReviewHistoryMockType } from '@/types/review-history-mock';
+import AdminReview from './AdminReview';
+
+export default function ReviewHistory({ reviewHistory }: { reviewHistory: ReviewHistoryMockType[] }) {
+
   return (
-    <AdminSection title="Review History">
-      No Recent Reviews...
-    </AdminSection>
+    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-lg flex w-full flex-col gap-y-6 mt-6" >
+      <p className={`${robotoCondensed.className} text-[32px] font-bold`}>
+        Review History
+      </p>
+      {reviewHistory.length === 0 && (
+        <BackdropContainer className="bg-white border border-1 border-application-detail-border-100 shadow-none">
+          <div className="flex flex-col items-center gap-y-5">
+            <Clock size={48} className="text-application-detail-text-secondary" />
+            <p className="text-application-detail-text-secondary">No Recent Reviews...</p>
+          </div>
+        </BackdropContainer>
+      )}
+
+      {reviewHistory.reverse().map((review: ReviewHistoryMockType, index) => {
+        return (
+          <AdminReview
+            key={index}
+            createdAt={review.created_at}
+            reviewerName={review.reviewer_name}
+            decision={review.decision}
+            reason={review.reason}
+            // if there was a conflict and there are more than 2 reviews,
+            // we know that the first review in the reversed array is the most recent and thus the final decision
+            isFinalDecision={reviewHistory.length > 2 && index === 0}
+          />
+        )
+      })}
+    </BackdropContainer>
   );
 }

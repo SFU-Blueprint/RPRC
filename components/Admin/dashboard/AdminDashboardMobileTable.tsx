@@ -22,6 +22,13 @@ export default function AdminDashboardMobileTable({
     pagination,
   });
 
+  const displayedCount = paginatedApplications.length;
+  const totalCount = filteredApplications.length;
+  const footerText =
+    totalCount > 0
+      ? `Showing ${displayedCount} of ${totalCount} application${totalCount === 1 ? '' : 's'}`
+      : 'No applications to display';
+
   return (
     <>
       <div className="flex flex-col mt-5.5 gap-y-4">
@@ -64,6 +71,9 @@ export default function AdminDashboardMobileTable({
             </div>
           </div>
         ))}
+      </div>
+      <div className="mt-3 px-1 text-[14px] text-gray-600">
+        {footerText}
       </div>
       {pagination && (
         <Pagination
