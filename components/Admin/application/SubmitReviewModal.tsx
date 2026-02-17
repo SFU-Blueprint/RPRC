@@ -1,7 +1,7 @@
 'use client';
 
 import { Modal } from '@/components/Admin';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { inter, robotoCondensed } from '@/app/fonts';
 import { ReviewHistoryMockType } from '@/types/review-history-mock';
 import { CONFIRM_REVIEW_TEXT } from './const';

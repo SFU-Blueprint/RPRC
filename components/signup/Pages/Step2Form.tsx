@@ -1,18 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
-import {
-  inter,
-  robotoCondensed,
-  headerStyles,
-  buttonStyles,
-} from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/api/helpers/signup-validation';
 import { ConfirmationModal } from '@/components/signup/layout/ConfirmationModal';
-import { submitToAPI } from '@/lib/signup-mock-api';
 import { ContactInfoIndividual } from '../domain/ContactInfoIndividual';
 import { ContactInfoOrganization } from '../domain/ContactInfoOrganization';
 import { AddressInformation } from '../inputs/AddressInformation';
@@ -20,6 +15,11 @@ import { MembershipInterests } from '../cards/MembershipInterests';
 import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
 import { PleaseNoteBox } from '../cards/PleaseNoteBox';
+import { Button } from '@/components/ui/button';
+import { scrollToFirstError } from '@/lib/utils';
+import { submitIndividualApplication, submitOrganizationApplication } from '@/app/actions/application';
+import { toast } from 'sonner';
+import { UserRole } from '@/lib/constants/enums';
 
 export function Step2Form() {
   const {
@@ -31,42 +31,64 @@ export function Step2Form() {
     setHasAttemptedValidation,
     goToNextStep,
   } = useSignUp();
+  
+  const { user } = useAuth();
+  const userRole = user?.user_metadata?.role;
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = () => {
     setHasAttemptedValidation(true);
+    setIsSubmitting(true);
 
-    const validationErrors = validateStep2(formData);
-    setErrors(validationErrors);
-
-    if (!hasErrors(validationErrors)) {
-      console.log('Step 2 validation passed');
-      setShowConfirmModal(true);
-    } else {
-      console.log('Step 2 validation failed:', validationErrors);
+    const validationErrors = validateStep2(formData, userRole);
+    if (hasErrors(validationErrors)) {
+      setErrors(validationErrors);
+      console.error('Step 2 validation failed:', validationErrors);
+      scrollToFirstError(validationErrors);
+      return;
     }
+    setShowConfirmModal(true);
   };
 
-  const handleConfirmSubmit = () => {
-    // Call mock API to submit data
-    const response = submitToAPI(formData);
-    console.log('API Response:', response);
+  const handleConfirmSubmit = async () => {
+    const formDataObj = new FormData();
 
-    // Close modal and proceed to success page
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        formDataObj.append(key, JSON.stringify(value));
+      } else if (value !== undefined && value !== null) {
+        formDataObj.append(key, String(value));
+      }
+    });
+    
+    // Call appropriate submission function based on user role
+    const submitFunction = isIndividual 
+      ? submitIndividualApplication 
+      : submitOrganizationApplication;
+    
+    const result = await submitFunction(formDataObj);
+    if (!result.success) {
+      toast.error('Failed to submit your application, please try again', {
+        description: `Error: ${result.error}`
+      });
+    }
+
+    // Close modal
     setShowConfirmModal(false);
     goToNextStep();
   };
 
-  // Dynamic form heading based on membership type
-  const formHeading =
-    formData.membershipType === 'individual'
-      ? 'Individual Membership Application Form'
-      : 'Organization Membership Application Form';
+  // Dynamic form heading based on user role
+  const isIndividual = userRole === UserRole.INDIVIDUAL;
+  const formHeading = isIndividual
+    ? 'Individual Membership Application Form'
+    : 'Organization Membership Application Form';
 
   return (
     <div
-      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] p-6 sm:p-8 md:p-10 lg:p-12 w-full max-w-6xl mx-auto ${inter.className}`}
+      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0px_-1px_2px_-1px_rgba(0,0,0,0.15),0px_1px_3px_1px_rgba(0,0,0,0.15)] p-6 sm:p-8 md:p-10 lg:p-12 w-full mx-auto ${inter.className} mt-16.25`}
     >
       {/* Dynamic Form Heading */}
       <h1
@@ -75,8 +97,8 @@ export function Step2Form() {
         {formHeading}
       </h1>
 
-      {/* Contact Information - Conditional based on membership type */}
-      {formData.membershipType === 'individual' ? (
+      {/* Contact Information - Conditional based on user role */}
+      {isIndividual ? (
         <ContactInfoIndividual />
       ) : (
         <ContactInfoOrganization />
@@ -98,11 +120,12 @@ export function Step2Form() {
           placeholder=""
           rows={6}
           showValidation={hasAttemptedValidation}
+          required
         />
       </div>
 
       {/* Conditional Individual/Organization Sections */}
-      {formData.membershipType === 'individual' ? (
+      {isIndividual ? (
         <MembershipWaiverSection />
       ) : (
         <OrganizationServicesSection />
@@ -111,33 +134,15 @@ export function Step2Form() {
       {/* Please Note - Info Box */}
       <PleaseNoteBox />
 
-      {/* Submit Application Button */}
+      {/* Submit button + Confirmation Modal */}
       <div className="flex justify-center">
-        <button
-          onClick={handleSubmit}
-          className={`
-            bg-signup-primary-green-500
-            hover:bg-signup-primary-green-600
-            active:bg-signup-primary-green-700
-            text-white
-            font-semibold
-            px-12 sm:px-16 md:px-20
-            py-3 md:py-4
-            rounded-lg
-            transition-colors
-            ${buttonStyles.text}
-          `}
-        >
-          Submit Application
-        </button>
+        <ConfirmationModal
+          isOpen={showConfirmModal}
+          onClose={() => setShowConfirmModal(false)}
+          onConfirm={handleConfirmSubmit}
+          handleSubmit={handleSubmit}
+        />
       </div>
-
-      {/* Confirmation Modal */}
-      <ConfirmationModal
-        isOpen={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
-        onConfirm={handleConfirmSubmit}
-      />
     </div>
   );
 }

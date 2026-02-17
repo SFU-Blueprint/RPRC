@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { forgotPassword } from '@/app/actions/auth';
-import { AuthErrorCode } from '@/lib/constants/auth-errors';
+import { AuthErrorCode } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 import Link from 'next/link';
@@ -16,6 +16,47 @@ export default function ForgotPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(60);
+  const [isResending, setIsResending] = useState(false);
+
+  // Countdown timer for resend email
+  useEffect(() => {
+    if (success && resendCountdown > 0) {
+      const timer = setTimeout(() => {
+        setResendCountdown(resendCountdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, resendCountdown]);
+
+  const handleResendEmail = async () => {
+    setIsResending(true);
+
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('email', email);
+
+      const result = await forgotPassword(formDataObj);
+
+      if ('error' in result) {
+        console.error('Resend error:', result.error, 'Code:', result.code);
+        
+        if (result.code === AuthErrorCode.RATE_LIMITED) {
+          alert(result.error);
+        } else {
+          alert('Failed to resend email. Please try again or contact support.');
+        }
+      } else {
+        console.log('Password reset email resent successfully');
+        setResendCountdown(60);
+      }
+    } catch (error) {
+      console.error('Unexpected error during resend:', error);
+      alert('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +103,28 @@ export default function ForgotPasswordPage() {
                 <strong>Note:</strong> The link will expire in 24 hours. If you don&apos;t see the email, check your spam folder.
               </AlertDescription>
             </Alert>
+
+            {/* Resend Email Button */}
+            <div className="mt-6 flex flex-col items-center gap-3">
+              <Button
+                onClick={handleResendEmail}
+                disabled={resendCountdown > 0 || isResending}
+                variant="outline"
+                size="lg"
+              >
+                {isResending
+                  ? 'Resending...'
+                  : resendCountdown > 0
+                  ? `Resend email in ${resendCountdown}s`
+                  : 'Resend email'}
+              </Button>
+              {resendCountdown === 0 && !isResending && (
+                <p className="text-sm text-muted-foreground">
+                  Didn&apos;t receive the email? Click above to resend.
+                </p>
+              )}
+            </div>
+
             <div className="mt-6 text-center">
               <Link
                 href={ROUTES.HOME}

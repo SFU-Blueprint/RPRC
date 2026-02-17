@@ -1,13 +1,11 @@
 'use client';
 
 import React from 'react';
-import {
-  inter,
-  robotoCondensed,
-  headerStyles,
-  bodyStyles,
-  buttonStyles,
-} from '@/app/fonts';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { AlertCircle } from 'lucide-react';
+import { robotoCondensed, headerStyles } from '@/app/fonts';
 
 type FormTextAreaProps = {
   label: string;
@@ -19,6 +17,7 @@ type FormTextAreaProps = {
   rows?: number;
   disabled?: boolean;
   showValidation?: boolean;
+  required?: boolean;
 };
 
 export function FormTextArea({
@@ -31,65 +30,32 @@ export function FormTextArea({
   rows = 5,
   disabled = false,
   showValidation = false,
+  required = false
 }: FormTextAreaProps) {
-  const getBorderClass = () => {
-    if (disabled) {
-      return 'border-gray-200';
-    }
-    if (!showValidation) {
-      return 'border-gray-300 focus:border-blue-500';
-    }
-    if (error) {
-      return 'border-red-500 focus:border-red-500';
-    }
-    if (value && !error) {
-      return 'border-signup-primary-green-400 focus:border-signup-primary-green-400';
-    }
-    return 'border-gray-300 focus:border-blue-500';
-  };
-
-  const getBackgroundClass = () => {
-    if (disabled) {
-      return 'bg-gray-50';
-    }
-    if (error && showValidation) {
-      return 'bg-red-50';
-    }
-    return 'bg-white';
-  };
-
   return (
-    <div className={`w-full ${inter.className}`}>
+    <div className="w-full flex flex-col gap-2">
       {/* Label - Bold with Roboto Condensed */}
-      <label
+      <Label
         htmlFor={label}
-        className={`block text-gray-900 mb-2 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
+        className={cn("text-gray-900", headerStyles.mResponsive, robotoCondensed.className)}
       >
         {label}
-      </label>
+      </Label>
 
       {/* Textarea Field */}
       <div className="relative">
-        <textarea
+        <Textarea
           id={label}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={rows}
           disabled={disabled}
-          className={`
-            w-full px-4 py-3 
-            border rounded-[20px]
-            ${bodyStyles.m}
-            text-gray-900
-            placeholder:text-gray-400
-            focus:outline-none
-            transition-colors
-            resize-vertical
-            disabled:cursor-not-allowed disabled:text-gray-500
-            ${getBorderClass()}
-            ${getBackgroundClass()}
-          `}
+          className={cn(
+            "rounded-[20px] resize-vertical",
+            showValidation && error && "border-destructive bg-destructive/5",
+            showValidation && value && !error && "border-green-500"
+          )}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={
             error
@@ -100,12 +66,10 @@ export function FormTextArea({
           }
         />
 
-        {/* Error Icon (exclamation mark in red circle) */}
+        {/* Error Icon */}
         {showValidation && error && (
           <div className="absolute right-3 top-3">
-            <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-[12px] font-bold">!</span>
-            </div>
+            <AlertCircle className="w-5 h-5 text-destructive" />
           </div>
         )}
       </div>
@@ -114,7 +78,7 @@ export function FormTextArea({
       {showValidation && error ? (
         <p
           id={`${label}-error`}
-          className="text-red-500 ${bodyStyles.s} mt-1"
+          className="text-sm text-destructive"
           role="alert"
         >
           {error}
@@ -123,7 +87,7 @@ export function FormTextArea({
         helperText && (
           <p
             id={`${label}-helper`}
-            className="text-gray-400 ${bodyStyles.s} mt-1"
+            className="text-sm text-muted-foreground"
           >
             {helperText}
           </p>

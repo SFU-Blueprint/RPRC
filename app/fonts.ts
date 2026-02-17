@@ -31,11 +31,11 @@ export const headerStyles = {
   xsResponsive:
     'text-[12px] md:text-[14px] font-medium leading-[1] md:leading-[1.1]',
   sResponsive:
-    'text-[14px] md:text-[18px] font-medium leading-[1] md:leading-[1.1]',
+    'text-sm md:text-md font-medium leading-[1] md:leading-[1.1]',
   mResponsive:
-    'text-[16px] md:text-[26px] font-normal md:font-medium leading-[1] md:leading-[1.1]',
+    'text-md md:text-xl font-normal md:font-medium leading-[1] md:leading-[1.1]',
   lResponsive:
-    'text-[22px] md:text-[38px] font-medium md:font-semibold leading-[1] md:leading-[1.1]',
+    'text-xl md:text-2xl font-medium md:font-semibold leading-[1] md:leading-[1.1]',
   xlResponsive:
     'text-[28px] md:text-[50px] font-medium md:font-semibold leading-[1.1] md:leading-[1.2]',
 };

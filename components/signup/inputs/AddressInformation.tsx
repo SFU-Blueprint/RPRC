@@ -15,14 +15,15 @@ export function AddressInformation() {
     <div className="mb-8 md:mb-10">
       {/* Section Heading */}
       <h2
-        className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.sResponsive} ${robotoCondensed.className}`}
+        className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
       >
         Address Information
       </h2>
 
-      {/* Mailing Address (full width) */}
-      <div className="mb-4 md:mb-5">
+      {/* Mailing Address + City (2 columns) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
         <FormInput
+          name="mailingAddress"
           label="Mailing Address"
           type="text"
           value={formData.mailingAddress}
@@ -32,11 +33,8 @@ export function AddressInformation() {
           required
           showValidation={hasAttemptedValidation}
         />
-      </div>
-
-      {/* City + Province (2 columns) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
         <FormInput
+          name="city"
           label="City"
           type="text"
           value={formData.city}
@@ -46,9 +44,24 @@ export function AddressInformation() {
           required
           showValidation={hasAttemptedValidation}
         />
+      </div>
 
+      {/* Country + Province (2 columns) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
+        <FormSelect
+          label="Country"
+          name='country'
+          options={COUNTRIES}
+          value={formData.country}
+          onChange={(val) => updateFormData({ country: val })}
+          error={errors.country}
+          placeholder="Select a country"
+          required
+          showValidation={hasAttemptedValidation}
+        />
         <FormSelect
           label="Province"
+          name='province'
           options={CANADIAN_PROVINCES}
           value={formData.province}
           onChange={(val) => updateFormData({ province: val })}
@@ -59,20 +72,10 @@ export function AddressInformation() {
         />
       </div>
 
-      {/* Country + Postal Code (2 columns) */}
+      {/* Postal Code (1/2 columns) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-        <FormSelect
-          label="Country"
-          options={COUNTRIES}
-          value={formData.country}
-          onChange={(val) => updateFormData({ country: val })}
-          error={errors.country}
-          placeholder="Select a country"
-          required
-          showValidation={hasAttemptedValidation}
-        />
-
         <FormInput
+          name="postalCode"
           label="Postal Code"
           type="text"
           value={formData.postalCode}

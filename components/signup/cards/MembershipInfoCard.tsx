@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 
 type MembershipInfoCardProps = {
@@ -25,13 +24,11 @@ export function MembershipInfoCard({
       className={`
         w-full p-4 md:p-5
         flex flex-col
-        border-2 border-gray-800
-        rounded-[25px]
+        border-2 border-gray-200
+        rounded-xl
         text-left
         transition-all duration-200
-        hover:border-signup-primary-green-400
-        focus:outline-none focus:ring-2 focus:ring-signup-primary-green-400 focus:ring-offset-2
-        ${isSelected ? 'bg-signup-membership-option-selected' : 'bg-signup-neutral-50'}
+        ${isSelected ? 'bg-primary-light' : 'bg-white'}
       `}
       aria-pressed={isSelected}
       aria-label={`Select ${title} membership`}

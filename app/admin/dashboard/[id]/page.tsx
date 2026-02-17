@@ -19,7 +19,7 @@ import React from 'react';
 import { BackdropContainer } from '@/components/ui/BackdropContainer';
 import ApplicationResult from '@/components/Admin/application/ApplicationResult';
 import { useParams } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Activity } from 'react';
 import { ApplicationStatus, ApplicationType, ReviewDecision } from '@/lib/constants/enums';
 

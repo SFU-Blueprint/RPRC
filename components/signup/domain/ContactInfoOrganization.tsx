@@ -14,7 +14,7 @@ export function ContactInfoOrganization() {
     <div className="mb-8 md:mb-10">
       {/* Section Heading */}
       <h2
-        className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.sResponsive} ${robotoCondensed.className}`}
+        className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
       >
         Contact Information
       </h2>
@@ -23,6 +23,7 @@ export function ContactInfoOrganization() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
         {/* Organization Name */}
         <FormInput
+          name="fullName"
           label="Organization Name"
           type="text"
           value={formData.fullName}
@@ -35,6 +36,7 @@ export function ContactInfoOrganization() {
 
         {/* Organization Email Address - Pre-filled and disabled */}
         <FormInput
+          name="email"
           label="Organization Email Address"
           type="email"
           value={formData.email}
@@ -51,6 +53,7 @@ export function ContactInfoOrganization() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
         {/* Organization Representative Name */}
         <FormInput
+          name="representativeName"
           label="Organization Representative Name"
           type="text"
           value={formData.representativeName || ''}
@@ -63,6 +66,7 @@ export function ContactInfoOrganization() {
 
         {/* Representative Email Address (Optional) */}
         <FormInput
+          name="representativeEmail"
           label="Representative Email Address (if different from the one given above)"
           type="email"
           value={formData.representativeEmail || ''}
@@ -77,6 +81,7 @@ export function ContactInfoOrganization() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
         {/* Phone Number */}
         <FormInput
+          name="phoneNumber"
           label="Phone Number"
           type="tel"
           value={formData.phoneNumber}

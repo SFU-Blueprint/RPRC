@@ -42,18 +42,6 @@ export const CANADIAN_PROVINCES: string[] = [
 ];
 
 /**
- * Membership interest options (in order)
- */
-export const MEMBERSHIP_INTERESTS: string[] = [
-  'Health',
-  'Education',
-  'Environment',
-  'Arts+Culture',
-  'Housing',
-  'Other',
-];
-
-/**
  * Membership type constants
  * Re-export from centralized enums for backwards compatibility
  */

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,7 +10,7 @@ import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
 import { subheaderStyles, bodyStyles } from '@/app/fonts';
 import { ROUTES } from '@/lib/constants/routes';
 import { login } from '@/app/actions/auth';
-import { AuthErrorCode } from '@/lib/constants/auth-errors';
+import { AuthErrorCode } from '@/lib/constants/error-types';
 
 export const HomePageForm = () => {
   const [formData, setFormData] = useState({
@@ -34,7 +34,7 @@ export const HomePageForm = () => {
 
       if ('error' in result) {
         console.error('Login error:', result.error, 'Code:', result.code);
-        
+
         // Show user-friendly error messages
         if (result.code === AuthErrorCode.INVALID_CREDENTIALS) {
           setError('Invalid email or password. Please try again.');
@@ -54,8 +54,8 @@ export const HomePageForm = () => {
   };
 
   return (
-    <div className="rounded-3xl p-8 md:p-10 lg:p-12 bg-white shadow-[0_2.8px_2.2px_rgba(0,_0,_0,_0.034),_0_6.7px_5.3px_rgba(0,_0,_0,_0.048),_0_12.5px_10px_rgba(0,_0,_0,_0.06),_0_22.3px_17.9px_rgba(0,_0,_0,_0.072),_0_41.8px_33.4px_rgba(0,_0,_0,_0.086),_0_100px_80px_rgba(0,_0,_0,_0.12)]">
-      <h3 className={`${subheaderStyles.s} mb-4 text-gray-900`}>
+    <div className="rounded-3xl p-8 md:p-10 lg:p-12 bg-background-off-white shadow-[0_2.8px_2.2px_rgba(0,_0,_0,_0.034),_0_6.7px_5.3px_rgba(0,_0,_0,_0.048),_0_12.5px_10px_rgba(0,_0,_0,_0.06),_0_22.3px_17.9px_rgba(0,_0,_0,_0.072),_0_41.8px_33.4px_rgba(0,_0,_0,_0.086),_0_100px_80px_rgba(0,_0,_0,_0.12)]">
+      <h3 className={`${subheaderStyles.m} mb-4 text-gray-900`}>
         Existing Member?
       </h3>
 
@@ -80,9 +80,11 @@ export const HomePageForm = () => {
             id="email"
             type="email"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             placeholder="your.email@example.com"
-            className='mt-1'
+            className="mt-1"
             required
           />
         </div>
@@ -100,15 +102,18 @@ export const HomePageForm = () => {
 
         {/* Forgot password link */}
         <div>
-          <Link href={ROUTES.AUTH_FORGOT_PASSWORD} className="text-black text-xs font-medium underline">
+          <Link
+            href={ROUTES.AUTH_FORGOT_PASSWORD}
+            className="text-black text-xs font-medium underline"
+          >
             Forgot password?
           </Link>
         </div>
 
         {/* Submit Button */}
         <div className="pt-4">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isSubmitting || !formData.email || !formData.password}
             className="bg-primary-black mx-auto block w-fit cursor-pointer"
           >

@@ -60,7 +60,8 @@ export function PasswordInput({
   }, [value]);
 
   const allRequirementsMet = requirementStatus.every((req) => req.met);
-  const showRequirementsList = showRequirements && (isFocused || value.length > 0);
+  const showRequirementsList =
+    showRequirements && (isFocused || value.length > 0);
 
   return (
     <div className="flex flex-col gap-2">
@@ -82,7 +83,9 @@ export function PasswordInput({
           placeholder={placeholder}
           className={cn(
             'pr-12',
-            showValidation && error && 'border-destructive aria-invalid:border-destructive'
+            showValidation &&
+              error &&
+              'border-destructive aria-invalid:border-destructive',
           )}
           aria-invalid={showValidation && !!error}
         />
@@ -93,11 +96,15 @@ export function PasswordInput({
           onClick={() => setShowPassword(!showPassword)}
           className={cn(
             'absolute top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none transition-colors',
-            showValidation && error ? 'right-10' : 'right-3'
+            showValidation && error ? 'right-10' : 'right-3',
           )}
           aria-label={showPassword ? 'Hide password' : 'Show password'}
         >
-          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          {showPassword ? (
+            <EyeOff className="w-4 h-4" />
+          ) : (
+            <Eye className="w-4 h-4" />
+          )}
         </button>
 
         {/* Error Icon */}
@@ -120,7 +127,9 @@ export function PasswordInput({
                 key={req.id}
                 className={cn(
                   'flex items-start gap-2 text-xs transition-colors',
-                  req.met ? 'text-green-600 dark:text-green-500' : 'text-muted-foreground'
+                  req.met
+                    ? 'text-green-600 dark:text-green-500'
+                    : 'text-muted-foreground',
                 )}
               >
                 <span className="flex-shrink-0 mt-0.5">
@@ -130,7 +139,9 @@ export function PasswordInput({
                     <X className="w-4 h-4" strokeWidth={2.5} />
                   )}
                 </span>
-                <span className={req.met ? 'font-medium' : ''}>{req.label}</span>
+                <span className={req.met ? 'font-medium' : ''}>
+                  {req.label}
+                </span>
               </li>
             ))}
           </ul>

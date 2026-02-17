@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from '../inputs/FormInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
@@ -14,14 +13,14 @@ export function MembershipWaiverSection() {
     <div className="mb-8 md:mb-10">
       {/* Section Heading */}
       <h2
-        className={`text-gray-900 mb-3 ${headerStyles.sResponsive} ${robotoCondensed.className}`}
+        className={`text-gray-900 mb-3 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
       >
         Membership Fee Waiver (Optional)
       </h2>
 
       {/* Helper Text - Only ~60% width */}
       <p
-        className={`text-gray-700 mb-5 max-w-3xl ${bodyStyles.s} ${inter.className}`}
+        className={`text-primary-black mb-5 max-w-3xl ${bodyStyles.m} ${inter.className}`}
       >
         We are committed to making membership accessible to everyone. Applicants
         who are unable to afford the membership fee may request a waiver.
@@ -48,6 +47,7 @@ export function MembershipWaiverSection() {
 
         {/* Reason Input Column */}
         <FormInput
+          name="waiverreason"
           label="Reason (optional)"
           type="text"
           value={formData.waiverreason || ''}

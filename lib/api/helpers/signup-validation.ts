@@ -183,15 +183,17 @@ export function validateStep1(
  * Validate entire Step 2 (Contact & Address Information + Membership Interests)
  * Validates common fields, then membership-type-specific fields
  */
-export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
+export function validateStep2(data: Partial<SignUpFormData>, userRole?: string): ValidationErrors {
   const errors: ValidationErrors = {};
+  
+  const isOrganization = userRole === 'organization';
 
   // COMMON FIELDS (Both Individual & Organization)
 
   // Validate full name (Individual: "Name", Organization: "Organization Name")
   const fullNameError = validateRequired(
     data.fullName,
-    data.membershipType === MEMBERSHIP_TYPES.ORGANIZATION
+    isOrganization
       ? 'Organization name'
       : 'Name',
   );
@@ -242,16 +244,15 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
   }
 
   /* CODE FOR VALIDATING REASON FOR JOINING WAS REMOVED AS THIS FIELD IS OPTIONAL
-  TO MAKE IT REQUIRED, UNCOMMENT THIS CODE.
+  TO MAKE IT REQUIRED, UNCOMMENT THIS CODE. */
   // Validate reason for joining (whyrpcmember)
   const whyRPRCError = validateRequired(
     data.whyrpcmember,
-    'Why do you want to be an RPRC member',
+    'Reason',
   );
   if (whyRPRCError) {
     errors.whyrpcmember = whyRPRCError;
   }
-  */
 
   // Note: Interests are optional, no validation needed
   // Note: membershipwaiver is boolean, no validation needed
@@ -259,7 +260,7 @@ export function validateStep2(data: Partial<SignUpFormData>): ValidationErrors {
 
   // MEMBERSHIP-TYPE-SPECIFIC FIELDS
 
-  if (data.membershipType === MEMBERSHIP_TYPES.ORGANIZATION) {
+  if (isOrganization) {
     // Organization-specific validations
 
     // Validate representative name (required for organization)
