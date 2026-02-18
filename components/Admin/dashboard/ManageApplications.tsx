@@ -7,32 +7,39 @@ import {
   AdminDashboardTable,
   AdminDashboardMobileTable,
 } from '@/components/Admin';
-import { BackdropContainer } from '@/components/ui/BackdropContainer';
 import { Button } from '@/components/ui/button';
 import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
-import { getPagination } from '@/lib/admin/utils';
+import { getPagination, filterApplicationsBySearch } from '@/lib/admin/utils';
 import type { ManageApplicationsProps } from '@/types/admin.types';
 
 export default function ManageApplications({ applications }: ManageApplicationsProps) {
   const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const filteredBySearch = useMemo(
+    () => filterApplicationsBySearch(applications, searchQuery),
+    [applications, searchQuery]
+  );
+
   const paginationMobile = useMemo(
-    () => getPagination(applications.length, 5),
-    [applications.length]
+    () => getPagination(filteredBySearch.length, 5),
+    [filteredBySearch.length]
   );
   const paginationDesktop = useMemo(
-    () => getPagination(applications.length, 10),
-    [applications.length]
+    () => getPagination(filteredBySearch.length, 10),
+    [filteredBySearch.length]
   );
 
   return (
     <div className="mb-20 w-full">
-      <BackdropContainer className="border-2 rounded-[16px] p-4 md:p-5 lg:p-6">
+      {/* No backdrop on mobile; backdrop container from md up */}
+      <div
+        className="rounded-[16px] p-5 md:border-2 md:bg-[#F6F6F6] md:p-5 md:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_4px_16px_rgba(0,0,0,0.04)] lg:p-6"
+      >
         {/* Title and Search row */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6 first:mt-0">
           <h1
-            className={`${robotoCondensed.className} text-[28px] md:text-[32px] font-bold shrink-0`}
+            className={`${robotoCondensed.className} text-[30px] md:text-[32px] font-bold shrink-0`}
           >
             Manage Applications
           </h1>
@@ -43,7 +50,7 @@ export default function ManageApplications({ applications }: ManageApplicationsP
 
         {/* Filter Tabs */}
         <div
-          className={`${inter.className} flex gap-x-4 overflow-x-auto scrollbar-hide rounded-3xl md:rounded-none bg-background-off-white md:bg-transparent mt-6 p-0`}
+          className={`${inter.className} flex gap-x-4 overflow-x-auto scrollbar-hide mt-6 p-0`}
         >
           {ADMIN_DASHBOARD_CONST.TABS.map((tab) => {
             const isActive = tab.value === currentTab.value;
@@ -67,20 +74,22 @@ export default function ManageApplications({ applications }: ManageApplicationsP
         {/* Tables */}
         <div className="block md:hidden">
           <AdminDashboardMobileTable
-            applications={applications}
+            applications={filteredBySearch}
             currentTab={currentTab}
             pagination={paginationMobile}
+            searchQuery={searchQuery}
           />
         </div>
         <div className="hidden md:block">
           <AdminDashboardTable
             columns={ADMIN_DASHBOARD_CONST.TABLE_COLUMNS}
-            applications={applications}
+            applications={filteredBySearch}
             currentTab={currentTab}
             pagination={paginationDesktop}
+            searchQuery={searchQuery}
           />
         </div>
-      </BackdropContainer>
+      </div>
     </div>
   );
 }

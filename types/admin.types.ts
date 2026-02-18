@@ -68,6 +68,7 @@ export type AdminDashboardTablePropTypes = {
     label: string;
     value: string;
   };
+  searchQuery?: string;
   pagination?: {
     itemCount: number;
     numberPerPage: number;
@@ -80,6 +81,7 @@ export type AdminDashboardMobileTablePropTypes = {
     label: string;
     value: string;
   };
+  searchQuery?: string;
   pagination?: {
     itemCount: number;
     numberPerPage: number;

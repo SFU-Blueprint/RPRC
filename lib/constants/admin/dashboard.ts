@@ -28,6 +28,9 @@ const ALL_TAB = { value: 'all', label: 'All' } as const;
 export const ADMIN_DASHBOARD_CONST = {
   PAGE_TITLE: 'Admin Dashboard',
 
+  /** Empty state message when no applications match filters/search */
+  EMPTY_STATE_MESSAGE: 'No members or applications with this status.',
+
   /** Filter tabs: "All" plus one tab per application status type */
   TABS: [ALL_TAB, ...APPLICATION_STATUS_TYPES],
   TABLE_COLUMNS: [

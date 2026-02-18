@@ -131,13 +131,6 @@ function DataPagination({
 }: DataPaginationProps) {
   const pageCount = Math.ceil(itemCount / numberItemsPerPage)
 
-  const windowSize = 5
-  const shouldShift = activePage > windowSize
-  const windowEnd = shouldShift
-    ? Math.min(activePage, pageCount)
-    : Math.min(windowSize, pageCount)
-  const windowStart = Math.max(windowEnd - (windowSize - 1), 1)
-
   if (pageCount <= 1) return null
 
   const handlePrev = (e: React.MouseEvent) => {
@@ -150,53 +143,61 @@ function DataPagination({
     if (activePage < pageCount) onPageChange(activePage + 1)
   }
 
+  const btnBase =
+    "inline-flex size-9 items-center justify-center rounded-lg bg-[#F9F9F9] no-underline transition-colors hover:bg-gray-200 focus-visible:outline focus-visible:ring-2 focus-visible:ring-ring"
+  const activeBtn = "border border-[#A08050]"
+  const arrowEnabled = "text-[#343a40]"
+  const arrowDisabled = "pointer-events-none text-[#adb5bd]"
+
   return (
     <Pagination className="py-6">
-      <PaginationContent>
+      <PaginationContent className="gap-2">
         <PaginationItem>
-          <PaginationPrevious
+          <a
             href="#"
+            role="button"
+            aria-label="Go to previous page"
             onClick={handlePrev}
             aria-disabled={activePage === 1}
             className={cn(
-              activePage === 1 && "pointer-events-none opacity-50"
+              btnBase,
+              activePage === 1 ? arrowDisabled : arrowEnabled
             )}
-          />
+          >
+            <ChevronLeftIcon className="size-4 shrink-0" />
+          </a>
         </PaginationItem>
 
-        {Array.from({ length: Math.min(windowSize, pageCount) }).map(
-          (_, index) => {
-            const pageNumber = windowStart + index
-            const isActive = activePage === pageNumber
-
-            return (
-              <PaginationItem key={pageNumber}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    onPageChange(pageNumber)
-                  }}
-                  isActive={isActive}
-                  size="icon"
-                  role="button"
-                >
-                  {pageNumber}
-                </PaginationLink>
-              </PaginationItem>
-            )
-          }
-        )}
+        <PaginationItem>
+          <span
+            role="status"
+            aria-current="page"
+            className={cn(btnBase, activeBtn)}
+          >
+            {activePage}
+          </span>
+        </PaginationItem>
 
         <PaginationItem>
-          <PaginationNext
+          <span className="flex size-9 items-center justify-center text-[#888888] text-sm">
+            / {pageCount}
+          </span>
+        </PaginationItem>
+
+        <PaginationItem>
+          <a
             href="#"
+            role="button"
+            aria-label="Go to next page"
             onClick={handleNext}
             aria-disabled={activePage === pageCount}
             className={cn(
-              activePage === pageCount && "pointer-events-none opacity-50"
+              btnBase,
+              activePage === pageCount ? arrowDisabled : arrowEnabled
             )}
-          />
+          >
+            <ChevronRightIcon className="size-4 shrink-0" />
+          </a>
         </PaginationItem>
       </PaginationContent>
     </Pagination>
