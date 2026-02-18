@@ -21,6 +21,7 @@ const TAB_VALUE_TO_STATUS: Record<string, string> = {
 type UseApplicationListOptions = {
   applications: ApplicationType[];
   currentTab: Tab;
+  searchQuery?: string;
   pagination?: {
     itemCount: number;
     numberPerPage: number;
@@ -30,6 +31,7 @@ type UseApplicationListOptions = {
 export function useApplicationList({
   applications,
   currentTab,
+  searchQuery = '',
   pagination,
 }: UseApplicationListOptions) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,6 +39,10 @@ export function useApplicationList({
   useEffect(() => {
     setCurrentPage(1);
   }, [currentTab]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const filteredApplications = useMemo(() => {
     if (currentTab.value === 'all') return applications;

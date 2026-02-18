@@ -2,6 +2,7 @@
 
 import { StatusChip } from '@/components/Admin';
 import { formatDateWithOrdinal } from '@/lib/utils';
+import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
 import { AdminDashboardMobileTablePropTypes } from '@/types/admin.types';
 import { Pagination } from '@/components/Pagination';
 import { useApplicationList } from './useApplicationList';
@@ -9,6 +10,7 @@ import { useApplicationList } from './useApplicationList';
 export default function AdminDashboardMobileTable({
   applications,
   currentTab,
+  searchQuery,
   pagination,
 }: AdminDashboardMobileTablePropTypes) {
   const {
@@ -19,6 +21,7 @@ export default function AdminDashboardMobileTable({
   } = useApplicationList({
     applications,
     currentTab,
+    searchQuery,
     pagination,
   });
 
@@ -27,12 +30,19 @@ export default function AdminDashboardMobileTable({
   const footerText =
     totalCount > 0
       ? `Showing ${displayedCount} of ${totalCount} application${totalCount === 1 ? '' : 's'}`
-      : 'No applications to display';
+      : 'Showing 0 of 0';
+
+  const isEmpty = filteredApplications.length === 0;
 
   return (
     <>
       <div className="flex flex-col mt-5.5 gap-y-4">
-        {paginatedApplications.map((app) => (
+        {isEmpty ? (
+          <div className="p-12 text-center text-[16px] leading-6 tracking-[-0.31px] text-gray-600 rounded-3xl border-2 border-[#BAB7B2] bg-[#F5F4F2]">
+            {ADMIN_DASHBOARD_CONST.EMPTY_STATE_MESSAGE}
+          </div>
+        ) : (
+          paginatedApplications.map((app) => (
           <div
             key={app.id}
             className="rounded-3xl border-2 border-[#BAB7B2] bg-[#F5F4F2] p-4.5"
@@ -70,7 +80,8 @@ export default function AdminDashboardMobileTable({
               </div>
             </div>
           </div>
-        ))}
+        ))
+        )}
       </div>
       <div className="mt-3 px-1 text-[14px] text-gray-600">
         {footerText}
