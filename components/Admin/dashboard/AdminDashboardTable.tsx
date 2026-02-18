@@ -2,6 +2,7 @@
 
 import { Table, StatusChip } from '@/components/Admin';
 import { formatDateWithOrdinal } from '@/lib/utils';
+import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
 import { AdminDashboardTablePropTypes } from '@/types/admin.types';
 import { useRouter } from 'next/navigation';
 import { useApplicationList } from './useApplicationList';
@@ -10,6 +11,7 @@ export default function AdminDashboardTable({
   columns,
   applications,
   currentTab,
+  searchQuery,
   pagination,
 }: AdminDashboardTablePropTypes) {
   const router = useRouter();
@@ -21,6 +23,7 @@ export default function AdminDashboardTable({
   } = useApplicationList({
     applications,
     currentTab,
+    searchQuery,
     pagination,
   });
 
@@ -33,7 +36,9 @@ export default function AdminDashboardTable({
   const footerText =
     totalCount > 0
       ? `Showing ${displayedCount} of ${totalCount} application${totalCount === 1 ? '' : 's'}`
-      : 'No applications to display';
+      : 'Showing 0 of 0';
+
+  const isEmpty = filteredApplications.length === 0;
 
   return (
     <Table
@@ -55,7 +60,17 @@ export default function AdminDashboardTable({
       onPageChange={setCurrentPage}
       footer={footerText}
     >
-      {paginatedApplications.map((app) => (
+      {isEmpty ? (
+        <tr>
+          <td
+            colSpan={columns.length}
+            className="p-12 text-center text-[16px] leading-6 tracking-[-0.31px] text-gray-600"
+          >
+            {ADMIN_DASHBOARD_CONST.EMPTY_STATE_MESSAGE}
+          </td>
+        </tr>
+      ) : (
+        paginatedApplications.map((app) => (
         <tr
           key={app.id}
           onClick={() => handleRowClick(app.id)}
@@ -76,7 +91,8 @@ export default function AdminDashboardTable({
             {app.reviewer2 === '' ? '-' : app.reviewer2}
           </td>
         </tr>
-      ))}
+      ))
+      )}
     </Table>
   );
 }

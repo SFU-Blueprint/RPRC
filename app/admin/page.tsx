@@ -24,7 +24,7 @@ export default async function AdminDashboard() {
           </h1>
           <StatCards stats={statCardsData} />
         </div>
-        <div className="max-w-[100rem] mx-auto px-4 md:px-8">
+        <div className="max-w-[90rem] mx-auto px-4 md:px-8">
           <ManageApplications applications={applications} />
         </div>
       </div>

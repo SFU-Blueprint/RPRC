@@ -1,11 +1,11 @@
 import { ApplicationType, type AdminDashboardStats } from '@/types/admin.types';
 
 /* Stat card types. */
-export const STAT_CARD_TYPES = ['independent', 'organization', 'applications'] as const;
+export const STAT_CARD_TYPES = ['independent', 'organization', 'toReview'] as const;
 
 export type StatCardType = (typeof STAT_CARD_TYPES)[number];
 
-/** Stats for the three overview cards: independent, organization, applications */
+/** Stats for the three overview cards: independent, organization, toReview */
 export type StatCardsData = Array<{ type: StatCardType; value: number }>;
 
 /* Build stat cards array from AdminDashboardStats using STAT_CARD_TYPES order. */
@@ -27,6 +27,9 @@ const ALL_TAB = { value: 'all', label: 'All' } as const;
 
 export const ADMIN_DASHBOARD_CONST = {
   PAGE_TITLE: 'Admin Dashboard',
+
+  /** Empty state message when no applications match filters/search */
+  EMPTY_STATE_MESSAGE: 'No members or applications with this status.',
 
   /** Filter tabs: "All" plus one tab per application status type */
   TABS: [ALL_TAB, ...APPLICATION_STATUS_TYPES],

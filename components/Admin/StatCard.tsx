@@ -14,8 +14,8 @@ const STAT_CARD_CONFIG: Record<StatCardType, { label: string; image: string }> =
     label: 'Organization Members',
     image: '/Adminpage/AdminOrganiziationMembers.png',
   },
-  applications: {
-    label: 'New Applications',
+  toReview: {
+    label: 'To Review',
     image: '/Adminpage/AdminNewApplicationsIcon.png',
   },
 };
@@ -31,10 +31,11 @@ function StatCard({ type, value }: StatCardProps) {
 
   return (
     <BackdropContainer
-      className="flex-1 min-w-0 flex flex-col items-center justify-center text-center
+      className="flex-1 min-w-0 aspect-square md:aspect-auto flex flex-col items-center justify-center text-center
         border-2 border-primary-black rounded-[16px] p-4 md:p-5 lg:p-6"
     >
-      <div className="flex items-center justify-center gap-2 mb-1.5">
+      {/* Mobile: icon on top, then number, then label. Desktop: icon + number in a row, label below */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-2 mb-1.5 md:gap-2">
         <span className="text-primary-black shrink-0 [&>svg]:w-8 [&>svg]:h-8 [&>img]:w-8 [&>img]:h-8 md:[&>svg]:w-9 md:[&>svg]:h-9 md:[&>img]:w-9 md:[&>img]:h-9">
           <Image src={iconSrc} alt={label} width={36} height={36} />
         </span>
