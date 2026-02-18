@@ -27,8 +27,8 @@ export default function ManageApplications({ applications }: ManageApplicationsP
   );
 
   return (
-    <div className="mb-20 -mx-4 md:-mx-8 px-4 md:px-8 w-full">
-      <BackdropContainer>
+    <div className="mb-20 w-full">
+      <BackdropContainer className="border-2 rounded-[16px] p-4 md:p-5 lg:p-6">
         {/* Title and Search row */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6 first:mt-0">
           <h1

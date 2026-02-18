@@ -144,6 +144,15 @@ export async function getAdminApplicationList(): Promise<ApplicationType[]> {
     );
 }
 
+
+/* Pure helper: count applications with status TO_REVIEW (no async, no Supabase). */
+
+function countApplicationsToReview(applications: ApplicationType[]): number {
+    return applications.filter((a) => a.status === ApplicationStatus.TO_REVIEW).length;
+}
+
+
+
 /* getAdminDashboardStats() Derives counts from the same list. */
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
@@ -153,6 +162,6 @@ export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {
     return {
         independent,
         organization,
-        applications: list.length,
+        toReview: countApplicationsToReview(list),
     };
 }

@@ -49,11 +49,11 @@ export type ApplicationType = {
   reviewer2: string;
 };
 
-/** Stats for the admin overview cards (independent, organization, applications counts). */
+/** Stats for the admin overview cards (independent, organization, toReview counts). */
 export type AdminDashboardStats = {
   independent: number;
   organization: number;
-  applications: number;
+  toReview: number;
 };
 
 /** Props for the Manage Applications section (applications list from server). */

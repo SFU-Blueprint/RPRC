@@ -14,8 +14,8 @@ const STAT_CARD_CONFIG: Record<StatCardType, { label: string; image: string }> =
     label: 'Organization Members',
     image: '/Adminpage/AdminOrganiziationMembers.png',
   },
-  applications: {
-    label: 'New Applications',
+  toReview: {
+    label: 'To Review',
     image: '/Adminpage/AdminNewApplicationsIcon.png',
   },
 };

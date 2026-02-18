@@ -1,11 +1,11 @@
 import { ApplicationType, type AdminDashboardStats } from '@/types/admin.types';
 
 /* Stat card types. */
-export const STAT_CARD_TYPES = ['independent', 'organization', 'applications'] as const;
+export const STAT_CARD_TYPES = ['independent', 'organization', 'toReview'] as const;
 
 export type StatCardType = (typeof STAT_CARD_TYPES)[number];
 
-/** Stats for the three overview cards: independent, organization, applications */
+/** Stats for the three overview cards: independent, organization, toReview */
 export type StatCardsData = Array<{ type: StatCardType; value: number }>;
 
 /* Build stat cards array from AdminDashboardStats using STAT_CARD_TYPES order. */
