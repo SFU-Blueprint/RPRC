@@ -19,7 +19,7 @@ export function formatDateWithOrdinal(date: string | Date) {
   const month = d.toLocaleString('en-US', { month: 'short' });
   const year = d.getFullYear();
 
-  return `${day}${getOrdinal(day)} ${month} ${year}`;
+  return `${month} ${day}${getOrdinal(day)}, ${year}`;
 }
 
 export function formatDisplayDate(date: string) {
