@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { AlertTriangle } from 'lucide-react';
 
 import { inter, robotoCondensed } from '@/app/fonts';
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -16,23 +16,24 @@ import type { ReviewHistoryItem } from '@/types/admin.types';
 
 import SubmitReviewModal from './SubmitReviewModal';
 
-type SubmitReviewProps = {
+type ConflictResolutionProps = {
   appId: string;
   reviewHistory: ReviewHistoryItem[];
 };
 
-export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps) {
+export default function ConflictResolution({ appId, reviewHistory }: ConflictResolutionProps) {
   const router = useRouter();
 
-  const [boardMemberName, setBoardMemberName] = useState('');
-  const [reviewDate, setReviewDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const isFormValid = Boolean(boardMemberName && reviewDate && decision && reason);
+  const approvalCount = reviewHistory.filter(r => r.decision === ReviewDecision.APPROVE).length;
+  const rejectionCount = reviewHistory.filter(r => r.decision === ReviewDecision.REJECT).length;
+
+  const isFormValid = Boolean(decision && reason.trim());
 
   const handleConfirmSubmit = async () => {
     if (!isFormValid || isSubmitting) return;
@@ -42,8 +43,8 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
 
     const result = await submitApplicationReview({
       appId,
-      reviewerName: boardMemberName,
-      reviewDate,
+      reviewerName: 'Board Admin',
+      reviewDate: new Date().toISOString().slice(0, 10),
       decision: decision as ReviewDecision,
       reason,
     });
@@ -56,9 +57,6 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
       return;
     }
 
-    // Reset form after successful submission
-    setBoardMemberName('');
-    setReviewDate(new Date().toISOString().slice(0, 10));
     setDecision('');
     setReason('');
     setSubmitError('');
@@ -68,39 +66,24 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
   };
 
   return (
-    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex flex-col gap-y-6 mt-6 w-full">
+    <BackdropContainer className="bg-application-conflict-background border border-application-conflict-border p-5 rounded-xl flex flex-col gap-y-6 mt-6 w-full">
       <p className={`${robotoCondensed.className} text-3xl font-bold`}>Submit Review</p>
 
-      <div className="flex flex-col md:flex-row gap-x-6 gap-y-4">
-        <div className="flex-[2]">
-          <Label htmlFor="boardMemberName" className="text-application-detail-text-secondary text-md">
-            Board Member Name
-          </Label>
-          <Input
-            id="boardMemberName"
-            placeholder="Enter your name"
-            value={boardMemberName}
-            onChange={(e) => setBoardMemberName(e.target.value)}
-            className="mt-2 w-full"
-          />
+      {/* Conflict warning banner */}
+      <div className="bg-application-conflict-note border-l-4 border-application-conflict-border rounded-md px-4 py-3">
+        <div className="flex items-center gap-2 mb-1">
+          <AlertTriangle size={18} className="text-application-conflict-border shrink-0" />
+          <p className="font-semibold text-sm">Conflicting decisions</p>
         </div>
-
-        <div className="flex-1">
-          <Label htmlFor="reviewDate" className="text-application-detail-text-secondary text-md">
-            Review Date
-          </Label>
-          <Input
-            id="reviewDate"
-            type="date"
-            value={reviewDate}
-            onChange={(e) => setReviewDate(e.target.value)}
-            className="mt-2 w-full"
-          />
-        </div>
+        <p className="text-sm text-application-detail-text-secondary">
+          This application has {approvalCount} approval{approvalCount !== 1 ? 's' : ''} and{' '}
+          {rejectionCount} rejection{rejectionCount !== 1 ? 's' : ''}. Please discuss with your
+          team and finalize the decision with a note.
+        </p>
       </div>
 
       <div>
-        <Label className="text-application-detail-text-secondary text-md">Decision</Label>
+        <Label className="text-application-detail-text-secondary text-md">Final Decision</Label>
 
         <div className="flex justify-center w-full mt-2">
           <RadioGroup
@@ -111,11 +94,11 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
             <div className="flex items-center gap-3">
               <RadioGroupItem
                 value={ReviewDecision.APPROVE}
-                id="approve"
+                id="conflict-approve"
                 className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
               />
               <Label
-                htmlFor="approve"
+                htmlFor="conflict-approve"
                 className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
               >
                 Approve
@@ -125,11 +108,11 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
             <div className="flex items-center gap-3">
               <RadioGroupItem
                 value={ReviewDecision.REJECT}
-                id="reject"
+                id="conflict-reject"
                 className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
               />
               <Label
-                htmlFor="reject"
+                htmlFor="conflict-reject"
                 className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
               >
                 Reject
@@ -140,15 +123,15 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
       </div>
 
       <div>
-        <Label htmlFor="reason" className="text-application-detail-text-secondary text-md">
-          Note
+        <Label htmlFor="conflict-reason" className="text-application-detail-text-secondary text-md">
+          Resolution Note
         </Label>
         <textarea
-          id="reason"
+          id="conflict-reason"
           name="reason"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className={`${inter.className} w-full h-42.5 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
+          className={`${inter.className} w-full h-42.5 bg-signup-neutral-50 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
           placeholder="Enter your reasoning..."
         />
       </div>

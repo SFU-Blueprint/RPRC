@@ -14,6 +14,7 @@ import {
   ApplicationErrorCode,
   SubmitApplication,
 } from '@/lib/constants/application-errors';
+import { isAdmin } from '@/lib/helpers/auth-helper';
 import type { Database } from '@/types/database';
 
 function formatPhoneWithAreaCode(phoneNumber: string): string {
@@ -320,6 +321,10 @@ export async function submitApplicationReview(
     return { success: false, error: 'User not authenticated' };
   }
 
+  if (!(await isAdmin())) {
+    return { success: false, error: 'Unauthorized: admin role required' };
+  }
+
   if (
     !input.appId ||
     !input.reviewerName.trim() ||
@@ -328,6 +333,16 @@ export async function submitApplicationReview(
     !input.reason.trim()
   ) {
     return { success: false, error: 'All review fields are required' };
+  }
+
+  const { data: application } = await supabase
+    .from('applications')
+    .select('status')
+    .eq('id', input.appId)
+    .single();
+
+  if (application?.status === 'payment_pending' || application?.status === 'rejected') {
+    return { success: false, error: 'This application has already been finalized' };
   }
 
   const { data: existingReviews, error: reviewsError } = await supabase
@@ -376,6 +391,10 @@ export async function submitApplicationReview(
 
   revalidatePath(ROUTES.ADMIN_DASHBOARD);
   revalidatePath(ROUTES.ADMIN_APPLICATION_DETAIL(input.appId));
+
+  if (isFinalized) {
+    revalidatePath(ROUTES.MEMBERSHIP_DASHBOARD);
+  }
 
   return { success: true };
 }
