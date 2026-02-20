@@ -22,6 +22,30 @@ export async function getUserClient() {
 }
 
 /**
+ * (server-side) Checks if the given email has admin role in public.users.
+ * Single source of truth for the "lookup by email and check role" logic.
+ */
+export async function isAdminByEmail(email: string): Promise<boolean> {
+  if (!email) return false;
+  const supabase = await createServerClient();
+  const { data } = await supabase
+    .from('users')
+    .select('role')
+    .eq('email', email)
+    .maybeSingle();
+  return data?.role === 'admin';
+}
+
+/**
+ * (server-side) Checks if the current session user is an admin.
+ * Uses isAdminByEmail with the signed-in user's email.
+ */
+export async function isAdmin(): Promise<boolean> {
+  const user = await getUser();
+  return isAdminByEmail(user?.email ?? '');
+}
+
+/**
  * Check if user has an application
  */
 export async function hasApplication(userId: string): Promise<boolean> {

@@ -46,6 +46,14 @@ export const HomePageForm = () => {
       }
       // Success case handled by server action (redirects to dashboard)
     } catch (error) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'digest' in error &&
+        String((error as { digest?: string }).digest).startsWith('NEXT_REDIRECT')
+      ) {
+        throw error;
+      }
       console.error('Unexpected error during login:', error);
       setError('An unexpected error occurred. Please try again.');
     } finally {
