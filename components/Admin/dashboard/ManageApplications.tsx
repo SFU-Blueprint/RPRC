@@ -9,7 +9,8 @@ import {
 } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
-import { getPagination, filterApplicationsBySearch } from '@/lib/admin/utils';
+import { getPagination } from '@/lib/utils/pagination-utils';
+import { filterApplicationsBySearch } from '@/lib/utils/application-search-utils';
 import type { ManageApplicationsProps } from '@/types/admin.types';
 
 export default function ManageApplications({ applications }: ManageApplicationsProps) {

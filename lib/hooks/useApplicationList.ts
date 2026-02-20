@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { ApplicationType } from '@/types/admin.types';
+import { useCallback, useMemo, useState } from 'react';
+import type { ApplicationType } from '@/types/admin.types';
 
 type Tab = {
   label: string;
   value: string;
 };
 
-/** Map tab value ) */
 const TAB_VALUE_TO_STATUS: Record<string, string> = {
   toReview: 'to_review',
   paymentPending: 'payment_pending',
@@ -34,20 +33,23 @@ export function useApplicationList({
   searchQuery = '',
   pagination,
 }: UseApplicationListOptions) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const key = `${currentTab.value}::${searchQuery}`;
+  const [pageState, setPageState] = useState({ key, page: 1 });
+  const currentPage = pageState.key === key ? pageState.page : 1;
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [currentTab]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
+  const setCurrentPage = useCallback(
+    (page: number) => {
+      setPageState({ key, page });
+    },
+    [key],
+  );
 
   const filteredApplications = useMemo(() => {
     if (currentTab.value === 'all') return applications;
     const status = TAB_VALUE_TO_STATUS[currentTab.value];
-    return status ? applications.filter((app) => app.status === status) : applications;
+    return status
+      ? applications.filter((app) => app.status === status)
+      : applications;
   }, [applications, currentTab]);
 
   const paginatedApplications = useMemo(() => {

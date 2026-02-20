@@ -1,17 +1,8 @@
 import type { ApplicationType } from '@/types/admin.types';
 
-// Helper function to get pagination
-export function getPagination(itemCount: number, numberPerPage: number) {
-  return {
-    itemCount,
-    numberPerPage,
-  };
-}
-
-/** Filter applications by search query (applicant name, reviewer 1, reviewer 2). Case-insensitive substring match. */
 export function filterApplicationsBySearch(
   applications: ApplicationType[],
-  query: string
+  query: string,
 ): ApplicationType[] {
   const q = query.trim().toLowerCase();
   if (!q) return applications;
@@ -22,5 +13,3 @@ export function filterApplicationsBySearch(
     return name.includes(q) || r1.includes(q) || r2.includes(q);
   });
 }
-
-

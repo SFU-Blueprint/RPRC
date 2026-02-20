@@ -1,4 +1,4 @@
-import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { AdminSection } from './AdminSection';
 import { robotoCondensed } from '@/app/fonts';
 import { Clock } from 'lucide-react';
@@ -36,5 +36,5 @@ export default function ReviewHistory({ reviewHistory }: { reviewHistory: Review
         );
       })}
     </BackdropContainer>
-  );
+  ); 
 }

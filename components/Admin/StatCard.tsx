@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { inter } from '@/app/fonts';
-import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { type StatCardType, type StatCardsData } from '@/lib/constants/admin/dashboard';
 
 export type { StatCardsData };
