@@ -23,7 +23,6 @@ export const ROUTES = {
   AUTH_RESET_PASSWORD: '/auth/reset-password',
 
   // Admin
-  ADMIN: '/admin',
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_APPLICATION_DETAIL: (id: string) => `/admin/dashboard/${id}`,
 
@@ -42,7 +41,6 @@ export const PROTECTED_ROUTES = [
 
 // Admin routes that require admin role
 export const ADMIN_ROUTES = [
-  ROUTES.ADMIN,
   ROUTES.ADMIN_DASHBOARD,
 ] as const
 
