@@ -3,6 +3,7 @@
 import { Table, StatusChip } from '@/components/admin';
 import { formatDateWithOrdinal } from '@/lib/utils';
 import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
+import { ROUTES } from '@/lib/constants/routes';
 import { AdminDashboardTablePropTypes } from '@/types/admin.types';
 import { useRouter } from 'next/navigation';
 import { useApplicationList } from './useApplicationList';
@@ -28,7 +29,7 @@ export default function AdminDashboardTable({
   });
 
   const handleRowClick = (appId: string) => {
-    router.push(`/admin/dashboard/${appId}`);
+    router.push(ROUTES.ADMIN_APPLICATION_DETAIL(appId));
   };
 
   const displayedCount = paginatedApplications.length;
