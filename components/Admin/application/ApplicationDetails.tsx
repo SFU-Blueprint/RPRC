@@ -1,7 +1,7 @@
 import { inter } from '@/app/fonts';
 import { Mail, Phone, MapPin, Calendar, User, Building } from 'lucide-react';
 import { BackdropContainer } from '@/components/ui/BackdropContainer';
-import { APPLICATION_DETAIL_ICON_SIZES } from './const';
+import { APPLICATION_DETAIL_ICON_SIZES } from '@/lib/constants/admin';
 import { ApplicationType } from '@/lib/constants';
 
 type ApplicationDetailsProps = {

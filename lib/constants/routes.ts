@@ -10,22 +10,22 @@ export const ROUTES = {
   // Home & Auth
   HOME: '/',
   ERROR: '/error',
-  
+
   // Membership
   MEMBERSHIP_SIGNUP: '/membership/signup',
   MEMBERSHIP_FORM: '/membership/form',
   MEMBERSHIP_CONFIRMATION: '/membership/confirmation',
   MEMBERSHIP_DASHBOARD: '/membership/dashboard',
-  
+
   // Auth
   AUTH_CALLBACK: '/auth/callback',
   AUTH_FORGOT_PASSWORD: '/auth/forgot-password',
   AUTH_RESET_PASSWORD: '/auth/reset-password',
-  
+
   // Admin
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_APPLICATION_DETAIL: (id: string) => `/admin/dashboard/${id}`,
-  
+
   // API
   API_APPLICATION: '/api/application',
   API_APPLICATION_BY_ID: (id: string) => `/api/application/${id}`,

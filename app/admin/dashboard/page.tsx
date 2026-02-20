@@ -1,4 +1,4 @@
-import { AdminNavbar, ManageApplications, StatCards } from '@/components/Admin';
+import { AdminNavbar, ManageApplications, StatCards } from '@/components/admin';
 import { robotoCondensed } from '@/app/fonts';
 import { getAdminApplicationList, getAdminDashboardStats } from '@/lib/admin/applications';
 import { toStatCardsData } from '@/lib/constants/admin';

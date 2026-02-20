@@ -1,10 +1,10 @@
 'use client';
 
-import { Modal } from '@/components/Admin';
+import { Modal } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { inter, robotoCondensed } from '@/app/fonts';
 import { ReviewHistoryMockType } from '@/types/review-history-mock';
-import { CONFIRM_REVIEW_TEXT } from './const';
+import { CONFIRM_REVIEW_TEXT } from '@/lib/constants/admin';
 import { ReviewDecision } from '@/lib/constants';
 
 type SubmitReviewModalProps = {
