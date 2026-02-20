@@ -40,7 +40,7 @@ export function FormSelect({
         {label}
         {required && <span className="text-destructive ml-1">*</span>}
       </Label>
-      
+
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
           id={label}

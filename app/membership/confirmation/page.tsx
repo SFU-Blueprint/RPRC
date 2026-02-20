@@ -6,6 +6,7 @@ import { SIGNUP_STEPS } from '../signup/const';
 import { inter } from '@/app/fonts';
 import { Step3Success } from '@/components/signup/Pages/Step3Success';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { Spinner } from '@/components/ui/spinner';
 
 function MembershipFormConfirmation() {
   const { user, loading } = useAuth();
@@ -13,7 +14,7 @@ function MembershipFormConfirmation() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
+        <Spinner className="size-6 text-gray-600" />
       </div>
     );
   }

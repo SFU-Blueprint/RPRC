@@ -1,20 +1,29 @@
 'use client';
 
-import { Modal } from '@/components/Admin';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { inter, robotoCondensed } from '@/app/fonts';
-import { ReviewHistoryMockType } from '@/types/review-history-mock';
-import { CONFIRM_REVIEW_TEXT } from './const';
+import { robotoCondensed } from '@/app/fonts';
+import type { ReviewHistoryItem } from '@/types/admin.types';
+import { CONFIRM_REVIEW_TEXT } from '@/lib/constants/admin';
 import { ReviewDecision } from '@/lib/constants';
 
 type SubmitReviewModalProps = {
   isOpen: boolean;
-  reviewHistory: ReviewHistoryMockType[];
+  reviewHistory: ReviewHistoryItem[];
   action: ReviewDecision;
+  isSubmitting: boolean;
+  onConfirm: () => void;
   setModalOpen: (isOpen: boolean) => void;
 };
 
-const getModalText = (reviewHistory: ReviewHistoryMockType[], action: ReviewDecision) => {
+const getModalText = (reviewHistory: ReviewHistoryItem[], action: ReviewDecision) => {
   const numberOfReviews = reviewHistory.length;
   const numberApproved = reviewHistory.filter(review => review.decision === ReviewDecision.APPROVE).length;
   const numberRejected = reviewHistory.filter(review => review.decision === ReviewDecision.REJECT).length;
@@ -62,30 +71,24 @@ export default function SubmitReviewModal({
   isOpen,
   reviewHistory,
   action,
+  isSubmitting,
+  onConfirm,
   setModalOpen,
 }: SubmitReviewModalProps) {
   const modalText = getModalText(reviewHistory, action);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={() => setModalOpen(false)}
-      showCloseButton={false}
-      closeOnOutsideClick={true}
-      additionalClasses={{
-        modal: 'max-w-lg',
-      }}
-    >
-      <div className={inter.className}>
-        <div className="px-8">
-          <h1 className={`${robotoCondensed.className} text-[24px] font-bold mb-2 mt-4`}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && setModalOpen(false)}>
+      <DialogContent showCloseButton={false} className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className={`${robotoCondensed.className} text-[24px] font-bold`}>
             {modalText?.title || "Confirm Review Submission"}
-          </h1>
-          <p className="text-xs font-normal leading-relaxed">
+          </DialogTitle>
+          <DialogDescription className="text-xs font-normal leading-relaxed">
             {modalText?.description || "Please confirm you want to submit this review. This will be logged to the review history."}
-          </p>
-        </div>
-        <div className="flex gap-4 justify-end pr-7 pb-6.25 mt-6">
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
           <Button
             variant="outline"
             onClick={() => setModalOpen(false)}
@@ -94,13 +97,14 @@ export default function SubmitReviewModal({
             Cancel
           </Button>
           <Button
-            onClick={() => setModalOpen(false)}
+            onClick={onConfirm}
+            disabled={isSubmitting}
             className="bg-primary text-white border-transparent hover:bg-primary/90 font-normal cursor-pointer"
           >
-            Confirm
+            {isSubmitting ? 'Submitting...' : 'Confirm'}
           </Button>
-        </div>
-      </div>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

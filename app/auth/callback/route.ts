@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { ROUTES } from '@/lib/constants/routes'
 import { ErrorType } from '@/lib/constants/error-types'
+import { isAdminByEmail } from '@/lib/helpers/auth-helper'
 
 // GET /auth/callback
 // This route is used to handle the callback from the email confirmation link
@@ -47,6 +48,10 @@ export async function GET(request: NextRequest) {
   }
 
   console.log('Session established for user:', data.user.id)
+
+  if (await isAdminByEmail(data.user.email ?? '')) {
+    return NextResponse.redirect(new URL(ROUTES.ADMIN_DASHBOARD, requestUrl.origin))
+  }
 
   // Check if user has an application
   try {

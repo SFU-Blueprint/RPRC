@@ -18,7 +18,7 @@ export default function StatusChip({ theme }: StatusChipProps) {
     >
       <div className="rounded-full w-2 h-2 bg-white"></div>
 
-      <p className="text-[10px] sm:text-[14px] text-white">{status.label}</p>
+      <p className="text-xs text-white">{status.label}</p>
     </div>
   );
 }

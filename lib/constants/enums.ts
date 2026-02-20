@@ -64,6 +64,19 @@ export const ReviewDecision = {
 export type ReviewDecision = (typeof ReviewDecision)[keyof typeof ReviewDecision];
 
 /**
+ * Membership Interest Enum
+ * Shared list for interest chips/options
+ */
+export const MembershipInterest = {
+  HEALTH: 'Health',
+  ENVIRONMENT: 'Environment',
+  ARTS_CULTURE: 'Arts + Culture',
+} as const;
+
+export type MembershipInterest =
+  (typeof MembershipInterest)[keyof typeof MembershipInterest];
+
+/**
  * Payment Transaction Status Enum
  * Matches database: payment_transaction_status enum
  */

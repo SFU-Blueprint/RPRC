@@ -10,23 +10,25 @@ export const ROUTES = {
   // Home & Auth
   HOME: '/',
   ERROR: '/error',
-  
+  EVENTS: '/events',
+  CONTACT: '/contact',
+  DONATE: '/donate',
+
   // Membership
   MEMBERSHIP_SIGNUP: '/membership/signup',
   MEMBERSHIP_FORM: '/membership/form',
   MEMBERSHIP_CONFIRMATION: '/membership/confirmation',
   MEMBERSHIP_DASHBOARD: '/membership/dashboard',
-  
+
   // Auth
   AUTH_CALLBACK: '/auth/callback',
   AUTH_FORGOT_PASSWORD: '/auth/forgot-password',
   AUTH_RESET_PASSWORD: '/auth/reset-password',
-  
+
   // Admin
-  ADMIN: '/admin',
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_APPLICATION_DETAIL: (id: string) => `/admin/dashboard/${id}`,
-  
+
   // API
   API_APPLICATION: '/api/application',
   API_APPLICATION_BY_ID: (id: string) => `/api/application/${id}`,
@@ -42,7 +44,6 @@ export const PROTECTED_ROUTES = [
 
 // Admin routes that require admin role
 export const ADMIN_ROUTES = [
-  ROUTES.ADMIN,
   ROUTES.ADMIN_DASHBOARD,
 ] as const
 

@@ -4,32 +4,28 @@ import { useEffect, useState } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { InterestCard } from './InterestCard';
 import { robotoCondensed, headerStyles } from '@/app/fonts';
-import { createClient } from '@/lib/supabase/client';
+import {
+  getMembershipInterests,
+  type MembershipInterestItem,
+} from '@/lib/api/services/application-service';
 
 export function MembershipInterests() {
   const { formData, updateFormData } = useSignUp();
-  const supabase = createClient();
   const [membershipInterests, setMembershipInterests] = useState<
-    {
-      id: number;
-      name: string;
-    }[]
+    MembershipInterestItem[]
   >([]);
 
   useEffect(() => {
     const fetchInterests = async () => {
-      const { data, error } = await supabase
-        .from('membership_interests')
-        .select('*');
-
-      if (error) {
+      try {
+        const data = await getMembershipInterests();
+        setMembershipInterests(data);
+      } catch (error) {
         console.error('Error fetching interests:', error);
-      } else {
-        setMembershipInterests(data || []);
       }
     };
     fetchInterests();
-  }, [ supabase ]);
+  }, []);
 
   const toggleInterest = (interest: string) => {
     const currentInterests = formData.interests || [];

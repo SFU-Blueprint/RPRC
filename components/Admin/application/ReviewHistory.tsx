@@ -1,16 +1,15 @@
-import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { AdminSection } from './AdminSection';
 import { robotoCondensed } from '@/app/fonts';
 import { Clock } from 'lucide-react';
-
-import { ReviewHistoryMockType } from '@/types/review-history-mock';
+import type { ReviewHistoryItem } from '@/types/admin.types';
 import AdminReview from './AdminReview';
 
-export default function ReviewHistory({ reviewHistory }: { reviewHistory: ReviewHistoryMockType[] }) {
+export default function ReviewHistory({ reviewHistory }: { reviewHistory: ReviewHistoryItem[] }) {
 
   return (
-    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-lg flex w-full flex-col gap-y-6 mt-6" >
-      <p className={`${robotoCondensed.className} text-[32px] font-bold`}>
+    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex w-full flex-col gap-y-6 mt-6" >
+      <p className={`${robotoCondensed.className} text-3xl font-bold`}>
         Review History
       </p>
       {reviewHistory.length === 0 && (
@@ -22,10 +21,10 @@ export default function ReviewHistory({ reviewHistory }: { reviewHistory: Review
         </BackdropContainer>
       )}
 
-      {reviewHistory.reverse().map((review: ReviewHistoryMockType, index) => {
+      {[...reviewHistory].reverse().map((review: ReviewHistoryItem, index) => {
         return (
           <AdminReview
-            key={index}
+            key={review.id}
             createdAt={review.created_at}
             reviewerName={review.reviewer_name}
             decision={review.decision}
@@ -34,8 +33,8 @@ export default function ReviewHistory({ reviewHistory }: { reviewHistory: Review
             // we know that the first review in the reversed array is the most recent and thus the final decision
             isFinalDecision={reviewHistory.length > 2 && index === 0}
           />
-        )
+        );
       })}
     </BackdropContainer>
-  );
+  ); 
 }

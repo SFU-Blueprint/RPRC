@@ -1,5 +1,5 @@
 import { createClient as createServerClient } from '@/lib/supabase/server';
-import { createClient as createBrowserClient } from '@/lib/supabase/client';
+import { getCurrentAuthUser } from '@/lib/api/services/auth-service';
 
 /**
  * Get current user (server-side)
@@ -7,7 +7,9 @@ import { createClient as createBrowserClient } from '@/lib/supabase/client';
  */
 export async function getUser() {
   const supabase = await createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return user;
 }
 
@@ -16,9 +18,7 @@ export async function getUser() {
  * Use in Client Components
  */
 export async function getUserClient() {
-  const supabase = createBrowserClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
+  return getCurrentAuthUser();
 }
 
 /**
@@ -52,7 +52,7 @@ export async function hasApplication(userId: string): Promise<boolean> {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/application?userId=${userId}`,
-      { cache: 'no-store' }
+      { cache: 'no-store' },
     );
 
     if (response.ok) {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { HomePageForm } from "@/components/homepage/HomePageForm";
-import { getUser, hasApplication, isAdmin } from "@/lib/auth/helpers";
+import { getUser, hasApplication, isAdmin } from "@/lib/helpers/auth-helper";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/constants/routes";
 
@@ -12,7 +12,7 @@ export default async function HomePage() {
 
   if (user) {
     if (await isAdmin()) {
-      // Admins can stay on the login page (e.g. to sign out); don't redirect to membership
+      redirect(ROUTES.ADMIN_DASHBOARD);
     } else {
       const userHasApplication = await hasApplication(user.id);
       if (userHasApplication) {

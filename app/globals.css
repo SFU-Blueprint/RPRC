@@ -56,9 +56,7 @@
   --color-signup-neutral-800: var(--signup-neutral-800);
   --color-signup-neutral-900: var(--signup-neutral-900);
   --color-signup-neutral-950: var(--signup-neutral-950);
-  --color-signup-membership-option-selected: var(
-    --signup-membership-option-selected
-  );
+  --color-signup-membership-option-selected: var(--signup-membership-option-selected);
   --color-interactive-feature-stroke: var(--interactive-feature-stroke);
   --color-feedback-info: var(--feedback-info);
   --color-feedback-info-accent: var(--feedback-info-accent);
@@ -83,9 +81,14 @@
   --color-application-rejected: var(--application-rejected);
   --color-application-rejected-border: var(--application-rejected-border);
   --color-application-rejected-icon-background: var(--application-rejected-icon-background);
+  --color-application-conflict-background: var(--application-conflict-background);
+  --color-application-conflict-border: var(--application-conflict-border);
+  --color-application-conflict-note: var(--application-conflict-note);
 
-  --breakpoint-stack-membership-options: 72.5rem; /* 1160px */
-  --breakpoint-xs: 30rem; /* 480px */
+  --breakpoint-stack-membership-options: 72.5rem;
+  /* 1160px */
+  --breakpoint-xs: 30rem;
+  /* 480px */
 }
 
 :root {
@@ -153,9 +156,12 @@
   --application-detail-background: #F9FAFB;
   --application-approved: #EFF7EA;
   --application-approved-border: #004E00;
-  --application-rejected: #3A3226;
+  --application-rejected: #FBEAEA;
   --application-rejected-border: #AA2628;
   --application-rejected-icon-background: #962123;
+  --application-conflict-background: #FDF6EA;
+  --application-conflict-border: #E6A835;
+  --application-conflict-note: #F5E0B8;
 
   --feedback-info: #d5d9f0;
   --feedback-info-accent: #6c78ca;
@@ -203,6 +209,7 @@
   body {
     @apply bg-background text-foreground;
   }
+
   button:not(:disabled),
   [role='button']:not(:disabled) {
     cursor: pointer;

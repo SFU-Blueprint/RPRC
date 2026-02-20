@@ -1,15 +1,40 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from './FormInput';
 import { FormSelect } from './FormSelect';
 import { robotoCondensed, headerStyles } from '@/app/fonts';
-import { CANADIAN_PROVINCES, COUNTRIES } from '@/app/membership/signup/const';
+import { State } from 'country-state-city';
+import { COUNTRIES } from '@/app/membership/signup/const';
 
 export function AddressInformation() {
   const { formData, updateFormData, errors, hasAttemptedValidation } =
     useSignUp();
+
+  // Set Canada as default on mount
+  useEffect(() => {
+    if (!formData.country) {
+      updateFormData({ country: 'Canada' });
+    }
+  }, [formData.country, updateFormData]);
+
+  // Get country code from country name
+  const countryCode = formData.country === 'Canada' ? 'CA' : formData.country === 'United States' ? 'US' : '';
+
+  // Get states/provinces for selected country
+  const states = useMemo(() => {
+    if (!countryCode) return [];
+    return State.getStatesOfCountry(countryCode).map((state) => state.name);
+  }, [countryCode]);
+
+  // Handle country change
+  const handleCountryChange = (countryName: string) => {
+    updateFormData({ country: countryName, province: '' });
+  };
+
+  // Label for state/province based on country
+  const stateLabel = formData.country === 'United States' ? 'State' : 'Province';
 
   return (
     <div className="mb-8 md:mb-10">
@@ -46,27 +71,27 @@ export function AddressInformation() {
         />
       </div>
 
-      {/* Country + Province (2 columns) */}
+      {/* Country + State/Province (2 columns) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
         <FormSelect
+          name="country"
           label="Country"
-          name='country'
           options={COUNTRIES}
           value={formData.country}
-          onChange={(val) => updateFormData({ country: val })}
+          onChange={handleCountryChange}
           error={errors.country}
           placeholder="Select a country"
           required
           showValidation={hasAttemptedValidation}
         />
         <FormSelect
-          label="Province"
-          name='province'
-          options={CANADIAN_PROVINCES}
+          name="province"
+          label={stateLabel}
+          options={states}
           value={formData.province}
           onChange={(val) => updateFormData({ province: val })}
           error={errors.province}
-          placeholder="Select a province"
+          placeholder={`Select a ${stateLabel.toLowerCase()}`}
           required
           showValidation={hasAttemptedValidation}
         />
