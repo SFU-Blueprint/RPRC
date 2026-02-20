@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { ROUTES } from '@/lib/constants/routes'
 import { ErrorType } from '@/lib/constants/error-types'
-import { isAdminByEmail } from '@/lib/helpers/auth-helper'
 
 // GET /auth/callback
 // This route is used to handle the callback from the email confirmation link
@@ -47,33 +46,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`, requestUrl.origin))
   }
 
-  console.log('Session established for user:', data.user.id)
-
-  if (await isAdminByEmail(data.user.email ?? '')) {
-    return NextResponse.redirect(new URL(ROUTES.ADMIN_DASHBOARD, requestUrl.origin))
-  }
-
-  // Check if user has an application
-  try {
-    const applicationResponse = await fetch(
-      `${requestUrl.origin}/api/application?userId=${data.user.id}`
-    )
-
-    if (applicationResponse.ok) {
-      const applicationData = await applicationResponse.json()
-
-      if (applicationData.application) {
-        // Has application - redirect to dashboard
-        console.log('→ Redirecting to dashboard (has application)')
-        return NextResponse.redirect(new URL(ROUTES.MEMBERSHIP_DASHBOARD, requestUrl.origin))
-      }
-    }
-  } catch (error) {
-    console.error('Error checking application:', error)
-    // Continue to form if application check fails
-  }
-
-  // No application - redirect to form
-  console.log('→ Redirecting to form (no application)')
-  return NextResponse.redirect(new URL(ROUTES.MEMBERSHIP_FORM, requestUrl.origin))
+  // Destination routing is centralized in lib/supabase/proxy.ts.
+  return NextResponse.redirect(new URL(ROUTES.HOME, requestUrl.origin))
 }

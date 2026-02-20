@@ -37,15 +37,70 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Check if accessing protected route
+  const pathname = request.nextUrl.pathname
+  const isMembershipRoute = pathname.startsWith('/membership')
+  const isAdminRoute = pathname.startsWith('/admin')
+  const isSigninRoute = pathname === ROUTES.HOME
+  const isSignupRoute =
+    pathname.startsWith(ROUTES.MEMBERSHIP_SIGNUP) || pathname === '/membership'
+  const isSigninOrSignupRoute = isSigninRoute || isSignupRoute
+
+  // Check if accessing protected membership routes
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
+    pathname.startsWith(route)
   )
 
-  // Redirect to signup if accessing protected route without authentication
-  if (isProtectedRoute && !user) {
+  if (!user) {
+    if (isProtectedRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = ROUTES.MEMBERSHIP_SIGNUP
+      return NextResponse.redirect(url)
+    }
+
+    if (isAdminRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = ROUTES.HOME
+      return NextResponse.redirect(url)
+    }
+
+    return supabaseResponse
+  }
+
+  const isAdminUser = user.user_metadata?.role === 'admin'
+
+  // if user has an application, redirect to membership dashboard, otherwise redirect to membership form
+  const getMembershipLandingPath = async () => {
+    const { data: applications } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1)
+
+    return applications && applications.length > 0
+      ? ROUTES.MEMBERSHIP_DASHBOARD
+      : ROUTES.MEMBERSHIP_FORM
+  }
+
+  // Logged-in users should not return to sign-in/sign-up entry points.
+  if (isSigninOrSignupRoute) {
     const url = request.nextUrl.clone()
-    url.pathname = ROUTES.MEMBERSHIP_SIGNUP
+    url.pathname = isAdminUser
+      ? ROUTES.ADMIN_DASHBOARD
+      : await getMembershipLandingPath()
+    return NextResponse.redirect(url)
+  }
+
+  // Admins are restricted to admin portal.
+  if (isAdminUser && isMembershipRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = ROUTES.ADMIN_DASHBOARD
+    return NextResponse.redirect(url)
+  }
+
+  // Non-admin users are restricted to membership area.
+  if (!isAdminUser && isAdminRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = await getMembershipLandingPath()
     return NextResponse.redirect(url)
   }
 

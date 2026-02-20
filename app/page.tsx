@@ -3,26 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { HomePageForm } from "@/components/homepage/HomePageForm";
-import { getUser, hasApplication, isAdmin } from "@/lib/helpers/auth-helper";
-import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/constants/routes";
 
 export default async function HomePage() {
-  const user = await getUser();
-
-  if (user) {
-    if (await isAdmin()) {
-      redirect(ROUTES.ADMIN_DASHBOARD);
-    } else {
-      const userHasApplication = await hasApplication(user.id);
-      if (userHasApplication) {
-        redirect(ROUTES.MEMBERSHIP_DASHBOARD);
-      } else {
-        redirect(ROUTES.MEMBERSHIP_FORM);
-      }
-    }
-  }
-
   return (
     <div className="min-h-screen relative">
       <Image
