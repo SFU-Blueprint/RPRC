@@ -23,23 +23,9 @@ export const SIGNUP_STEPS: StepInfo[] = [
 ];
 
 /**
- * for selection dropdown
+ * Countries for membership application
  */
-export const CANADIAN_PROVINCES: string[] = [
-  'Alberta',
-  'British Columbia',
-  'Manitoba',
-  'New Brunswick',
-  'Newfoundland and Labrador',
-  'Northwest Territories',
-  'Nova Scotia',
-  'Nunavut',
-  'Ontario',
-  'Prince Edward Island',
-  'Quebec',
-  'Saskatchewan',
-  'Yukon',
-];
+export const COUNTRIES: string[] = ['Canada', 'United States'];
 
 /**
  * Membership type constants
@@ -49,8 +35,6 @@ export const MEMBERSHIP_TYPES = {
   INDIVIDUAL: ApplicationType.INDIVIDUAL,
   ORGANIZATION: ApplicationType.ORGANIZATION,
 } as const;
-
-export const COUNTRIES: string[] = ['Canada', 'United States'];
 
 /**
  * Empty form data - initial state

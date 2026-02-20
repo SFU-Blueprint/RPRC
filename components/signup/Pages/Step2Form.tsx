@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { useAuth } from '@/lib/contexts/AuthContext';
@@ -15,11 +15,11 @@ import { MembershipInterests } from '../cards/MembershipInterests';
 import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
 import { PleaseNoteBox } from '../cards/PleaseNoteBox';
-import { Button } from '@/components/ui/button';
 import { scrollToFirstError } from '@/lib/utils';
 import { submitIndividualApplication, submitOrganizationApplication } from '@/app/actions/application';
 import { toast } from 'sonner';
 import { UserRole } from '@/lib/constants/enums';
+import { createClient } from '@/lib/supabase/client';
 
 export function Step2Form() {
   const {
@@ -31,16 +31,38 @@ export function Step2Form() {
     setHasAttemptedValidation,
     goToNextStep,
   } = useSignUp();
-  
+
   const { user } = useAuth();
-  const userRole = user?.user_metadata?.role;
+  const [resolvedRole, setResolvedRole] = useState<string | undefined>(
+    user?.user_metadata?.role,
+  );
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!user?.id) {
+        setResolvedRole(undefined);
+        return;
+      }
+
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      setResolvedRole((data?.role as string | undefined) ?? user.user_metadata?.role);
+    };
+
+    fetchRole();
+  }, [user?.id, user?.user_metadata?.role]);
+
+  const userRole = resolvedRole ?? user?.user_metadata?.role;
 
   const handleSubmit = () => {
     setHasAttemptedValidation(true);
-    setIsSubmitting(true);
 
     const validationErrors = validateStep2(formData, userRole);
     if (hasErrors(validationErrors)) {
@@ -62,12 +84,12 @@ export function Step2Form() {
         formDataObj.append(key, String(value));
       }
     });
-    
+
     // Call appropriate submission function based on user role
-    const submitFunction = isIndividual 
-      ? submitIndividualApplication 
+    const submitFunction = isIndividual
+      ? submitIndividualApplication
       : submitOrganizationApplication;
-    
+
     const result = await submitFunction(formDataObj);
     if (!result.success) {
       toast.error('Failed to submit your application, please try again', {
@@ -88,7 +110,7 @@ export function Step2Form() {
 
   return (
     <div
-      className={`bg-signup-neutral-100 rounded-[25px] shadow-[0px_-1px_2px_-1px_rgba(0,0,0,0.15),0px_1px_3px_1px_rgba(0,0,0,0.15)] p-6 sm:p-8 md:p-10 lg:p-12 w-full mx-auto ${inter.className} mt-16.25`}
+      className={`bg-signup-neutral-100 rounded-4xl shadow-[0px_-1px_2px_-1px_rgba(0,0,0,0.15),0px_1px_3px_1px_rgba(0,0,0,0.15)] p-6 sm:p-8 md:p-10 lg:p-12 w-full mx-auto ${inter.className}`}
     >
       {/* Dynamic Form Heading */}
       <h1

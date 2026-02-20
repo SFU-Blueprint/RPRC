@@ -21,13 +21,13 @@ export function ProgressIndicator({
       : 'RPRC Membership Application';
 
   return (
-    <div className="w-full bg-signup-neutral-50 py-3 md:py-4">
+    <div className="w-full py-3 md:py-4">
       <h1
         className={`${robotoCondensed.className} mb-4 md:mb-6 ${headerStyles.lResponsive} text-left px-6 md:px-12 lg:px-24 pt-6`}
       >
         {title}
       </h1>
-      <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24 items-center justify-center">
+      <div className="max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24 items-center justify-center ">
         {/* Progress Indicator - Centered */}
         <div className="flex items-center justify-center">
           {steps.map((step, index) => {
