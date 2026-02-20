@@ -67,6 +67,11 @@ export async function updateSession(request: NextRequest) {
   }
 
   const isAdminUser = user.user_metadata?.role === 'admin'
+  // TODO: Remove this bypass and re-enable stricter admin routing in production.
+  // Dev mode: allow authenticated admin users to access all routes.
+  if (isAdminUser) {
+    return supabaseResponse
+  }
 
   // if user has an application, redirect to membership dashboard, otherwise redirect to membership form
   const getMembershipLandingPath = async () => {
