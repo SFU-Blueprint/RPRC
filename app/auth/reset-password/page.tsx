@@ -6,6 +6,7 @@ import { AuthErrorCode, ErrorType } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Spinner } from '@/components/ui/spinner';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 import Link from 'next/link';
@@ -208,7 +209,7 @@ export default function ResetPasswordPage() {
   return (
     <React.Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+        <Spinner className="size-6 text-gray-600" />
       </div>
     }>
       <ResetPasswordForm />

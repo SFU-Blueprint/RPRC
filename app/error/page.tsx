@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Spinner } from '@/components/ui/spinner';
 import { ErrorType, ERROR_MESSAGES, type ErrorTypeValue } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
@@ -68,7 +69,7 @@ export default function ErrorPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+        <Spinner className="size-6 text-gray-600" />
       </div>
     }>
       <ErrorContent />

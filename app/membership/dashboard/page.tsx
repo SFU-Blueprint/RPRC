@@ -2,6 +2,7 @@
 
 import { inter, headerStyles } from '@/app/fonts';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function MembershipDashboard() {
   const { user, loading } = useAuth();
@@ -9,7 +10,7 @@ export default function MembershipDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
+        <Spinner className="size-6 text-gray-600" />
       </div>
     );
   }
@@ -20,7 +21,7 @@ export default function MembershipDashboard() {
         <h1 className={`${headerStyles.lResponsive} text-gray-900 mb-6`}>
           Membership Dashboard
         </h1>
-        
+
         <div className="bg-white rounded-3xl p-8 shadow-sm">
           <p className="text-gray-700 mb-4">
             Welcome, {user?.email}!
