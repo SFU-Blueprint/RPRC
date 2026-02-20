@@ -11,6 +11,7 @@ import { formatDisplayDate } from '@/lib/utils';
 import type { AdminApplicationDetailsData, ReviewHistoryItem } from '@/types/admin.types';
 import StatusChip from './StatusChip';
 import ApplicationDetails from './application/ApplicationDetails';
+import ConflictResolution from './application/ConflictResolution';
 import SubmitReview from './application/SubmitReview';
 import ApplicationResult from './application/ApplicationResult';
 import ReviewHistory from './application/ReviewHistory';
@@ -34,12 +35,12 @@ export default function ApplicationDetailPage({
 
   const ableToReview =
     currentStatus === ApplicationStatus.TO_REVIEW ||
-    currentStatus === ApplicationStatus.CONFLICT ||
-    currentStatus === ApplicationStatus.ACTIVE;
+    currentStatus === ApplicationStatus.CONFLICT;
 
   const isReviewFinalized =
     currentStatus === ApplicationStatus.PAYMENT_PENDING ||
-    currentStatus === ApplicationStatus.REJECTED;
+    currentStatus === ApplicationStatus.REJECTED ||
+    currentStatus === ApplicationStatus.ACTIVE;
 
   return (
     <div className="overflow-hidden flex flex-col items-center">
@@ -76,7 +77,12 @@ export default function ApplicationDetailPage({
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xs:mt-[25px]">
-            {ableToReview && <SubmitReview appId={appId} reviewHistory={reviewHistory} />}
+            {ableToReview && currentStatus === ApplicationStatus.CONFLICT && (
+              <ConflictResolution appId={appId} reviewHistory={reviewHistory} />
+            )}
+            {ableToReview && currentStatus !== ApplicationStatus.CONFLICT && (
+              <SubmitReview appId={appId} reviewHistory={reviewHistory} />
+            )}
             {isReviewFinalized && <ApplicationResult result={currentStatus} />}
             <ReviewHistory reviewHistory={reviewHistory} />
           </div>
