@@ -29,6 +29,13 @@ export function formatDateWithOrdinal(date: string | Date) {
   return `${day}${getOrdinal(day)} ${month} ${year}`;
 }
 
+export function formatDisplayDate(date: string) {
+  if (!date) return '';
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return date;
+  return formatDateWithOrdinal(parsed);
+}
+
 export function scrollToFirstError(errors: Record<string, string | undefined>) {
   // Get first key that has an actual error
   const firstErrorKey = Object.keys(errors).find(

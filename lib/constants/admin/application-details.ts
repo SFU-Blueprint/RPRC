@@ -2,6 +2,7 @@ import { ReviewHistoryMockType } from "@/types/review-history-mock";
 
 export const APPLICATION_DETAIL_ICON_SIZES = {
   LARGE: 30,
+  MEDIUM: 25,
   SMALL: 20,
 } as const;
 

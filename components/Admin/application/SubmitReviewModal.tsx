@@ -3,18 +3,20 @@
 import { Modal } from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { inter, robotoCondensed } from '@/app/fonts';
-import { ReviewHistoryMockType } from '@/types/review-history-mock';
+import type { ReviewHistoryItem } from '@/types/admin.types';
 import { CONFIRM_REVIEW_TEXT } from '@/lib/constants/admin';
 import { ReviewDecision } from '@/lib/constants';
 
 type SubmitReviewModalProps = {
   isOpen: boolean;
-  reviewHistory: ReviewHistoryMockType[];
+  reviewHistory: ReviewHistoryItem[];
   action: ReviewDecision;
+  isSubmitting: boolean;
+  onConfirm: () => void;
   setModalOpen: (isOpen: boolean) => void;
 };
 
-const getModalText = (reviewHistory: ReviewHistoryMockType[], action: ReviewDecision) => {
+const getModalText = (reviewHistory: ReviewHistoryItem[], action: ReviewDecision) => {
   const numberOfReviews = reviewHistory.length;
   const numberApproved = reviewHistory.filter(review => review.decision === ReviewDecision.APPROVE).length;
   const numberRejected = reviewHistory.filter(review => review.decision === ReviewDecision.REJECT).length;
@@ -62,6 +64,8 @@ export default function SubmitReviewModal({
   isOpen,
   reviewHistory,
   action,
+  isSubmitting,
+  onConfirm,
   setModalOpen,
 }: SubmitReviewModalProps) {
   const modalText = getModalText(reviewHistory, action);
@@ -94,10 +98,11 @@ export default function SubmitReviewModal({
             Cancel
           </Button>
           <Button
-            onClick={() => setModalOpen(false)}
+            onClick={onConfirm}
+            disabled={isSubmitting}
             className="bg-primary text-white border-transparent hover:bg-primary/90 font-normal cursor-pointer"
           >
-            Confirm
+            {isSubmitting ? 'Submitting...' : 'Confirm'}
           </Button>
         </div>
       </div>

@@ -4,7 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import {
+  ApplicationStatus,
   PhoneType,
+  ReviewDecision,
   UserRole,
 } from '@/lib/constants/enums';
 import { ROUTES } from '@/lib/constants/routes';
@@ -12,6 +14,14 @@ import {
   ApplicationErrorCode,
   SubmitApplication,
 } from '@/lib/constants/application-errors';
+import type { Database } from '@/types/database';
+
+function formatPhoneWithAreaCode(phoneNumber: string): string {
+  const normalized = phoneNumber.trim();
+  if (!normalized) return normalized;
+  if (normalized.startsWith('+1')) return normalized;
+  return `+1 ${normalized}`;
+}
 
 /**
  * Submit Individual Membership Application
@@ -37,6 +47,7 @@ export async function submitIndividualApplication(
     membershipwaiver: formData.get('membershipwaiver') === 'true',
     waiverreason: formData.get('waiverreason') as string | undefined,
   };
+  const phoneNumberWithAreaCode = formatPhoneWithAreaCode(data.phoneNumber);
 
   // Validate required fields
   const requiredFields = [
@@ -63,7 +74,7 @@ export async function submitIndividualApplication(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  
+
   if (!user) {
     return {
       success: false,
@@ -94,7 +105,7 @@ export async function submitIndividualApplication(
       {
         p_user_id: user.id,
         p_name: data.fullName,
-        p_phone_num: data.phoneNumber,
+        p_phone_num: phoneNumberWithAreaCode,
         p_phone_type: data.phoneType,
         p_mailing_address: data.mailingAddress,
         p_city: data.city,
@@ -152,6 +163,7 @@ export async function submitOrganizationApplication(
     representativeName: formData.get('representativeName') as string | undefined,
     representativeEmail: formData.get('representativeEmail') as string | undefined,
   };
+  const phoneNumberWithAreaCode = formatPhoneWithAreaCode(data.phoneNumber);
 
   // Validate required fields
   const requiredFields = [
@@ -179,7 +191,7 @@ export async function submitOrganizationApplication(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  
+
   if (!user) {
     return {
       success: false,
@@ -193,7 +205,7 @@ export async function submitOrganizationApplication(
     .from('organization_profiles')
     .select('*')
     .or(
-      `phone_num.eq.${data.phoneNumber},user_id.eq.${user.id}`,
+      `phone_num.eq.${phoneNumberWithAreaCode},phone_num.eq.${data.phoneNumber},user_id.eq.${user.id}`,
     )
     .maybeSingle();
 
@@ -201,7 +213,10 @@ export async function submitOrganizationApplication(
     let errorMessage = 'Organization already exists';
     if (existing.user_id === user.id) {
       errorMessage = 'You have already submitted an application';
-    } else if (existing.phone_num === data.phoneNumber) {
+    } else if (
+      existing.phone_num === phoneNumberWithAreaCode ||
+      existing.phone_num === data.phoneNumber
+    ) {
       errorMessage = 'An organization with this phone number already exists';
     }
 
@@ -221,7 +236,7 @@ export async function submitOrganizationApplication(
         p_org_name: data.fullName,
         p_org_rep_name: data.representativeName || null,
         p_org_rep_email: data.representativeEmail || null,
-        p_phone_num: data.phoneNumber,
+        p_phone_num: phoneNumberWithAreaCode,
         p_phone_type: data.phoneType,
         p_mailing_address: data.mailingAddress,
         p_city: data.city,
@@ -252,4 +267,115 @@ export async function submitOrganizationApplication(
   revalidatePath(ROUTES.MEMBERSHIP_FORM, 'layout');
   revalidatePath(ROUTES.MEMBERSHIP_DASHBOARD, 'layout');
   redirect(ROUTES.MEMBERSHIP_CONFIRMATION);
+}
+
+type SubmitApplicationReviewInput = {
+  appId: string;
+  reviewerName: string;
+  reviewDate: string;
+  decision: Database['public']['Enums']['review_decision'];
+  reason: string;
+};
+
+type SubmitApplicationReviewResult = {
+  success: boolean;
+  error?: string;
+};
+
+function getNextApplicationStatus(
+  reviews: Array<Pick<Database['public']['Tables']['application_reviews']['Row'], 'decision'>>,
+): Database['public']['Enums']['application_status'] {
+  const approveCount = reviews.filter(
+    (review) => review.decision === ReviewDecision.APPROVE,
+  ).length;
+  const rejectCount = reviews.filter(
+    (review) => review.decision === ReviewDecision.REJECT,
+  ).length;
+
+  if (approveCount >= 2) {
+    return ApplicationStatus.PAYMENT_PENDING;
+  }
+
+  if (rejectCount >= 2) {
+    return ApplicationStatus.REJECTED;
+  }
+
+  if (approveCount > 0 && rejectCount > 0) {
+    return ApplicationStatus.CONFLICT;
+  }
+
+  return ApplicationStatus.TO_REVIEW;
+}
+
+export async function submitApplicationReview(
+  input: SubmitApplicationReviewInput,
+): Promise<SubmitApplicationReviewResult> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: 'User not authenticated' };
+  }
+
+  if (
+    !input.appId ||
+    !input.reviewerName.trim() ||
+    !input.reviewDate ||
+    !input.decision ||
+    !input.reason.trim()
+  ) {
+    return { success: false, error: 'All review fields are required' };
+  }
+
+  const { data: existingReviews, error: reviewsError } = await supabase
+    .from('application_reviews')
+    .select('decision')
+    .eq('application_id', input.appId);
+
+  if (reviewsError) {
+    return { success: false, error: reviewsError.message };
+  }
+
+  const reviewCreatedAt = new Date(`${input.reviewDate}T00:00:00.000Z`).toISOString();
+
+  const { error: insertError } = await supabase.from('application_reviews').insert({
+    application_id: input.appId,
+    reviewer_name: input.reviewerName.trim(),
+    decision: input.decision,
+    reason: input.reason.trim(),
+    created_at: reviewCreatedAt,
+  });
+
+  if (insertError) {
+    return { success: false, error: insertError.message };
+  }
+
+  const allReviews = [
+    ...(existingReviews ?? []),
+    { decision: input.decision as Database['public']['Enums']['review_decision'] },
+  ];
+  const nextStatus = getNextApplicationStatus(allReviews);
+  const isFinalized =
+    nextStatus === ApplicationStatus.PAYMENT_PENDING ||
+    nextStatus === ApplicationStatus.REJECTED;
+
+  const { error: updateError } = await supabase
+    .from('applications')
+    .update({
+      status: nextStatus,
+      finalized_at: isFinalized ? new Date().toISOString() : null,
+    })
+    .eq('id', input.appId);
+
+  if (updateError) {
+    return { success: false, error: updateError.message };
+  }
+
+  revalidatePath(ROUTES.ADMIN_DASHBOARD);
+  revalidatePath(ROUTES.ADMIN_APPLICATION_DETAIL(input.appId));
+
+  return { success: true };
 }
