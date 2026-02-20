@@ -7,6 +7,7 @@ import { inter } from '@/app/fonts';
 import { Step2Form } from '@/components/signup/Pages/Step2Form';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { useEffect } from 'react';
+import { Spinner } from '@/components/ui/spinner';
 
 function MembershipFormContent() {
   const { user, loading } = useAuth();
@@ -22,7 +23,7 @@ function MembershipFormContent() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
+        <Spinner className="size-6 text-gray-600" />
       </div>
     );
   }

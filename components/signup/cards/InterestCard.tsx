@@ -39,7 +39,7 @@ export function InterestCard({
       )}
 
       {/* Label */}
-      <span className={cn("text-gray-800 font-medium", bodyStyles.lg)}>
+      <span className="text-gray-800 font-medium">
         {label}
       </span>
     </Button>

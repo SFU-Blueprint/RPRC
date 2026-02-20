@@ -6,11 +6,12 @@ import { AuthErrorCode, ErrorType } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Spinner } from '@/components/ui/spinner';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { exchangeCodeForSession } from '@/lib/api/services/auth-service';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -26,14 +27,14 @@ function ResetPasswordForm() {
 
   // Exchange code for session on mount
   useEffect(() => {
-    const exchangeCodeForSession = async () => {
+    const verifyResetLink = async () => {
       // Check for Supabase error parameters in URL
       const urlError = searchParams.get('error');
       const errorCode = searchParams.get('error_code');
 
       if (urlError) {
         console.error('Supabase error in URL, redirecting to error page');
-        
+
         // Redirect to error page with appropriate error type
         if (errorCode === 'otp_expired') {
           router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_EXPIRED}`);
@@ -44,15 +45,14 @@ function ResetPasswordForm() {
       }
 
       const code = searchParams.get('code');
-      
+
       if (!code) {
         console.error('No code provided in URL, redirecting to error page');
         router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`);
         return;
       }
 
-      const supabase = createClient();
-      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      const { error: exchangeError } = await exchangeCodeForSession(code);
 
       if (exchangeError) {
         console.error('Error exchanging code for session, redirecting to error page');
@@ -63,12 +63,12 @@ function ResetPasswordForm() {
       setIsLoading(false);
     };
 
-    exchangeCodeForSession();
+    verifyResetLink();
   }, [searchParams, router]);
 
   const validatePasswords = () => {
     let isValid = true;
-    
+
     // Client-side validation is handled by PasswordInput component
     // Just check if passwords match
     if (password !== confirmPassword) {
@@ -209,7 +209,7 @@ export default function ResetPasswordPage() {
   return (
     <React.Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+        <Spinner className="size-6 text-gray-600" />
       </div>
     }>
       <ResetPasswordForm />

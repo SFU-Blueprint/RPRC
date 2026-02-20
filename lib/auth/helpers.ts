@@ -1,5 +1,5 @@
 import { createClient as createServerClient } from '@/lib/supabase/server';
-import { createClient as createBrowserClient } from '@/lib/supabase/client';
+import { getCurrentAuthUser } from '@/lib/api/services/auth-service';
 
 /**
  * Get current user (server-side)
@@ -16,9 +16,7 @@ export async function getUser() {
  * Use in Client Components
  */
 export async function getUserClient() {
-  const supabase = createBrowserClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
+  return getCurrentAuthUser();
 }
 
 /**

@@ -3,6 +3,7 @@
 import React from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from '../inputs/FormInput';
+import { PhoneInput } from '../inputs/PhoneInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 import { FormRadioButton } from '../inputs/FormRadioButton';
 
@@ -40,7 +41,7 @@ export function ContactInfoOrganization() {
           label="Organization Email Address"
           type="email"
           value={formData.email}
-          onChange={() => {}} // No-op since it's disabled
+          onChange={() => { }} // No-op since it's disabled
           error={errors.email}
           placeholder=""
           required
@@ -80,14 +81,11 @@ export function ContactInfoOrganization() {
       {/* Phone Number + Phone Type (2 columns) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
         {/* Phone Number */}
-        <FormInput
-          name="phoneNumber"
+        <PhoneInput
           label="Phone Number"
-          type="tel"
           value={formData.phoneNumber}
           onChange={(val) => updateFormData({ phoneNumber: val })}
           error={errors.phoneNumber}
-          placeholder=""
           required
           showValidation={hasAttemptedValidation}
         />
