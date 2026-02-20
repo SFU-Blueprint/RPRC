@@ -15,42 +15,69 @@ import ApplicationDetails from '@/components/Admin/application/ApplicationDetail
 import SubmitReview from '@/components/Admin/application/SubmitReview';
 import ReviewHistory from '@/components/Admin/application/ReviewHistory';
 import { ArrowLeft } from 'lucide-react';
-import React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { BackdropContainer } from '@/components/ui/BackdropContainer';
 import ApplicationResult from '@/components/Admin/application/ApplicationResult';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Activity } from 'react';
-import { ApplicationStatus, ApplicationType, ReviewDecision } from '@/lib/constants/enums';
+import {
+  ApplicationStatus,
+  ApplicationType,
+  MembershipInterest,
+  ReviewDecision,
+} from '@/lib/constants/enums';
+import { getAdminApplicationHeader } from '@/lib/api/services/application-service';
+import { ROUTES } from '@/lib/constants/routes';
 
 export default function Application() {
-  // TODO: Fetch application details using appId, using mock for now
   const params = useParams();
   const { id } = params;
-  console.log('Application ID from URL:', id); // Log the application ID
+  const appId = Array.isArray(id) ? id[0] : id;
 
-  // replace left side of equals with supabase queries in but not anything else or it will break
-  // (w/ state variables and useeffect)
-  // also i did not do application organization type yet cuz there wasnt a design for it
-  const application = APPLICATIONS_MOCK.find(app => app.id === id);
-  const user = USERS_MOCK.find(user => user.id === application?.user_id);
-  const userAddress = USER_ADDRESSES_MOCK.find(address => address.user_id === application?.user_id);
-  const userProfile = INDIVIDUAL_PROFILES_MOCK.find(profile => profile.user_id === application?.user_id);
-  const applicationDetails = INDIVIDUAL_APPLICATION_DETAILS_MOCK.find(details => details.application_id === application?.id);
-  const reviewHistory = REVIEW_HISTORY_MOCK_APPROVAL.filter(review => review.application_id === application?.id) || [];
+  const [headerName, setHeaderName] = useState<string>('');
+  const [headerStatus, setHeaderStatus] = useState<ApplicationStatus | null>(null);
 
-  // did not figure out how the membership interests / application interest tables worked
-  const applicationInterests = ['Health', 'Environment', 'Arts + Culture'];
+  useEffect(() => {
+    const fetchHeader = async () => {
+      if (!appId) return;
+      const data = await getAdminApplicationHeader(appId);
+      setHeaderName(data.name);
+      setHeaderStatus(data.status);
+    };
 
-  const [showDetails, setShowDetails] = React.useState(true);
-  const [showSubmitReview, setShowSubmitReview] = React.useState(true);
-  const [showReviewHistory, setShowReviewHistory] = React.useState(true);
+    fetchHeader();
+  }, [appId]);
 
-  // to maintain compatbility with ApplicationDetails component prop type
+  const application = APPLICATIONS_MOCK.find((app) => app.id === appId);
+  const user = USERS_MOCK.find((mockUser) => mockUser.id === application?.user_id);
+  const userAddress = USER_ADDRESSES_MOCK.find(
+    (address) => address.user_id === application?.user_id,
+  );
+  const userProfile = INDIVIDUAL_PROFILES_MOCK.find(
+    (profile) => profile.user_id === application?.user_id,
+  );
+  const applicationDetails = INDIVIDUAL_APPLICATION_DETAILS_MOCK.find(
+    (details) => details.application_id === application?.id,
+  );
+  const reviewHistory =
+    REVIEW_HISTORY_MOCK_APPROVAL.filter(
+      (review) => review.application_id === application?.id,
+    ) || [];
+
+  const applicationInterests = useMemo(
+    () => Object.values(MembershipInterest),
+    [],
+  );
+
+  const [showDetails, setShowDetails] = useState(true);
+  const [showSubmitReview, setShowSubmitReview] = useState(true);
+  const [showReviewHistory, setShowReviewHistory] = useState(true);
+
   const contactInfo = {
-    email: user?.email!,
-    phone: userProfile?.phone_number!,
-    address: `${userAddress?.mailing_address}, ${userAddress?.city}, ${userAddress?.province}, ${userAddress?.country} ${userAddress?.postal_code}`
+    email: user?.email ?? '',
+    phone: userProfile?.phone_number ?? '',
+    address: `${userAddress?.mailing_address ?? ''}, ${userAddress?.city ?? ''}, ${userAddress?.province ?? ''}, ${userAddress?.country ?? ''} ${userAddress?.postal_code ?? ''}`.trim(),
   };
 
   const ableToReview =
@@ -64,23 +91,21 @@ export default function Application() {
     <div className="overflow-hidden flex justify-center items-center">
       <div className="max-w-screen-2xl mx-auto w-full flex flex-col">
         <BackdropContainer className="pb-0 md:pb-0 lg:pb-6 bg-card-background-gray shadow-md rounded-none mb-2 z-1 w-screen left-0 absolute">
-          <span className={`flex items-center gap-x-2 ${inter.className} cursor-pointer`}>
-            <ArrowLeft />
-            <Link
-              href="/admin"
-              className={`text-[12px] sm:text-[16px] font-bold ${inter.className}`}
-            >
-              {APPLICATION_DETAILS_CONST.breadcrumbs}
-            </Link>
-          </span>
+          <Link
+            href={ROUTES.ADMIN_DASHBOARD}
+            className={`inline-flex items-center gap-x-2 text-sm font-bold ${inter.className}`}
+          >
+            <ArrowLeft size={14} />
+            {APPLICATION_DETAILS_CONST.breadcrumbs}
+          </Link>
 
-          <div className="mt-8 flex items-center gap-x-6 sm:gap-x-12">
-            <h1
-              className={`text-[32px] sm:text-[48px] font-semibold leading-[110%] ${robotoCondensed.className}`}
-            >
-              {userProfile?.name}
+          <div className="mt-4 flex items-center gap-x-6">
+            <h1 className="text-lg sm:text-4xl font-semibold leading-snug">
+              {headerName || userProfile?.name || 'Unknown Applicant'}
             </h1>
-            <StatusChip theme={application?.status as ApplicationStatus | ReviewDecision} />
+            <StatusChip
+              theme={(headerStatus ?? application?.status) as ApplicationStatus | ReviewDecision}
+            />
           </div>
 
           <div className="mt-5 lg:hidden w-full flex flex-row items-center justify-center">
@@ -118,25 +143,25 @@ export default function Application() {
         </BackdropContainer>
 
         <div className="p-5 bg-white mt-40 xs:mt-45 flex flex-col z-0">
-          <Activity mode={showDetails ? "visible" : "hidden"}>
+          <Activity mode={showDetails ? 'visible' : 'hidden'}>
             <ApplicationDetails
               type={application?.type as ApplicationType}
               interests={applicationInterests}
-              reason={applicationDetails?.reason!}
+              reason={applicationDetails?.reason ?? ''}
               contact={contactInfo}
-              dateReceived={application?.created_at!}
+              dateReceived={application?.created_at ?? ''}
             />
           </Activity>
 
 
           <div className="flex flex-col lg:flex-row gap-x-10 xs:mt-[25px] justify-between items-start">
-            <Activity mode={showSubmitReview && ableToReview ? "visible" : "hidden"}>
+            <Activity mode={showSubmitReview && ableToReview ? 'visible' : 'hidden'}>
               <SubmitReview reviewHistory={reviewHistory} />
             </Activity>
-            <Activity mode={showSubmitReview && isReviewFinalized ? "visible" : "hidden"}>
+            <Activity mode={showSubmitReview && isReviewFinalized ? 'visible' : 'hidden'}>
               <ApplicationResult result={application?.status as ApplicationStatus} />
             </Activity>
-            <Activity mode={showReviewHistory ? "visible" : "hidden"}>
+            <Activity mode={showReviewHistory ? 'visible' : 'hidden'}>
               <ReviewHistory reviewHistory={reviewHistory} />
             </Activity>
           </div>

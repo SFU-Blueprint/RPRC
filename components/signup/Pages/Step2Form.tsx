@@ -19,7 +19,7 @@ import { scrollToFirstError } from '@/lib/utils';
 import { submitIndividualApplication, submitOrganizationApplication } from '@/app/actions/application';
 import { toast } from 'sonner';
 import { UserRole } from '@/lib/constants/enums';
-import { createClient } from '@/lib/supabase/client';
+import { getUserRoleById } from '@/lib/api/services/application-service';
 
 export function Step2Form() {
   const {
@@ -46,14 +46,8 @@ export function Step2Form() {
         return;
       }
 
-      const supabase = createClient();
-      const { data } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      setResolvedRole((data?.role as string | undefined) ?? user.user_metadata?.role);
+      const role = await getUserRoleById(user.id);
+      setResolvedRole(role ?? user.user_metadata?.role);
     };
 
     fetchRole();
