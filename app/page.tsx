@@ -12,7 +12,7 @@ export default async function HomePage() {
 
   if (user) {
     if (await isAdmin()) {
-      // Admins can stay on the login page (e.g. to sign out); don't redirect to membership
+      redirect(ROUTES.ADMIN_DASHBOARD);
     } else {
       const userHasApplication = await hasApplication(user.id);
       if (userHasApplication) {

@@ -134,7 +134,7 @@ export async function login(formData: FormData): Promise<LoginResponse> {
   // check if user is admin and redirect to admin dashboard
   if (await isAdminByEmail(data.user.email ?? '')) {
     revalidatePath(ROUTES.HOME, 'layout')
-    redirect(ROUTES.ADMIN)
+    redirect(ROUTES.ADMIN_DASHBOARD)
   }
 
   const { data: applications } = await supabase
