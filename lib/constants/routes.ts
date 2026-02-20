@@ -10,6 +10,9 @@ export const ROUTES = {
   // Home & Auth
   HOME: '/',
   ERROR: '/error',
+  EVENTS: '/events',
+  CONTACT: '/contact',
+  DONATE: '/donate',
 
   // Membership
   MEMBERSHIP_SIGNUP: '/membership/signup',
