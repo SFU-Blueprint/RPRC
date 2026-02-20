@@ -81,6 +81,9 @@
   --color-application-rejected: var(--application-rejected);
   --color-application-rejected-border: var(--application-rejected-border);
   --color-application-rejected-icon-background: var(--application-rejected-icon-background);
+  --color-application-conflict-background: var(--application-conflict-background);
+  --color-application-conflict-border: var(--application-conflict-border);
+  --color-application-conflict-note: var(--application-conflict-note);
 
   --breakpoint-stack-membership-options: 72.5rem;
   /* 1160px */
@@ -153,9 +156,12 @@
   --application-detail-background: #F9FAFB;
   --application-approved: #EFF7EA;
   --application-approved-border: #004E00;
-  --application-rejected: #3A3226;
+  --application-rejected: #FBEAEA;
   --application-rejected-border: #AA2628;
   --application-rejected-icon-background: #962123;
+  --application-conflict-background: #FDF6EA;
+  --application-conflict-border: #E6A835;
+  --application-conflict-note: #F5E0B8;
 
   --feedback-info: #d5d9f0;
   --feedback-info-accent: #6c78ca;
