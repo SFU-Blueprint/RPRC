@@ -22,6 +22,7 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Activity } from 'react';
 import { ApplicationStatus, ApplicationType, ReviewDecision } from '@/lib/constants/enums';
+import { ROUTES } from '@/lib/constants/routes';
 
 export default function Application() {
   // TODO: Fetch application details using appId, using mock for now
@@ -67,7 +68,7 @@ export default function Application() {
           <span className={`flex items-center gap-x-2 ${inter.className} cursor-pointer`}>
             <ArrowLeft />
             <Link
-              href="/admin"
+              href={ROUTES.ADMIN}
               className={`text-[12px] sm:text-[16px] font-bold ${inter.className}`}
             >
               {APPLICATION_DETAILS_CONST.breadcrumbs}

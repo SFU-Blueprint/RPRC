@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { UserRole } from '@/lib/constants/enums'
 import { AuthErrorCode, type SignupResponse, type LoginResponse, type ForgotPasswordResponse, type ResetPasswordResponse, type ResendConfirmationResponse } from '@/lib/constants/error-types'
 import { ROUTES } from '@/lib/constants/routes'
+import { isAdminByEmail } from '@/lib/auth/helpers'
 
 export async function signup(formData: FormData): Promise<SignupResponse> {
   const supabase = await createClient()
@@ -17,9 +18,9 @@ export async function signup(formData: FormData): Promise<SignupResponse> {
 
   // Validate inputs
   if (!email || !password || !role) {
-    return { 
+    return {
       error: 'Email, password, and role are required',
-      code: AuthErrorCode.VALIDATION_ERROR 
+      code: AuthErrorCode.VALIDATION_ERROR
     }
   }
 
@@ -31,11 +32,11 @@ export async function signup(formData: FormData): Promise<SignupResponse> {
     .single()
 
   if (existingUser) {
-    return { 
+    return {
       success: true,
       userId: '', // Empty string since we don't create a new user
       email: email,
-      emailExists: true, 
+      emailExists: true,
     }
   }
 
@@ -53,36 +54,36 @@ export async function signup(formData: FormData): Promise<SignupResponse> {
 
   if (error) {
     console.error('Signup error:', error)
-    
+
     // Handle specific Supabase auth errors
-    if (error.message?.includes('already registered') || 
-        error.message?.includes('User already registered')) {
+    if (error.message?.includes('already registered') ||
+      error.message?.includes('User already registered')) {
       console.log('Email already exists via Supabase (returning 200 with emailExists flag):', email)
       // Return 200 status to avoid console errors, but include flag to show user message
-      return { 
+      return {
         success: true,
         userId: '',
         email: email,
         emailExists: true, // Flag to show "email exists" message to user
       }
     }
-    
-    return { 
+
+    return {
       error: error.message || 'Failed to create account',
-      code: AuthErrorCode.SERVER_ERROR 
+      code: AuthErrorCode.SERVER_ERROR
     }
   }
 
   if (!data.user) {
-    return { 
+    return {
       error: 'Failed to create account',
-      code: AuthErrorCode.SERVER_ERROR 
+      code: AuthErrorCode.SERVER_ERROR
     }
   }
 
   // Return success with user info
-  return { 
-    success: true, 
+  return {
+    success: true,
     userId: data.user.id,
     email: data.user.email,
   }
@@ -96,9 +97,9 @@ export async function login(formData: FormData): Promise<LoginResponse> {
 
   // Validate inputs
   if (!email || !password) {
-    return { 
+    return {
       error: 'Email and password are required',
-      code: AuthErrorCode.VALIDATION_ERROR 
+      code: AuthErrorCode.VALIDATION_ERROR
     }
   }
 
@@ -109,29 +110,33 @@ export async function login(formData: FormData): Promise<LoginResponse> {
 
   if (error) {
     console.error('Login error:', error)
-    
+
     // Handle specific auth errors
     if (error.message?.includes('Invalid login credentials')) {
-      return { 
+      return {
         error: 'Invalid email or password',
-        code: AuthErrorCode.INVALID_CREDENTIALS 
+        code: AuthErrorCode.INVALID_CREDENTIALS
       }
     }
-    
-    return { 
+
+    return {
       error: error.message || 'Failed to sign in',
-      code: AuthErrorCode.SERVER_ERROR 
+      code: AuthErrorCode.SERVER_ERROR
     }
   }
 
   if (!data.user) {
-    return { 
+    return {
       error: 'Failed to sign in',
-      code: AuthErrorCode.SERVER_ERROR 
+      code: AuthErrorCode.SERVER_ERROR
     }
   }
+  // check if user is admin and redirect to admin dashboard
+  if (await isAdminByEmail(data.user.email ?? '')) {
+    revalidatePath(ROUTES.HOME, 'layout')
+    redirect(ROUTES.ADMIN)
+  }
 
-  // Check if user has an application
   const { data: applications } = await supabase
     .from('applications')
     .select('id')
@@ -139,8 +144,7 @@ export async function login(formData: FormData): Promise<LoginResponse> {
     .limit(1)
 
   revalidatePath(ROUTES.HOME, 'layout')
-  
-  // Redirect based on application status
+
   if (applications && applications.length > 0) {
     redirect(ROUTES.MEMBERSHIP_DASHBOARD)
   } else {
@@ -162,9 +166,9 @@ export async function forgotPassword(formData: FormData): Promise<ForgotPassword
 
   // Validate input
   if (!email) {
-    return { 
+    return {
       error: 'Email is required',
-      code: AuthErrorCode.VALIDATION_ERROR 
+      code: AuthErrorCode.VALIDATION_ERROR
     }
   }
 
@@ -175,24 +179,24 @@ export async function forgotPassword(formData: FormData): Promise<ForgotPassword
 
   if (error) {
     console.error('Forgot password error:', error)
-    
+
     // Handle rate limiting
     if (error.message?.includes('rate limit') || error.message?.includes('too many')) {
-      return { 
+      return {
         error: 'Please wait before requesting another email. Try again in 1 minute.',
-        code: AuthErrorCode.RATE_LIMITED 
+        code: AuthErrorCode.RATE_LIMITED
       }
     }
-    
-    return { 
+
+    return {
       error: error.message || 'Failed to send reset email',
-      code: AuthErrorCode.SERVER_ERROR 
+      code: AuthErrorCode.SERVER_ERROR
     }
   }
 
-  return { 
+  return {
     success: true,
-    message: 'Password reset email sent successfully' 
+    message: 'Password reset email sent successfully'
   }
 }
 
@@ -203,9 +207,9 @@ export async function resetPassword(formData: FormData): Promise<ResetPasswordRe
 
   // Basic validation - detailed validation handled by PasswordInput component
   if (!password) {
-    return { 
+    return {
       error: 'Password is required',
-      code: AuthErrorCode.VALIDATION_ERROR 
+      code: AuthErrorCode.VALIDATION_ERROR
     }
   }
 
@@ -216,24 +220,24 @@ export async function resetPassword(formData: FormData): Promise<ResetPasswordRe
 
   if (error) {
     console.error('Reset password error:', error)
-    
+
     // Handle Supabase password policy errors as backup
     if (error.message?.includes('Password') || error.message?.includes('weak')) {
-      return { 
+      return {
         error: error.message,
-        code: AuthErrorCode.WEAK_PASSWORD 
+        code: AuthErrorCode.WEAK_PASSWORD
       }
     }
-    
-    return { 
+
+    return {
       error: error.message || 'Failed to reset password',
-      code: AuthErrorCode.SERVER_ERROR 
+      code: AuthErrorCode.SERVER_ERROR
     }
   }
 
-  return { 
+  return {
     success: true,
-    message: 'Password reset successfully' 
+    message: 'Password reset successfully'
   }
 }
 
@@ -244,9 +248,9 @@ export async function resendConfirmationEmail(formData: FormData): Promise<Resen
 
   // Validate input
   if (!email) {
-    return { 
+    return {
       error: 'Email is required',
-      code: AuthErrorCode.VALIDATION_ERROR 
+      code: AuthErrorCode.VALIDATION_ERROR
     }
   }
 
@@ -261,31 +265,31 @@ export async function resendConfirmationEmail(formData: FormData): Promise<Resen
 
   if (error) {
     console.error('Resend confirmation error:', error)
-    
+
     // Handle rate limiting
     if (error.message?.includes('rate limit') || error.message?.includes('too many')) {
-      return { 
+      return {
         error: 'Please wait before requesting another email. Try again in 1 minute.',
-        code: AuthErrorCode.RATE_LIMITED 
+        code: AuthErrorCode.RATE_LIMITED
       }
     }
-    
+
     // Handle email not found or already confirmed
     if (error.message?.includes('not found') || error.message?.includes('already confirmed')) {
-      return { 
+      return {
         error: 'Email not found or already confirmed',
-        code: AuthErrorCode.EMAIL_NOT_FOUND 
+        code: AuthErrorCode.EMAIL_NOT_FOUND
       }
     }
-    
-    return { 
+
+    return {
       error: error.message || 'Failed to resend confirmation email',
-      code: AuthErrorCode.SERVER_ERROR 
+      code: AuthErrorCode.SERVER_ERROR
     }
   }
 
-  return { 
+  return {
     success: true,
-    message: 'Confirmation email resent successfully' 
+    message: 'Confirmation email resent successfully'
   }
 }
