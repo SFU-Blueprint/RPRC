@@ -5,7 +5,7 @@ export default function AdminNavbar() {
   return (
     <div
       className="
-          h-14.5 md:h-17 bg-application-rejected sticky top-0 z-50 w-full 
+          h-14.5 md:h-17 bg-admin-navbar sticky top-0 z-50 w-full 
           flex items-center justify-center gap-3 
         "
     >

@@ -84,6 +84,7 @@
   --color-application-conflict-background: var(--application-conflict-background);
   --color-application-conflict-border: var(--application-conflict-border);
   --color-application-conflict-note: var(--application-conflict-note);
+  --color-admin-navbar: var(--admin-navbar);
 
   --breakpoint-stack-membership-options: 72.5rem;
   /* 1160px */
@@ -162,6 +163,7 @@
   --application-conflict-background: #FDF6EA;
   --application-conflict-border: #E6A835;
   --application-conflict-note: #F5E0B8;
+  --admin-navbar: #3A3226;
 
   --feedback-info: #d5d9f0;
   --feedback-info-accent: #6c78ca;

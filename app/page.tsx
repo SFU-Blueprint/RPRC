@@ -10,16 +10,12 @@ import { ROUTES } from "@/lib/constants/routes";
 export default async function HomePage() {
   const user = await getUser();
 
-  if (user) {
-    if (await isAdmin()) {
-      redirect(ROUTES.ADMIN_DASHBOARD);
+  if (user && !(await isAdmin())) {
+    const userHasApplication = await hasApplication(user.id);
+    if (userHasApplication) {
+      redirect(ROUTES.MEMBERSHIP_DASHBOARD);
     } else {
-      const userHasApplication = await hasApplication(user.id);
-      if (userHasApplication) {
-        redirect(ROUTES.MEMBERSHIP_DASHBOARD);
-      } else {
-        redirect(ROUTES.MEMBERSHIP_FORM);
-      }
+      redirect(ROUTES.MEMBERSHIP_FORM);
     }
   }
 
