@@ -14,7 +14,7 @@ import {
   ApplicationErrorCode,
   SubmitApplication,
 } from '@/lib/constants/application-errors';
-import { isAdmin } from '@/lib/auth/helpers';
+import { isAdmin } from '@/lib/helpers/auth-helper';
 import type { Database } from '@/types/database';
 
 function formatPhoneWithAreaCode(phoneNumber: string): string {
