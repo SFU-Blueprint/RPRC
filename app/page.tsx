@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { HomePageForm } from "@/components/homepage/HomePageForm";
-import { getUser, hasApplication, isAdmin } from "@/lib/auth/helpers";
+import { getUser, hasApplication, isAdmin } from "@/lib/helpers/auth-helper";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/constants/routes";
 

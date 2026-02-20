@@ -1,6 +1,6 @@
 import React from 'react';
 import { AdminReviewProps } from '@/types/admin.types';
-import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import StatusChip from '../StatusChip';
 import { ReviewDecision } from '@/lib/constants/enums';
 

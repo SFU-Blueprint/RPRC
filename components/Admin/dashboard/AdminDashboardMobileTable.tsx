@@ -3,9 +3,9 @@
 import { StatusChip } from '@/components/admin';
 import { formatDateWithOrdinal } from '@/lib/utils';
 import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
+import { useApplicationList } from '@/lib/hooks/useApplicationList';
 import { AdminDashboardMobileTablePropTypes } from '@/types/admin.types';
 import { Pagination } from '@/components/Pagination';
-import { useApplicationList } from './useApplicationList';
 
 export default function AdminDashboardMobileTable({
   applications,

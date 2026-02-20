@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { UserRole } from '@/lib/constants/enums'
 import { AuthErrorCode, type SignupResponse, type LoginResponse, type ForgotPasswordResponse, type ResetPasswordResponse, type ResendConfirmationResponse } from '@/lib/constants/error-types'
 import { ROUTES } from '@/lib/constants/routes'
-import { isAdminByEmail } from '@/lib/auth/helpers'
+import { isAdminByEmail } from '@/lib/helpers/auth-helper'
 
 export async function signup(formData: FormData): Promise<SignupResponse> {
   const supabase = await createClient()

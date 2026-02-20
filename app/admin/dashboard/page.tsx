@@ -1,6 +1,6 @@
 import { AdminNavbar, ManageApplications, StatCards } from '@/components/admin';
 import { robotoCondensed } from '@/app/fonts';
-import { getAdminApplicationList, getAdminDashboardStats } from '@/lib/admin/applications';
+import { getAdminApplicationList, getAdminDashboardStats } from '@/lib/api/services/server/admin-application-service';
 import { toStatCardsData } from '@/lib/constants/admin';
 
 // Server-side data fetching  

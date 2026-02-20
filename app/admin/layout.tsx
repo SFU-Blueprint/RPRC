@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { isAdmin } from '@/lib/auth/helpers';
+import { isAdmin } from '@/lib/helpers/auth-helper';
 import { ROUTES } from '@/lib/constants/routes';
 
 export default async function AdminLayout({

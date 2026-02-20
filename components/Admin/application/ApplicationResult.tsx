@@ -1,5 +1,5 @@
 import React from 'react'
-import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { robotoCondensed } from '@/app/fonts';
 import { ApplicationStatus } from '@/lib/constants/enums';

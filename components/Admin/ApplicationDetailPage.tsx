@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { inter } from '@/app/fonts';
-import { BackdropContainer } from '@/components/ui/BackdropContainer';
+import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { APPLICATION_DETAILS_CONST } from '@/lib/constants/admin';
 import { ApplicationStatus } from '@/lib/constants/enums';
 import { ROUTES } from '@/lib/constants/routes';
@@ -62,6 +62,7 @@ export default function ApplicationDetailPage({
           </div>
         </div>
       </BackdropContainer>
+
 
       {/* Page content */}
       <div className="max-w-screen-2xl mx-auto w-full flex flex-col">
