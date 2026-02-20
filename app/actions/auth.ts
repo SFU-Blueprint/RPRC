@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/server'
 import { UserRole } from '@/lib/constants/enums'
 import { AuthErrorCode, type SignupResponse, type LoginResponse, type ForgotPasswordResponse, type ResetPasswordResponse, type ResendConfirmationResponse } from '@/lib/constants/error-types'
 import { ROUTES } from '@/lib/constants/routes'
-import { isAdminByEmail } from '@/lib/helpers/auth-helper'
 
 export async function signup(formData: FormData): Promise<SignupResponse> {
   const supabase = await createClient()
@@ -131,25 +130,9 @@ export async function login(formData: FormData): Promise<LoginResponse> {
       code: AuthErrorCode.SERVER_ERROR
     }
   }
-  // check if user is admin and redirect to admin dashboard
-  if (await isAdminByEmail(data.user.email ?? '')) {
-    revalidatePath(ROUTES.HOME, 'layout')
-    redirect(ROUTES.ADMIN_DASHBOARD)
-  }
-
-  const { data: applications } = await supabase
-    .from('applications')
-    .select('id')
-    .eq('user_id', data.user.id)
-    .limit(1)
-
+  // Routing destinations are centralized in lib/supabase/proxy.ts.
   revalidatePath(ROUTES.HOME, 'layout')
-
-  if (applications && applications.length > 0) {
-    redirect(ROUTES.MEMBERSHIP_DASHBOARD)
-  } else {
-    redirect(ROUTES.MEMBERSHIP_FORM)
-  }
+  redirect(ROUTES.HOME)
 }
 
 export async function signout() {
