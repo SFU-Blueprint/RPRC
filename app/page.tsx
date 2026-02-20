@@ -1,28 +1,26 @@
-
-import { inter, headerStyles, subheaderStyles, bodyStyles, buttonStyles } from "@/app/fonts";
+import { headerStyles, subheaderStyles, bodyStyles } from "@/app/fonts";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { HomePageForm } from "@/components/homepage/HomePageForm";
-import { getUser, hasApplication } from "@/lib/auth/helpers";
+import { getUser, hasApplication, isAdmin } from "@/lib/auth/helpers";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/constants/routes";
 
 export default async function HomePage() {
-  // Check if user is already logged in
   const user = await getUser();
 
   if (user) {
-    // User is logged in, check for application
-    const userHasApplication = await hasApplication(user.id);
-
-    if (userHasApplication) {
-      // Has application - redirect to dashboard
-      redirect(ROUTES.MEMBERSHIP_DASHBOARD);
+    if (await isAdmin()) {
+      // Admins can stay on the login page (e.g. to sign out); don't redirect to membership
+    } else {
+      const userHasApplication = await hasApplication(user.id);
+      if (userHasApplication) {
+        redirect(ROUTES.MEMBERSHIP_DASHBOARD);
+      } else {
+        redirect(ROUTES.MEMBERSHIP_FORM);
+      }
     }
-
-    // No application - redirect to form
-    redirect(ROUTES.MEMBERSHIP_FORM);
   }
 
   return (
