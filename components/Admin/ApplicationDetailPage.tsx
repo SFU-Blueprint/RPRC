@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { inter } from '@/app/fonts';
+import { inter, robotoCondensed } from '@/app/fonts';
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
-import { APPLICATION_DETAILS_CONST } from '@/lib/constants/admin';
+import { APPLICATION_DETAILS_CONST, MOBILE_TABS } from '@/lib/constants/admin';
 import { ApplicationStatus } from '@/lib/constants/enums';
 import { ROUTES } from '@/lib/constants/routes';
 import { formatDisplayDate } from '@/lib/utils';
@@ -15,6 +15,10 @@ import ConflictResolution from './application/ConflictResolution';
 import SubmitReview from './application/SubmitReview';
 import ApplicationResult from './application/ApplicationResult';
 import ReviewHistory from './application/ReviewHistory';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
+import { headerStyles } from '@/app/fonts';
+import { useState } from 'react';
+import ApplicationDetailMobileTabs from './application/ApplicationDetailMobileTabs';
 
 type Props = {
   appId: string;
@@ -32,21 +36,25 @@ export default function ApplicationDetailPage({
   reviewHistory,
 }: Props) {
   const currentStatus = headerStatus ?? ApplicationStatus.TO_REVIEW;
+  const isMobile = useIsMobile();
+  const [currentTab, setCurrentTab] = useState<{ label: string, value: string }>(MOBILE_TABS[0])
 
-  const ableToReview =
-    currentStatus === ApplicationStatus.TO_REVIEW ||
-    currentStatus === ApplicationStatus.CONFLICT;
+  const ableToReview = ([
+    ApplicationStatus.TO_REVIEW,
+    ApplicationStatus.CONFLICT,
+  ] as ApplicationStatus[]).includes(currentStatus);
 
-  const isReviewFinalized =
-    currentStatus === ApplicationStatus.PAYMENT_PENDING ||
-    currentStatus === ApplicationStatus.REJECTED ||
-    currentStatus === ApplicationStatus.ACTIVE;
+  const isReviewFinalized = ([
+    ApplicationStatus.PAYMENT_PENDING,
+    ApplicationStatus.REJECTED,
+    ApplicationStatus.ACTIVE,
+  ] as ApplicationStatus[]).includes(currentStatus);
 
   return (
     <div className="overflow-hidden flex flex-col items-center">
       {/* Header / Breadcrumbs */}
       <BackdropContainer className="pb-0 md:pb-0 lg:pb-6 bg-card-background-gray shadow-md w-full rounded-none">
-        <div className="max-w-screen-2xl mx-auto w-ful">
+        <div className="max-w-screen-2xl mx-auto w-full">
           <Link
             href={ROUTES.ADMIN_DASHBOARD}
             className={`inline-flex items-center gap-x-2 text-sm font-bold ${inter.className}`}
@@ -55,12 +63,15 @@ export default function ApplicationDetailPage({
             {APPLICATION_DETAILS_CONST.breadcrumbs}
           </Link>
 
-          <div className="mt-4 flex items-center gap-x-6">
-            <h1 className="text-lg sm:text-4xl font-semibold leading-snug">
+          <div className={`mt-4 flex items-center gap-x-6 ${isMobile ? 'mb-8' : ''}`}>
+            <h1 className={`${isMobile ? headerStyles.l : headerStyles.xlResponsive} sm:text-4xl font-semibold leading-snug ${robotoCondensed.className}`}>
               {headerName || 'Unknown Applicant'}
             </h1>
             <StatusChip theme={currentStatus} />
           </div>
+          {isMobile ? (
+            <ApplicationDetailMobileTabs currentTab={currentTab} setCurrentTab={setCurrentTab} />
+          ) : ''}
         </div>
       </BackdropContainer>
 
@@ -68,23 +79,29 @@ export default function ApplicationDetailPage({
       {/* Page content */}
       <div className="max-w-screen-2xl mx-auto w-full flex flex-col">
         <div className="p-5 flex flex-col z-0">
-          <ApplicationDetails
+          {(!isMobile || currentTab.value === MOBILE_TABS[0].value) && <ApplicationDetails
             type={details.type}
             interests={details.interests}
             reason={details.reason}
             contact={details.contact}
             dateReceived={formatDisplayDate(details.dateReceived)}
-          />
+          />}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xs:mt-[25px]">
-            {ableToReview && currentStatus === ApplicationStatus.CONFLICT && (
-              <ConflictResolution appId={appId} reviewHistory={reviewHistory} />
+            {(!isMobile || currentTab.value === MOBILE_TABS[1].value) && (
+              <>
+                {ableToReview && currentStatus === ApplicationStatus.CONFLICT && (
+                  <ConflictResolution appId={appId} reviewHistory={reviewHistory} />
+                )}
+                {ableToReview && currentStatus !== ApplicationStatus.CONFLICT && (
+                  <SubmitReview appId={appId} reviewHistory={reviewHistory} />
+                )}
+                {isReviewFinalized && <ApplicationResult result={currentStatus} />}
+              </>
             )}
-            {ableToReview && currentStatus !== ApplicationStatus.CONFLICT && (
-              <SubmitReview appId={appId} reviewHistory={reviewHistory} />
+            {(!isMobile || currentTab.value === MOBILE_TABS[2].value) && (
+              <ReviewHistory reviewHistory={reviewHistory} />
             )}
-            {isReviewFinalized && <ApplicationResult result={currentStatus} />}
-            <ReviewHistory reviewHistory={reviewHistory} />
           </div>
         </div>
       </div>

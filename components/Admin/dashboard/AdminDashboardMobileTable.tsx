@@ -6,6 +6,8 @@ import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
 import { useApplicationList } from '@/lib/hooks/useApplicationList';
 import { AdminDashboardMobileTablePropTypes } from '@/types/admin.types';
 import { Pagination } from '@/components/Pagination';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/constants/routes';
 
 export default function AdminDashboardMobileTable({
   applications,
@@ -13,6 +15,7 @@ export default function AdminDashboardMobileTable({
   searchQuery,
   pagination,
 }: AdminDashboardMobileTablePropTypes) {
+  const router = useRouter();
   const {
     filteredApplications,
     paginatedApplications,
@@ -24,6 +27,10 @@ export default function AdminDashboardMobileTable({
     searchQuery,
     pagination,
   });
+
+  const handleRowClick = (appId: string) => {
+    router.push(ROUTES.ADMIN_APPLICATION_DETAIL(appId));
+  };
 
   const displayedCount = paginatedApplications.length;
   const totalCount = filteredApplications.length;
@@ -45,6 +52,7 @@ export default function AdminDashboardMobileTable({
           paginatedApplications.map((app) => (
             <div
               key={app.id}
+              onClick={() => handleRowClick(app.id)}
               className="rounded-3xl border-2 border-[#BAB7B2] bg-[#F5F4F2] p-4.5"
             >
               <div className="flex justify-between">

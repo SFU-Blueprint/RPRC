@@ -8,7 +8,7 @@ import AdminReview from './AdminReview';
 export default function ReviewHistory({ reviewHistory }: { reviewHistory: ReviewHistoryItem[] }) {
 
   return (
-    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex w-full flex-col gap-y-6 mt-6" >
+    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex w-full flex-col gap-y-6 mt-3" >
       <p className={`${robotoCondensed.className} text-3xl font-bold`}>
         Review History
       </p>
@@ -36,5 +36,5 @@ export default function ReviewHistory({ reviewHistory }: { reviewHistory: Review
         );
       })}
     </BackdropContainer>
-  ); 
+  );
 }
