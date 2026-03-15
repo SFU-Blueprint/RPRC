@@ -89,28 +89,28 @@ export default function ApplicationDetails({
 }: ApplicationDetailsProps) {
   const typeIcon =
     type === ApplicationType.INDIVIDUAL ? (
-      <User size={APPLICATION_DETAIL_ICON_SIZES.MEDIUM} />
+      <User size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />
     ) : (
-      <Building size={APPLICATION_DETAIL_ICON_SIZES.MEDIUM} />
+      <Building size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />
     );
 
   const typeText = type === ApplicationType.INDIVIDUAL ? 'Individual' : 'Organization';
 
   return (
-    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex flex-col gap-y-6 mt-6">
+    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex flex-col gap-y-6 mt-3">
       {/* Top Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-6">
         <DetailField label="Type" value={typeText} icon={typeIcon} />
         <DetailField
           label="Date Received"
           value={dateReceived}
-          icon={<Calendar size={APPLICATION_DETAIL_ICON_SIZES.MEDIUM} />}
+          icon={<Calendar size={APPLICATION_DETAIL_ICON_SIZES.SMALL} />}
         />
       </div>
 
       {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        <BackdropContainer className="bg-white border border-1 border-application-detail-border-100 shadow-none w-full h-full p-4">
+        <BackdropContainer className="bg-white border border-application-detail-border-100 shadow-none w-full h-full p-4">
           <div>
             <p className="text-gray-900 font-bold mb-3">Why do you want to be an RPRC member?</p>
             <p className="text-application-detail-text-secondary">{reason}</p>
@@ -118,7 +118,7 @@ export default function ApplicationDetails({
         </BackdropContainer>
 
         <div className="flex flex-col gap-y-6 w-full h-full">
-          <BackdropContainer className="bg-white border border-1 border-application-detail-border-100 shadow-none p-4">
+          <BackdropContainer className="bg-white border border-application-detail-border-100 shadow-none p-4">
             <p className="text-application-detail-text-primary font-bold mb-2">Membership Interests</p>
             <div className="flex flex-wrap gap-2">
               {interests.map((interest, index) => (

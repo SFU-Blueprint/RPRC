@@ -148,3 +148,17 @@ export const REVIEW_HISTORY_MOCK_NO_APPROVAL: ReviewHistoryMockType[] = [
   },
 ];
 
+export const MOBILE_TABS = [
+  {
+    label: 'Details',
+    value: 'details'
+  },
+  {
+    label: 'Submit Review',
+    value: 'submit_review'
+  },
+  {
+    label: 'Review History',
+    value: 'review_history'
+  },
+]

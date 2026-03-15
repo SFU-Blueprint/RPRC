@@ -66,7 +66,7 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
   };
 
   return (
-    <BackdropContainer className="bg-application-conflict-background border border-application-conflict-border p-5 rounded-xl flex flex-col gap-y-6 mt-6 w-full">
+    <BackdropContainer className="bg-application-conflict-background border border-application-conflict-border p-5 rounded-xl flex flex-col gap-y-6 mt-3 w-full">
       <p className={`${robotoCondensed.className} text-3xl font-bold`}>Submit Review</p>
 
       {/* Conflict warning banner */}

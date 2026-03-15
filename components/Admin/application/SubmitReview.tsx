@@ -68,7 +68,7 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
   };
 
   return (
-    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex flex-col gap-y-6 mt-6 w-full">
+    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex flex-col gap-y-6 mt-3 w-full">
       <p className={`${robotoCondensed.className} text-3xl font-bold`}>Submit Review</p>
 
       <div className="flex flex-col md:flex-row gap-x-6 gap-y-4">
@@ -155,7 +155,7 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
 
       {submitError ? <p className="text-destructive text-sm">{submitError}</p> : null}
 
-      <div className="flex justify-center mt-10">
+      <div className="flex justify-center mt-3">
         <Button
           type="button"
           onClick={() => setIsModalOpen(true)}
