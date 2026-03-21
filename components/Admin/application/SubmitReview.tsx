@@ -68,11 +68,11 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
   };
 
   return (
-    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex flex-col gap-y-6 mt-3 w-full">
-      <p className={`${robotoCondensed.className} text-3xl font-bold`}>Submit Review</p>
+    <BackdropContainer className="bg-signup-neutral-50 shadow-card p-4 text w-full">
+      <p className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}>Submit Review</p>
 
-      <div className="flex flex-col md:flex-row gap-x-6 gap-y-4">
-        <div className="flex-[2]">
+      <div className="flex flex-col gap-x-6 gap-y-4 mt-8">
+        <div className="flex-2">
           <Label htmlFor="boardMemberName" className="text-application-detail-text-secondary text-md">
             Board Member Name
           </Label>
@@ -99,7 +99,7 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
         </div>
       </div>
 
-      <div>
+      <div className="mt-4">
         <Label className="text-application-detail-text-secondary text-md">Decision</Label>
 
         <div className="flex justify-center w-full mt-2">
@@ -148,7 +148,7 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
           name="reason"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className={`${inter.className} w-full h-42.5 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
+          className={`${inter.className} w-full h-15 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
           placeholder="Enter your reasoning..."
         />
       </div>

@@ -77,30 +77,32 @@ export default function ApplicationDetailPage({
 
 
       {/* Page content */}
-      <div className="max-w-screen-2xl mx-auto w-full flex flex-col">
-        <div className="p-5 flex flex-col z-0">
+      <div className={`max-w-screen-2xl mx-auto w-full mt-8 gap-x-10 ${isMobile ? '': 'flex flex-row '}`}>
+        {/* Submit Review Section */}
+        {(!isMobile || currentTab.value === MOBILE_TABS[1].value) && (
+          <div className={`p-5 ${ isMobile ? '' : 'w-1/3 shrink-0'}`}>
+            {ableToReview && currentStatus === ApplicationStatus.CONFLICT && (
+                <ConflictResolution appId={appId} reviewHistory={reviewHistory} />
+            )}
+            {ableToReview && currentStatus !== ApplicationStatus.CONFLICT && (
+                <SubmitReview appId={appId} reviewHistory={reviewHistory} />
+            )}
+            {isReviewFinalized && <ApplicationResult result={currentStatus} />}
+          </div>
+        )}
+        <div className="py-5 z-0 flex-1 min-w-0">
           {(!isMobile || currentTab.value === MOBILE_TABS[0].value) && <ApplicationDetails
             type={details.type}
             interests={details.interests}
             reason={details.reason}
             contact={details.contact}
             dateReceived={formatDisplayDate(details.dateReceived)}
+            isMobile={isMobile}
           />}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xs:mt-[25px]">
-            {(!isMobile || currentTab.value === MOBILE_TABS[1].value) && (
-              <>
-                {ableToReview && currentStatus === ApplicationStatus.CONFLICT && (
-                  <ConflictResolution appId={appId} reviewHistory={reviewHistory} />
-                )}
-                {ableToReview && currentStatus !== ApplicationStatus.CONFLICT && (
-                  <SubmitReview appId={appId} reviewHistory={reviewHistory} />
-                )}
-                {isReviewFinalized && <ApplicationResult result={currentStatus} />}
-              </>
-            )}
+          <div className={`${isMobile ? 'px-5' : ''}`}>
             {(!isMobile || currentTab.value === MOBILE_TABS[2].value) && (
-              <ReviewHistory reviewHistory={reviewHistory} />
+              <ReviewHistory reviewHistory={reviewHistory} isMobile={isMobile} />
             )}
           </div>
         </div>

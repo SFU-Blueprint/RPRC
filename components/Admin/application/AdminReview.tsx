@@ -7,7 +7,7 @@ import { formatDateWithOrdinal } from '@/lib/utils/time-utils';
 
 const getBackgroundColor = (decision: ReviewDecision, isFinalDecision: boolean) => {
     if (!isFinalDecision) {
-        return 'bg-white';
+        return 'bg-signup-neutral-50';
     }
 
     if (decision === ReviewDecision.APPROVE) {
@@ -21,7 +21,7 @@ const getBackgroundColor = (decision: ReviewDecision, isFinalDecision: boolean) 
 
 const getBorderColor = (decision: ReviewDecision, isFinalDecision: boolean) => {
     if (!isFinalDecision) {
-        return 'border-application-detail-border-100';
+        return 'border-application-detail-border-50';
     }
 
     if (decision === ReviewDecision.APPROVE) {
@@ -37,7 +37,7 @@ export default function AdminReview({ createdAt, reviewerName, decision, reason,
     const formattedDate = formatDateWithOrdinal(createdAt);
 
     return (
-        <BackdropContainer className={`${getBackgroundColor(decision, isFinalDecision)} border border-1 ${getBorderColor(decision, isFinalDecision)} shadow-none`} >
+        <BackdropContainer className={`${getBackgroundColor(decision, isFinalDecision)} border ${getBorderColor(decision, isFinalDecision)} shadow-none mt-8`} >
             <p className="text-application-detail-text-secondary text-sm">{formattedDate}</p>
             <div className="flex items-center justify-between mt-2 mb-4">
                 <p className="text-application-detail-text-primary font-bold text-lg">
