@@ -56,7 +56,10 @@
   --color-signup-neutral-800: var(--signup-neutral-800);
   --color-signup-neutral-900: var(--signup-neutral-900);
   --color-signup-neutral-950: var(--signup-neutral-950);
-  --color-signup-membership-option-selected: var(--signup-membership-option-selected);
+  --color-signup-membership-option-selected: var(
+    --signup-membership-option-selected
+  );
+  --color-content-active: var(--content-active);
   --color-interactive-feature-stroke: var(--interactive-feature-stroke);
   --color-feedback-info: var(--feedback-info);
   --color-feedback-info-accent: var(--feedback-info-accent);
@@ -70,9 +73,15 @@
 
   --color-application-detail-blue-500: var(--application-detail-blue-500);
   --color-application-detail-blue-100: var(--application-detail-blue-100);
-  --color-application-detail-accent-green: var(--application-detail-accent-green);
-  --color-application-detail-text-primary: var(--application-detail-text-primary);
-  --color-application-detail-text-secondary: var(--application-detail-text-secondary);
+  --color-application-detail-accent-green: var(
+    --application-detail-accent-green
+  );
+  --color-application-detail-text-primary: var(
+    --application-detail-text-primary
+  );
+  --color-application-detail-text-secondary: var(
+    --application-detail-text-secondary
+  );
   --color-application-detail-border-100: var(--application-detail-border-100);
   --color-application-detail-border-50: var(--application-detail-border-50);
   --color-application-detail-background: var(--application-detail-background);
@@ -80,8 +89,12 @@
   --color-application-approved-border: var(--application-approved-border);
   --color-application-rejected: var(--application-rejected);
   --color-application-rejected-border: var(--application-rejected-border);
-  --color-application-rejected-icon-background: var(--application-rejected-icon-background);
-  --color-application-conflict-background: var(--application-conflict-background);
+  --color-application-rejected-icon-background: var(
+    --application-rejected-icon-background
+  );
+  --color-application-conflict-background: var(
+    --application-conflict-background
+  );
   --color-application-conflict-border: var(--application-conflict-border);
   --color-application-conflict-note: var(--application-conflict-note);
   --color-admin-navbar: var(--admin-navbar);
@@ -96,13 +109,14 @@
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+  --content-active: #003e00;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: #5eb42d;
-  --primary-light: #CFE8C0;
-  --content-secondary: #68655F;
+  --primary-light: #cfe8c0;
+  --content-secondary: #68655f;
   --card-background-gray: #f6f6f6;
   --background-off-white: #f5f4f2;
   --primary-black: #28231a;
@@ -147,23 +161,23 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --application-detail-blue-500: #2D3FB4;
-  --application-detail-blue-100: #D5D9F0;
-  --application-detail-accent-green: #AED996;
-  --application-detail-text-primary: #28231A;
-  --application-detail-text-secondary: #68655F;
-  --application-detail-border-100: #93918C;
-  --application-detail-border-50: #BEBDBA;
-  --application-detail-background: #F9FAFB;
-  --application-approved: #EFF7EA;
-  --application-approved-border: #004E00;
-  --application-rejected: #FBEAEA;
-  --application-rejected-border: #AA2628;
+  --application-detail-blue-500: #2d3fb4;
+  --application-detail-blue-100: #d5d9f0;
+  --application-detail-accent-green: #aed996;
+  --application-detail-text-primary: #28231a;
+  --application-detail-text-secondary: #68655f;
+  --application-detail-border-100: #93918c;
+  --application-detail-border-50: #bebdba;
+  --application-detail-background: #f9fafb;
+  --application-approved: #eff7ea;
+  --application-approved-border: #004e00;
+  --application-rejected: #fbeaea;
+  --application-rejected-border: #aa2628;
   --application-rejected-icon-background: #962123;
-  --application-conflict-background: #FDF6EA;
-  --application-conflict-border: #E6A835;
-  --application-conflict-note: #F5E0B8;
-  --admin-navbar: #3A3226;
+  --application-conflict-background: #fdf6ea;
+  --application-conflict-border: #e6a835;
+  --application-conflict-note: #f5e0b8;
+  --admin-navbar: #3a3226;
 
   --feedback-info: #d5d9f0;
   --feedback-info-accent: #6c78ca;
