@@ -19,13 +19,18 @@ export default function MembershipDashboard() {
 
   return (
     <div className={`min-h-screen bg-background ${inter.className}`}>
-      <div className="max-w-screen-2xl mx-auto px-6 md:px-12 lg:px-16 xl:px-24 py-12">
-        <p>RPRC Membership Profile</p>
-        <h1 className={`${headerStyles.lResponsive} text-gray-900 mb-6`}>
-          Welcome, {user?.email!}!
-        </h1>
+      <div className="mx-auto px-6 md:px-12 lg:px-16 xl:px-24 py-12 bg-background-reverse flex gap-2 items-center">
+        <div className='bg-primary rounded-full p-2'>
+          <User color="#FFFFFF" size={48}></User>
+        </div>
+        <div className='flex flex-col justify-center'>
+          <p className='text-white'>RPRC Membership Profile</p>
+          <h1 className={`${headerStyles.lResponsive} text-white mb-6`}>
+            Welcome, {user?.email!}!
+          </h1>
+        </div>
       </div>
-      <div className='flex justify-around'>
+      <div className='flex justify-around mt-10'>
         <div className='flex flex-col gap-10'>
           <div className="bg-white rounded-3xl p-8 shadow-sm border-2 border-signup-primary-green-700">
             <p className={`rounded-3x1 border p-2 bg-primary-light text-content-active ${headerStyles.mResponsive} font-extrabold rounded-xl`}>Active Membership</p>

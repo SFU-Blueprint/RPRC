@@ -8,6 +8,7 @@
   --color-background-off-white: var(--background-off-white);
   --color-primary-black: var(--primary-black);
   --color-card-background-gray: var(--card-background-gray);
+  --color-background-reverse: var(--background-reverse);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-light: var(--primary-light);
@@ -108,6 +109,7 @@
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
+  --background-reverse: #423f3a;
   --foreground: oklch(0.145 0 0);
   --content-active: #003e00;
   --card: oklch(1 0 0);
