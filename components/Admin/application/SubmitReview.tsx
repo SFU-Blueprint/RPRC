@@ -155,12 +155,12 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
 
       {submitError ? <p className="text-destructive text-sm">{submitError}</p> : null}
 
-      <div className="flex justify-center mt-3">
+      <div className="flex justify-center mt-4">
         <Button
           type="button"
           onClick={() => setIsModalOpen(true)}
           disabled={!isFormValid || isSubmitting}
-          className="bg-primary hover:bg-primary/90 cursor-pointer"
+          className="bg-primary hover:bg-primary/90 cursor-pointer w-full"
         >
           {isSubmitting ? 'Submitting…' : 'Submit Review'}
         </Button>

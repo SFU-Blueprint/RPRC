@@ -75,7 +75,6 @@ export default function ApplicationDetailPage({
         </div>
       </BackdropContainer>
 
-
       {/* Page content */}
       <div className={`max-w-screen-2xl mx-auto w-full mt-8 gap-x-10 ${isMobile ? '': 'flex flex-row '}`}>
         {/* Submit Review Section */}
