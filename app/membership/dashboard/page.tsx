@@ -4,10 +4,39 @@ import { inter, headerStyles, subheaderStyles, bodyStyles, buttonStyles } from '
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Spinner } from '@/components/ui/spinner';
 import { Info, Mail, MapPin, Phone, User } from 'lucide-react';
+import { useState } from 'react';
+import { DeleteProfileModal } from '@/components/membership/DeleteProfileModal';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+
+// placeholder delete function (to replace with actual API call)
+async function deleteProfile(userId: string, reason: string) {
+  console.log('Successfully deleted profile:', { userId, reason });
+  return { success: true };
+}
 
 export default function MembershipDashboard() {
   const { user, loading } = useAuth();
   const interests = ["Health", "Education", "Arts + Culture"]
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+
+  const handleDeleteConfirm = async (reason: string) => {
+    setIsDeleting(true);
+    // server-side logic for deletion and redirection
+    // for now placeholder
+    const result = await deleteProfile(user?.id ?? '', reason);
+    if ('error' in result) {
+      console.log('Failed to delete profile. Please try again.');
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      return;
+    }
+    // placeholderredirect after successful deletion
+    console.log('Redirecting...');
+    router.push('/');
+  }
 
   if (loading) {
     return (
@@ -86,12 +115,22 @@ export default function MembershipDashboard() {
             </div>
             <hr></hr>
             <div>
-              <a className={`text-destructive underline p-3`}>Delete Profile</a>
+              <Button variant="link" className="text-destructive p-3" onClick={() => setShowDeleteModal(true)}>
+                Delete Profile
+              </Button>
               <p className='p-3'>You can delete your profile if you wish to cancel your membership.</p>
             </div>
           </div>
         </div>
       </div>
+
+      <DeleteProfileModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
+      />
+
     </div >
   );
 }
