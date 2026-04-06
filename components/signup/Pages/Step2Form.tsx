@@ -14,7 +14,7 @@ import { AddressInformation } from '../inputs/AddressInformation';
 import { MembershipInterests } from '../cards/MembershipInterests';
 import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
-import { PleaseNoteBox } from '../cards/PleaseNoteBox';
+import { InfoBox } from "@/components/ui/infobox";
 import { scrollToFirstError } from '@/lib/utils';
 import { submitIndividualApplication, submitOrganizationApplication } from '@/app/actions/application';
 import { toast } from 'sonner';
@@ -148,7 +148,11 @@ export function Step2Form() {
       )}
 
       {/* Please Note - Info Box */}
-      <PleaseNoteBox />
+      <InfoBox
+        heading="Please Note"
+        primaryLine="To vote at the Annual General Meeting, members must be registered at least 30 days in advance."
+        secondaryLine="All memberships require renewal in January. Members who join after October 1 do not need to renew until January of the next calendar year"
+      />
 
       {/* Submit button + Confirmation Modal */}
       <div className="flex justify-center">

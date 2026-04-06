@@ -84,7 +84,7 @@ export default function ApplicationDetailPage({
                 <ConflictResolution appId={appId} reviewHistory={reviewHistory} />
             )}
             {ableToReview && currentStatus !== ApplicationStatus.CONFLICT && (
-                <SubmitReview appId={appId} reviewHistory={reviewHistory} />
+                <SubmitReview appId={appId} reviewHistory={reviewHistory} waiverRequested={details.feeWaiverRequested ?? false}/>
             )}
             {isReviewFinalized && <ApplicationResult result={currentStatus} />}
           </div>
@@ -97,6 +97,8 @@ export default function ApplicationDetailPage({
             contact={details.contact}
             dateReceived={formatDisplayDate(details.dateReceived)}
             isMobile={isMobile}
+            feeWaiverRequested={details.feeWaiverRequested}
+            feeWaiver={details.feeWaiverReason}
           />}
 
           <div className={`${isMobile ? 'px-5' : ''}`}>

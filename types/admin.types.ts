@@ -101,6 +101,8 @@ export type AdminApplicationDetailsData = {
   type: Database['public']['Enums']['application_type'];
   interests: string[];
   reason: string;
+  feeWaiverRequested?: boolean;
+  feeWaiverReason?: string;
   contact: {
     email: string;
     phone: string;
