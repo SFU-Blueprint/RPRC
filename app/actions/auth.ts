@@ -107,8 +107,9 @@ export async function login(formData: FormData): Promise<LoginResponse> {
     password,
   })
 
+
   if (error) {
-    console.error('Login error:', error)
+    console.error('Login error:', error.message)
 
     // Handle specific auth errors
     if (error.message?.includes('Invalid login credentials')) {

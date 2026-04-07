@@ -29,7 +29,7 @@ const getBorderColor = (decision: ReviewDecision, isFinalDecision: boolean) => {
     }
 
     if (decision === ReviewDecision.REJECT) {
-        return 'border-application-rejected-border';
+        return 'border-destructive-default';
     }
 }
 

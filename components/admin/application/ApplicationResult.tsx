@@ -23,7 +23,7 @@ const getBorderColor = (result: ApplicationStatus) => {
     }
 
     if (result === ApplicationStatus.REJECTED) {
-        return 'border-application-rejected-border';
+        return 'border-destructive-default';
     }
 }
 

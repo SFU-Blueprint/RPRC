@@ -72,7 +72,7 @@ export function Step3Success() {
       <div className="flex justify-center gap-3 sm:gap-4">
         {/* View Profile Button */}
         <Link
-          href="/profile"
+          href="/membership/dashboard"
           className={`
             bg-signup-primary-green-500
             hover:bg-signup-primary-green-600
