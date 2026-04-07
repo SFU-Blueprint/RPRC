@@ -48,6 +48,7 @@ export const ApplicationStatus = {
   EXPIRED: 'expired',
   CONFLICT: 'conflict',
   REJECTED: 'rejected',
+  EXPIRES_SOON: 'expires_soon',
 } as const;
 
 export type ApplicationStatus = (typeof ApplicationStatus)[keyof typeof ApplicationStatus];

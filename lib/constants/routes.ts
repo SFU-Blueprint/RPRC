@@ -19,6 +19,7 @@ export const ROUTES = {
   MEMBERSHIP_FORM: '/membership/form',
   MEMBERSHIP_CONFIRMATION: '/membership/confirmation',
   MEMBERSHIP_DASHBOARD: '/membership/dashboard',
+  MEMBERSHIP_RENEW: '/membership/renew',
 
   // Auth
   AUTH_CALLBACK: '/auth/callback',
@@ -40,6 +41,7 @@ export const PROTECTED_ROUTES = [
   ROUTES.MEMBERSHIP_FORM,
   ROUTES.MEMBERSHIP_CONFIRMATION,
   ROUTES.MEMBERSHIP_DASHBOARD,
+  ROUTES.MEMBERSHIP_RENEW,
 ] as const
 
 // Admin routes that require admin role
