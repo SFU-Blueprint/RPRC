@@ -27,6 +27,7 @@ export default function ReviewHistory({ reviewHistory, isMobile }: { reviewHisto
             reviewerName={review.reviewer_name}
             decision={review.decision}
             reason={review.reason}
+            waiverDecision={review.waiver_decision}
             // if there was a conflict and there are more than 2 reviews,
             // we know that the first review in the reversed array is the most recent and thus the final decision
             isFinalDecision={reviewHistory.length > 2 && index === 0}

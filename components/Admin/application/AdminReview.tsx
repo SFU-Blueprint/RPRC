@@ -36,16 +36,35 @@ const getBorderColor = (decision: ReviewDecision, isFinalDecision: boolean) => {
 export default function AdminReview({ createdAt, reviewerName, decision, reason, isFinalDecision }: AdminReviewProps) {
     const formattedDate = formatDateWithOrdinal(createdAt);
 
-    return (
-        <BackdropContainer className={`${getBackgroundColor(decision, isFinalDecision)} border ${getBorderColor(decision, isFinalDecision)} shadow-none mt-8`} >
+  return (
+    <BackdropContainer className={`${getBackgroundColor(decision, isFinalDecision)} border ${getBorderColor(decision, isFinalDecision)} shadow-none mt-8`} >
+      <div className="grid grid-cols-3 items-center mt-2 mb-4">
+          <div>
             <p className="text-application-detail-text-secondary text-sm">{formattedDate}</p>
-            <div className="flex items-center justify-between mt-2 mb-4">
-                <p className="text-application-detail-text-primary font-bold text-lg">
-                    {isFinalDecision ? 'Conflict Resolved' : reviewerName}
-                </p>
-                <StatusChip theme={decision} />
-            </div>
-            <p className="text-application-detail-text-primary">{reason}</p>
-        </BackdropContainer>
-    )
+            <p className="text-application-detail-text-primary font-bold text-lg">
+              {isFinalDecision ? 'Conflict Resolved' : reviewerName}
+            </p>
+          </div>
+          <div className="pl-8">
+            {
+              (waiverDecision !== null) && (
+                <div>
+                  <p className="text-application-detail-text-secondary text-sm">Fee Waived?</p>
+                  {
+                    waiverDecision === ReviewDecision.APPROVE ? (
+                        <p className="text-application-detail-text-primary font-bold text-lg">Yes</p>
+                      ) :
+                      (<p className="text-application-detail-text-primary font-bold text-lg">No</p>)
+                  }
+                </div>
+              )
+            }
+          </div>
+        <div className="flex justify-end">
+          <StatusChip theme={decision} />
+        </div>
+      </div>
+      <p className="text-application-detail-text-primary">{reason}</p>
+    </BackdropContainer>
+  )
 }

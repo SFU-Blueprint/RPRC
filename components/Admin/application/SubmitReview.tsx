@@ -49,6 +49,8 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
       reviewDate,
       decision: decision as ReviewDecision,
       reason,
+      waiverDecision: waiverDecision as ReviewDecision || undefined,
+      waiverReason
     });
 
     setIsSubmitting(false);
@@ -168,7 +170,7 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
                 id="waiverReason"
                 name="waiverReason"
                 value={waiverReason}
-                onChange={(e) => setReason(e.target.value)}
+                onChange={(e) => setWaiverReason(e.target.value)}
                 className={`${inter.className} w-full h-15 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
                 placeholder="Enter your reasoning..."
               />

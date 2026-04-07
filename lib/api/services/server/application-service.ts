@@ -68,7 +68,7 @@ export async function getAdminApplicationPageDataServer(
       .eq('application_id', appId),
     supabase
       .from('application_reviews')
-      .select('id, application_id, reason, reviewer_name, decision, created_at')
+      .select('id, application_id, reason, reviewer_name, decision, created_at, waiver_decision')
       .eq('application_id', appId)
       .order('created_at', { ascending: true }),
   ]);
