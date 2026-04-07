@@ -319,13 +319,13 @@ export async function submitApplicationReview(
     data: { user },
   } = await supabase.auth.getUser();
 
-  // if (!user) {
-  //   return { success: false, error: 'User not authenticated' };
-  // }
+  if (!user) {
+    return { success: false, error: 'User not authenticated' };
+  }
 
-  // if (!(await isAdmin())) {
-  //   return { success: false, error: 'Unauthorized: admin role required' };
-  // }
+  if (!(await isAdmin())) {
+    return { success: false, error: 'Unauthorized: admin role required' };
+  }
 
   if (
     !input.appId ||
