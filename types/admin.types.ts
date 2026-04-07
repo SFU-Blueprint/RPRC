@@ -94,6 +94,7 @@ export type AdminReviewProps = {
   reviewerName: string;
   decision: ReviewDecision
   reason: string;
+  waiverDecision?: ReviewDecision;
   isFinalDecision: boolean;
 };
 

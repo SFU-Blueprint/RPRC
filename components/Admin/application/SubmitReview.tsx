@@ -36,7 +36,7 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
   const [submitError, setSubmitError] = useState('');
 
   const isFormValid = Boolean(boardMemberName && reviewDate && decision && reason);
-  const showWaiverSection = decision === ReviewDecision.APPROVE && waiverRequested;
+  const showWaiverSection = (decision === ReviewDecision.APPROVE || decision === '') && waiverRequested;
 
   const handleConfirmSubmit = async () => {
     if (!isFormValid || isSubmitting) return;
