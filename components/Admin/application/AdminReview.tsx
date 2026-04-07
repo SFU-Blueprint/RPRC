@@ -6,35 +6,35 @@ import { ReviewDecision } from '@/lib/constants/enums';
 import { formatDateWithOrdinal } from '@/lib/utils/time-utils';
 
 const getBackgroundColor = (decision: ReviewDecision, isFinalDecision: boolean) => {
-    if (!isFinalDecision) {
-        return 'bg-signup-neutral-50';
-    }
+  if (!isFinalDecision) {
+    return 'bg-signup-neutral-50';
+  }
 
-    if (decision === ReviewDecision.APPROVE) {
-        return 'bg-application-approved';
-    }
+  if (decision === ReviewDecision.APPROVE) {
+    return 'bg-application-approved';
+  }
 
-    if (decision === ReviewDecision.REJECT) {
-        return 'bg-application-rejected';
-    }
+  if (decision === ReviewDecision.REJECT) {
+    return 'bg-application-rejected';
+  }
 }
 
 const getBorderColor = (decision: ReviewDecision, isFinalDecision: boolean) => {
-    if (!isFinalDecision) {
-        return 'border-application-detail-border-50';
-    }
+  if (!isFinalDecision) {
+    return 'border-application-detail-border-50';
+  }
 
-    if (decision === ReviewDecision.APPROVE) {
-        return 'border-application-approved-border';
-    }
+  if (decision === ReviewDecision.APPROVE) {
+    return 'border-application-approved-border';
+  }
 
-    if (decision === ReviewDecision.REJECT) {
-        return 'border-application-rejected-border';
-    }
+  if (decision === ReviewDecision.REJECT) {
+    return 'border-application-rejected-border';
+  }
 }
 
-export default function AdminReview({ createdAt, reviewerName, decision, reason, isFinalDecision }: AdminReviewProps) {
-    const formattedDate = formatDateWithOrdinal(createdAt);
+export default function AdminReview({ createdAt, reviewerName, decision, reason, waiverDecision, isFinalDecision }: AdminReviewProps) {
+  const formattedDate = formatDateWithOrdinal(createdAt);
 
   return (
     <BackdropContainer className={`${getBackgroundColor(decision, isFinalDecision)} border ${getBorderColor(decision, isFinalDecision)} shadow-none mt-8`} >
