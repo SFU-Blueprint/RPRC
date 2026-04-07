@@ -36,6 +36,7 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
   const [submitError, setSubmitError] = useState('');
 
   const isFormValid = Boolean(boardMemberName && reviewDate && decision && reason);
+  const showWaiverSection = decision === ReviewDecision.APPROVE && waiverRequested;
 
   const handleConfirmSubmit = async () => {
     if (!isFormValid || isSubmitting) return;
@@ -159,7 +160,7 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
       </div>
 
       {
-        waiverRequested && (
+        showWaiverSection && (
           <div className="mt-8">
             <p className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}>Fee Waiver Request</p>
             <div className="mt-8">
