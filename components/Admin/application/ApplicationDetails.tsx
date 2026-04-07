@@ -165,6 +165,25 @@ export default function ApplicationDetails({
               <p className="text-gray-900 font-bold mb-3">Why do you want to be an RPRC member?</p>
               <p className="text-application-detail-text-secondary">{reason}</p>
             </div>
+            {
+              feeWaiverRequested &&
+              (
+                <div className='mt-8'>
+                  <p className="text-gray-900 font-bold mb-3">Fee Waiver Request</p>
+                  <InfoBox
+                    heading="The applicant has requested a membership fee waiver"
+                  />
+                  {feeWaiver &&
+                    (
+                      <BackdropContainer className="shadow-none p-6! rounded-3xl border border-feedback-info-accent">
+                        <p className="text-gray-900 font-bold mb-3">Reason for Request</p>
+                        <p>{feeWaiver}</p>
+                      </BackdropContainer>
+                    )
+                  }
+                </div>
+              )
+            }
           </BackdropContainer>
 
         </div>
