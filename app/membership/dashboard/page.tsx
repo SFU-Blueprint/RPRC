@@ -9,18 +9,11 @@ import "@/app/globals.css";
 import MembershipStatusCard from '@/components/membership/MembershipStatusCard';
 import MembershipProfileBanner from '@/components/membership/MembershipProfileBanner';
 import { ApplicationStatus } from '@/lib/constants/enums';
-import { fetchMemberDashboardData } from '@/app/actions/dashboard';
+import { fetchMemberDashboardData, removeMemberProfile } from '@/app/actions/dashboard';
 import type { MemberDashboardData } from '@/types/membership.types';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { DeleteProfileModal } from '@/components/membership/DeleteProfileModal';
-import { useRouter } from 'next/navigation';
 
-// placeholder delete function (to replace with actual API call)
-async function deleteProfile(userId: string, reason: string) {
-  console.log('Successfully deleted profile:', { userId, reason });
-  return { success: true };
-}
 
 export default function MembershipDashboard() {
   const { user, loading } = useAuth();
@@ -28,22 +21,12 @@ export default function MembershipDashboard() {
   const [dataLoading, setDataLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const router = useRouter();
 
   const handleDeleteConfirm = async (reason: string) => {
     setIsDeleting(true);
-    // server-side logic for deletion and redirection
-    // for now placeholder
-    const result = await deleteProfile(user?.id ?? '', reason);
-    if ('error' in result) {
-      console.log('Failed to delete profile. Please try again.');
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-      return;
-    }
-    // placeholderredirect after successful deletion
-    console.log('Redirecting...');
-    router.push('/');
+    await removeMemberProfile(user?.id ?? '', reason);
+    setIsDeleting(false);
+    setShowDeleteModal(false);
   }
 
   useEffect(() => {

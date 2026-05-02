@@ -126,3 +126,19 @@ export async function getMemberDashboardData(
         dateFinalized: application.finalized_at ?? '',
     };
 }
+
+export async function deleteMemberProfile(
+    userId: string,
+): Promise<{ success: true } | { error: string }> {
+    const supabase = await createClient();
+
+    const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', userId);
+    if (error) return { error: error.message };
+
+    // delete from auth.users if required
+
+    return { success: true };
+}

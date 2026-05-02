@@ -50,3 +50,6 @@ local-test/
 
 # docs
 per-docs
+
+# mine
+local_ignore/
