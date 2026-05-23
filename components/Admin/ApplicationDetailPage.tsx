@@ -76,15 +76,15 @@ export default function ApplicationDetailPage({
       </BackdropContainer>
 
       {/* Page content */}
-      <div className={`max-w-screen-2xl mx-auto w-full mt-8 gap-x-10 ${isMobile ? '': 'flex flex-row '}`}>
+      <div className={`max-w-screen-2xl mx-auto w-full mt-8 gap-x-10 ${isMobile ? '' : 'flex flex-row '}`}>
         {/* Submit Review Section */}
         {(!isMobile || currentTab.value === MOBILE_TABS[1].value) && (
-          <div className={`p-5 ${ isMobile ? '' : 'w-1/3 shrink-0'}`}>
+          <div className={`p-5 ${isMobile ? '' : 'w-1/3 shrink-0'}`}>
             {ableToReview && currentStatus === ApplicationStatus.CONFLICT && (
-                <ConflictResolution appId={appId} reviewHistory={reviewHistory} />
+              <ConflictResolution appId={appId} reviewHistory={reviewHistory} />
             )}
             {ableToReview && currentStatus !== ApplicationStatus.CONFLICT && (
-                <SubmitReview appId={appId} reviewHistory={reviewHistory} waiverRequested={details.feeWaiverRequested ?? false}/>
+              <SubmitReview appId={appId} reviewHistory={reviewHistory} waiverRequested={details.feeWaiverRequested ?? false} />
             )}
             {isReviewFinalized && <ApplicationResult result={currentStatus} />}
           </div>
