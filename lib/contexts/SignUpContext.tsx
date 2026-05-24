@@ -37,9 +37,9 @@ const SignUpContext = createContext<SignUpContextType | undefined>(undefined);
 /**
  * Provider component
  */
-export function SignUpProvider({ children }: { children: ReactNode }) {
+export function SignUpProvider({ children, initialStep = 1 }: { children: ReactNode; initialStep?: number }) {
   const [formData, setFormData] = useState<SignUpFormData>(SIGNUP_INITIAL);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(initialStep);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [hasAttemptedValidation, setHasAttemptedValidation] = useState(false); // NEW
   const [isSubmitting, setIsSubmitting] = useState(false);

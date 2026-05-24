@@ -82,12 +82,18 @@
   --color-application-approved: var(--application-approved);
   --color-application-approved-border: var(--application-approved-border);
   --color-application-rejected: var(--application-rejected);
-  --color-application-rejected-border: var(--application-rejected-border);
+  --color-destructive-default: var(--destructive-default);
   --color-application-rejected-icon-background: var(--application-rejected-icon-background);
   --color-application-conflict-background: var(--application-conflict-background);
   --color-application-conflict-border: var(--application-conflict-border);
   --color-application-conflict-note: var(--application-conflict-note);
   --color-admin-navbar: var(--admin-navbar);
+  --color-edit-profile-button: var(--edit-profile-button);
+  --color-warning-stroke: var(--warning-stroke);
+  --color-warning: var(--warning);
+  --color-content-error: var(--content-error);
+  --color-surface-secondary: var(--surface-secondary);
+  --color-surface-rejected: var(--surface-rejected);
 
   --breakpoint-stack-membership-options: 72.5rem;
   /* 1160px */
@@ -163,7 +169,7 @@
   --application-approved: #eff7ea;
   --application-approved-border: #004e00;
   --application-rejected: #fbeaea;
-  --application-rejected-border: #aa2628;
+  --destructive-default: #aa2628;
   --application-rejected-icon-background: #962123;
   --application-conflict-background: #fdf6ea;
   --application-conflict-border: #e6a835;
@@ -172,6 +178,14 @@
   --shadow-card-value: 0px 1px 2px 0px #0000001A, 0px 1px 8px 1px #0000001A;
   --feedback-info: #d5d9f0;
   --feedback-info-accent: #6c78ca;
+
+  --edit-profile-button: #74654C;
+  --warning-stroke: #A87A27;
+  --warning: #86621F;
+  --content-error: #6A1719;
+  --surface-secondary: #FBEDD7;
+  --surface-rejected: #FBEAEA;
+
 }
 
 .dark {

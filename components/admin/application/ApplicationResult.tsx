@@ -17,6 +17,16 @@ const getBackgroundColor = (result: ApplicationStatus) => {
     }
 }
 
+const getBorderColor = (result: ApplicationStatus) => {
+    if (isApproved(result)) {
+        return 'border-application-approved-border';
+    }
+
+    if (result === ApplicationStatus.REJECTED) {
+        return 'border-destructive-default';
+    }
+}
+
 export default function ApplicationResult({ result }: { result: ApplicationStatus }) {
 
     const backgroundColor = getBackgroundColor(result);

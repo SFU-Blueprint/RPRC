@@ -28,9 +28,9 @@ const getBorderColor = (decision: ReviewDecision, isFinalDecision: boolean) => {
     return 'border-application-approved-border';
   }
 
-  if (decision === ReviewDecision.REJECT) {
-    return 'border-application-rejected-border';
-  }
+    if (decision === ReviewDecision.REJECT) {
+        return 'border-destructive-default';
+    }
 }
 
 export default function AdminReview({ createdAt, reviewerName, decision, reason, waiverDecision, isFinalDecision }: AdminReviewProps) {
