@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --shadow-card: var(--shadow-card);
+  --shadow-card: var(--shadow-card-value);
   --color-background: var(--background);
   --color-background-off-white: var(--background-off-white);
   --color-primary-black: var(--primary-black);
@@ -165,7 +165,7 @@
   --application-conflict-border: #E6A835;
   --application-conflict-note: #F5E0B8;
   --admin-navbar: #3A3226;
-  --shadow-card: 0px 1px 2px 0px #0000001A, 0px 1px 8px 1px #0000001A;
+  --shadow-card-value: 0px 1px 2px 0px #0000001A, 0px 1px 8px 1px #0000001A;
   --feedback-info: #d5d9f0;
   --feedback-info-accent: #6c78ca;
 }
