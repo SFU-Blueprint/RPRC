@@ -1,5 +1,6 @@
 import { Calendar, StepForward, User } from 'lucide-react';
 import { ApplicationStatus } from '@/lib/constants/enums';
+import { ROUTES } from '@/lib/constants/routes';
 
 export const INFO_CARDS = [
   {
@@ -31,8 +32,6 @@ export const INFO_CARDS = [
       "Once approved, you'll receive payment instructions. After confirmation, your membership will be activated.",
   },
 ];
-
-import { ROUTES } from '@/lib/constants/routes';
 
 export const MEMBERSHIP_STATUS_LABELS: Record<string, string> = {
   ACTIVE: 'Active Membership',
@@ -70,6 +69,17 @@ export const STATUS_CONFIG: Record<
     labelText: 'text-content-active',
     borderColor: 'border-signup-primary-green-700',
   },
+  expires_soon: {
+    label: MEMBERSHIP_STATUS_LABELS.EXPIRES_SOON,
+    labelBg: 'bg-surface-secondary',
+    labelText: 'text-warning',
+    borderColor: 'border-warning-stroke',
+    ctaText: MEMBERSHIP_STATUS_CTA.EXPIRES_SOON,
+    ctaHref: ROUTES.MEMBERSHIP_RENEW,
+    ctaColor: 'bg-warning-stroke hover:bg-warning-stroke/90',
+    ctaTextColor: 'text-white',
+  },
+
   expired: {
     label: MEMBERSHIP_STATUS_LABELS.EXPIRED,
     labelBg: 'bg-surface-rejected',

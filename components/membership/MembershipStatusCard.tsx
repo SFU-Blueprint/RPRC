@@ -12,9 +12,10 @@ import { ApplicationStatus } from '@/lib/constants/enums';
 interface MembershipStatusProps {
     status: ApplicationStatus;
     dateFinalized?: string;
+    onConfirmInfo?: () => void;
 }
 
-export default function MembershipStatusCard({ status, dateFinalized }: MembershipStatusProps) {
+export default function MembershipStatusCard({ status, dateFinalized, onConfirmInfo }: MembershipStatusProps) {
     const config = STATUS_CONFIG[status];
     const descriptionText = MEMBERSHIP_STATUS_DESCRIPTION_TEXT[status];
 
@@ -51,13 +52,25 @@ export default function MembershipStatusCard({ status, dateFinalized }: Membersh
                 {descriptionText}
             </p>
 
-            {config.ctaText && config.ctaHref && (
-                <Link
-                    href={config.ctaHref}
-                    className={`mt-6 w-full py-2 rounded-xl text-center block ${config.ctaColor} ${config.ctaTextColor} ${robotoCondensed.className} text-lg font-normal transition-colors`}
-                >
-                    {config.ctaText}
-                </Link>
+            {config.ctaText && (
+                onConfirmInfo ? (
+                    <button
+                        type="button"
+                        onClick={onConfirmInfo}
+                        className={`mt-6 w-full py-2 rounded-xl text-center block ${config.ctaColor ?? 'bg-primary'} ${config.ctaTextColor ?? 'text-white'} ${robotoCondensed.className} text-lg font-normal transition-colors`}
+                    >
+                        {config.ctaText}
+                    </button>
+                ) : (
+                    config.ctaHref && (
+                        <Link
+                            href={config.ctaHref}
+                            className={`mt-6 w-full py-2 rounded-xl text-center block ${config.ctaColor} ${config.ctaTextColor} ${robotoCondensed.className} text-lg font-normal transition-colors`}
+                        >
+                            {config.ctaText}
+                        </Link>
+                    )
+                )
             )}
         </div>
     );

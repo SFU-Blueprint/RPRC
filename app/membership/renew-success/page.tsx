@@ -13,14 +13,7 @@ import { UserRole } from '@/lib/constants/enums';
 
 function MembershipRenewContent() {
     const { user, loading } = useAuth();
-    const { updateFormData, formData, currentStep } = useSignUp();
     const [role, setRole] = useState<UserRole | null>(null);
-
-    useEffect(() => {
-        if (user?.email && !formData.email) {
-            updateFormData({ email: user.email });
-        }
-    }, [user, formData.email, updateFormData]);
 
     useEffect(() => {
         if (!user?.id) return;
@@ -44,8 +37,7 @@ function MembershipRenewContent() {
             <div className="max-w-screen-2xl mx-auto pb-12 md:pb-16 lg:pb-20 mt-10">
                 <div className="w-full flex justify-center">
                     <div className="w-full max-w-[80%]">
-                        {currentStep === 2 && <Step2Form />}
-                        {currentStep === 3 && <Step3Success />}
+                        <Step3Success />
                     </div>
                 </div>
             </div>
