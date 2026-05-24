@@ -30,13 +30,12 @@ const getBorderColor = (result: ApplicationStatus) => {
 export default function ApplicationResult({ result }: { result: ApplicationStatus }) {
 
     const backgroundColor = getBackgroundColor(result);
-    const borderColor = getBorderColor(result);
 
     const approved = isApproved(result);
     const iconBackgroundColor = approved ? 'bg-primary' : 'bg-application-rejected-icon-background';
 
     return (
-        <BackdropContainer className={`${backgroundColor} border ${borderColor} h-140 p-5 rounded-lg flex flex-col gap-y-6 mt-6 w-full`} >
+        <BackdropContainer className={`${backgroundColor} shadow-card h-140 p-5 rounded-lg flex flex-col gap-y-6 w-full`} >
             <div className="flex flex-col items-center justify-center h-screen">
                 <div className={`${iconBackgroundColor} p-2 rounded-full text-white h-25 w-25 flex items-center justify-center`}>
                     {approved ? <CheckCircle className="w-15 h-15" /> : <XCircle className="w-15 h-15" />}

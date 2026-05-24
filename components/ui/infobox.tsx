@@ -3,10 +3,20 @@
 import React from 'react';
 import { inter, bodyStyles } from '@/app/fonts';
 
-export function PleaseNoteBox() {
+type Props = {
+  heading: string;
+  primaryLine?: string;
+  secondaryLine?: string;
+}
+
+export function InfoBox({
+  heading,
+  primaryLine,
+  secondaryLine
+}: Props) {
   return (
     <div
-      className={`mb-8 md:mb-10 bg-feedback-info border-l-8 border-feedback-info-accent sm:p-4 rounded-lg flex gap-2 ${inter.className}`}
+      className={`mb-6 bg-feedback-info border-l-8 border-feedback-info-accent sm:p-4 rounded-lg flex gap-2 ${inter.className}`}
     >
       {/* Info Icon */}
       <div className="shrink-0">
@@ -26,26 +36,32 @@ export function PleaseNoteBox() {
       {/* Text Content */}
       <div>
         <h3 className={`font-semibold text-gray-900 mb-1 ${bodyStyles.m}`}>
-          Please Note
+          {heading}
         </h3>
         <ul
           className={`text-gray-800 space-y-1 ${bodyStyles.s} leading-relaxed`}
         >
-          <li className="flex gap-2">
-            <span>•</span>
-            <span>
-              Be eligible to vote at our Annual General Meeting, members must
-              have been registered for at least 30 days prior to the meeting.
-            </span>
-          </li>
-          <li className="flex gap-2">
-            <span>•</span>
-            <span>
-              All memberships require a renewal every January. If you join after
-              October 1st, your membership carries over, and you won&apos;t need
-              to renew until January of the year after next.
-            </span>
-          </li>
+          { primaryLine &&
+            (
+              <li className="flex gap-2">
+                <span>•</span>
+                <span>
+                  {primaryLine}
+                </span>
+              </li>
+            )
+          }
+          {
+            secondaryLine &&
+            (
+              <li className="flex gap-2">
+                <span>•</span>
+                <span>
+                  {secondaryLine}
+                </span>
+              </li>
+            )
+          }
         </ul>
       </div>
     </div>

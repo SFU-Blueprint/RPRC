@@ -66,7 +66,7 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
   };
 
   return (
-    <BackdropContainer className="bg-application-conflict-background border border-application-conflict-border p-5 rounded-xl flex flex-col gap-y-6 mt-6 w-full">
+    <BackdropContainer className="bg-application-conflict-background shadow-card p-5 rounded-xl flex flex-col gap-y-6 w-full">
       <p className={`${robotoCondensed.className} text-3xl font-bold`}>Submit Review</p>
 
       {/* Conflict warning banner */}
@@ -138,12 +138,12 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
 
       {submitError ? <p className="text-destructive text-sm">{submitError}</p> : null}
 
-      <div className="flex justify-center mt-10">
+      <div className="flex justify-center mt-2">
         <Button
           type="button"
           onClick={() => setIsModalOpen(true)}
           disabled={!isFormValid || isSubmitting}
-          className="bg-primary hover:bg-primary/90 cursor-pointer"
+          className="bg-primary hover:bg-primary/90 cursor-pointer w-full"
         >
           {isSubmitting ? 'Submitting…' : 'Submit Review'}
         </Button>

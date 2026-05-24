@@ -54,7 +54,7 @@ export async function getAdminApplicationPageDataServer(
       .maybeSingle(),
     supabase
       .from('individual_application_details')
-      .select('reason')
+      .select('reason, fee_waiver_reason, fee_waiver')
       .eq('application_id', appId)
       .maybeSingle(),
     supabase
@@ -68,7 +68,7 @@ export async function getAdminApplicationPageDataServer(
       .eq('application_id', appId),
     supabase
       .from('application_reviews')
-      .select('id, application_id, reason, reviewer_name, decision, created_at')
+      .select('id, application_id, reason, reviewer_name, decision, created_at, waiver_decision')
       .eq('application_id', appId)
       .order('created_at', { ascending: true }),
   ]);
@@ -96,6 +96,13 @@ export async function getAdminApplicationPageDataServer(
     application.type === 'organization'
       ? (organizationDetails?.reason ?? '')
       : (individualDetails?.reason ?? '');
+
+  const feeWaiverRequested = application.type === 'organization'
+    ? false
+    : (individualDetails?.fee_waiver ?? false);
+  const feeWaiverReason = application.type === 'organization'
+    ? null
+    : (individualDetails?.fee_waiver_reason ?? '');
   const interests = (interestRows ?? [])
     .map((row) => {
       const relation = row.membership_interests as
@@ -128,6 +135,8 @@ export async function getAdminApplicationPageDataServer(
       type: application.type as Database['public']['Enums']['application_type'],
       interests,
       reason,
+      feeWaiverRequested,
+      feeWaiverReason,
       contact: {
         email: userData?.email ?? '',
         phone,

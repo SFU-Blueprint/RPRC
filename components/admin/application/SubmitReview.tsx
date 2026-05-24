@@ -19,20 +19,24 @@ import SubmitReviewModal from './SubmitReviewModal';
 type SubmitReviewProps = {
   appId: string;
   reviewHistory: ReviewHistoryItem[];
+  waiverRequested?: boolean;
 };
 
-export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps) {
+export default function SubmitReview({ appId, reviewHistory, waiverRequested }: SubmitReviewProps) {
   const router = useRouter();
 
   const [boardMemberName, setBoardMemberName] = useState('');
   const [reviewDate, setReviewDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
+  const [waiverDecision, setWaiverDecision] = useState<ReviewDecision | ''>('');
+  const [waiverReason, setWaiverReason] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   const isFormValid = Boolean(boardMemberName && reviewDate && decision && reason);
+  const showWaiverSection = (decision === ReviewDecision.APPROVE || decision === '') && waiverRequested;
 
   const handleConfirmSubmit = async () => {
     if (!isFormValid || isSubmitting) return;
@@ -46,6 +50,8 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
       reviewDate,
       decision: decision as ReviewDecision,
       reason,
+      waiverDecision: waiverDecision as ReviewDecision || undefined,
+      waiverReason
     });
 
     setIsSubmitting(false);
@@ -68,11 +74,11 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
   };
 
   return (
-    <BackdropContainer className="bg-application-detail-background border border-application-detail-border-50 p-5 rounded-xl flex flex-col gap-y-6 mt-6 w-full">
-      <p className={`${robotoCondensed.className} text-3xl font-bold`}>Submit Review</p>
+    <BackdropContainer className="bg-signup-neutral-50 shadow-card p-4 text w-full">
+      <p className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}>Submit Review</p>
 
-      <div className="flex flex-col md:flex-row gap-x-6 gap-y-4">
-        <div className="flex-[2]">
+      <div className="flex flex-col gap-x-6 gap-y-4 mt-8">
+        <div className="flex-2">
           <Label htmlFor="boardMemberName" className="text-application-detail-text-secondary text-md">
             Board Member Name
           </Label>
@@ -99,7 +105,7 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
         </div>
       </div>
 
-      <div>
+      <div className="mt-4">
         <Label className="text-application-detail-text-secondary text-md">Decision</Label>
 
         <div className="flex justify-center w-full mt-2">
@@ -148,19 +154,79 @@ export default function SubmitReview({ appId, reviewHistory }: SubmitReviewProps
           name="reason"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          className={`${inter.className} w-full h-42.5 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
+          className={`${inter.className} w-full h-15 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
           placeholder="Enter your reasoning..."
         />
       </div>
 
+      {
+        showWaiverSection && (
+          <div className="mt-8">
+            <p className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}>Fee Waiver Request</p>
+            <div className="mt-8">
+              <Label htmlFor="reason" className="text-application-detail-text-secondary text-md">
+                Note
+              </Label>
+              <textarea
+                id="waiverReason"
+                name="waiverReason"
+                value={waiverReason}
+                onChange={(e) => setWaiverReason(e.target.value)}
+                className={`${inter.className} w-full h-15 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
+                placeholder="Enter your reasoning..."
+              />
+            </div>
+            <div className="mt-4">
+              <Label className="text-application-detail-text-secondary text-md">Decision</Label>
+
+              <div className="flex justify-center w-full mt-2">
+                <RadioGroup
+                  value={waiverDecision}
+                  className="w-[75%] flex flex-row justify-between"
+                  onValueChange={(val) => setWaiverDecision(val as ReviewDecision)}
+                >
+                  <div className="flex items-center gap-3">
+                    <RadioGroupItem
+                      value={ReviewDecision.APPROVE}
+                      id="approve"
+                      className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                    />
+                    <Label
+                      htmlFor="approve"
+                      className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                    >
+                      Approve
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <RadioGroupItem
+                      value={ReviewDecision.REJECT}
+                      id="reject"
+                      className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                    />
+                    <Label
+                      htmlFor="reject"
+                      className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                    >
+                      Reject
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
       {submitError ? <p className="text-destructive text-sm">{submitError}</p> : null}
 
-      <div className="flex justify-center mt-10">
+      <div className="flex justify-center mt-8">
         <Button
           type="button"
           onClick={() => setIsModalOpen(true)}
           disabled={!isFormValid || isSubmitting}
-          className="bg-primary hover:bg-primary/90 cursor-pointer"
+          className="bg-primary hover:bg-primary/90 cursor-pointer w-full"
         >
           {isSubmitting ? 'Submitting…' : 'Submit Review'}
         </Button>
