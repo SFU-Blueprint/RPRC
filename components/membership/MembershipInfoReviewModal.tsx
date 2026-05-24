@@ -19,7 +19,7 @@ interface MembershipInfoReviewModalProps {
     isOpen: boolean;
     onClose: () => void;
     data: MemberDashboardData | null;
-    userId?: string;
+    userId: string | null;
 }
 
 export default function MembershipInfoReviewModal({ isOpen, onClose, data, userId }: MembershipInfoReviewModalProps) {
@@ -104,7 +104,7 @@ export default function MembershipInfoReviewModal({ isOpen, onClose, data, userI
                         <div className="mt-4">
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {data.interests.map((interest, idx) => (
-                                    <span key={idx} className="rounded-full border border-content-secondary px-3 py-1.5 text-content-secondary text-xs">
+                                    <span key={idx} className="rounded-full border border-content-secondary px-3 py-1.5 text-content-secondary text-sm">
                                         {interest}
                                     </span>
                                 ))}

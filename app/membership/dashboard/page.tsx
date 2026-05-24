@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { inter, robotoCondensed, headerStyles, bodyStyles, buttonStyles, subheaderStyles } from '@/app/fonts';
-import { useAuth } from '@/lib/contexts/AuthContext';
 import { Spinner } from '@/components/ui/spinner';
 import { Info, Mail, MapPin, Phone, User } from 'lucide-react';
 import "@/app/globals.css";
@@ -12,25 +11,33 @@ import MembershipInfoReviewModal from '@/components/membership/MembershipInfoRev
 import { ApplicationStatus } from '@/lib/constants/enums';
 import { fetchMemberDashboardData } from '@/app/actions/member-dashboard';
 import type { MemberDashboardData } from '@/types/membership.types';
+import { getCurrentAuthUser } from '@/lib/api/services/auth-service';
 
 export default function MembershipDashboard() {
-  const { user, loading } = useAuth();
+  // This was not working!!! I hate auth context providers!!!!
+  // const { user, loading } = useAuth();
+  const [authLoading, setAuthLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<MemberDashboardData | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('User ID:', user?.id); // Debugging line to check user ID
-    if (!user?.id) return;
-    fetchMemberDashboardData(user.id)
-      .then(data => {
-        setDashboardData(data);
-      })
-      .finally(() => setDataLoading(false));
+    // Hack to ensure we have the most up-to-date user data, since there were issues with the user object being stale when fetched from AuthContext. This directly calls the auth service to get the current user on component mount.
+    getCurrentAuthUser().then((currentUser) => {
+      const userId = currentUser?.id;
+      if (!userId) return;
+      setUserId(userId);
+      setAuthLoading(false);
+      fetchMemberDashboardData(userId)
+        .then(data => {
+          setDashboardData(data);
+        })
+        .finally(() => setDataLoading(false))
+    });
+  }, []);
 
-  }, [user?.id]);
-
-  if (loading || dataLoading) {
+  if (authLoading || dataLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Spinner className="size-6 text-gray-600" />
@@ -71,24 +78,24 @@ export default function MembershipDashboard() {
               <h3 className="text-base md:text-lg lg:text-xl font-medium p-3">Name</h3>
               <div className="flex p-2 items-center gap-2 mb-5">
                 <User className="text-primary" />
-                <p className={bodyStyles.m}>{dashboardData?.name ?? ''}</p>
+                <p className={bodyStyles.lg}>{dashboardData?.name ?? ''}</p>
               </div>
               <hr className="mb-4" />
               <h3 className="text-base md:text-lg lg:text-xl font-medium p-3">Contact Information</h3>
               <div className="flex p-2 items-center gap-2">
                 <Mail className="text-primary" />
-                <p className={bodyStyles.m}>{dashboardData?.contact?.email ?? ''}</p>
+                <p className={bodyStyles.lg}>{dashboardData?.contact?.email ?? ''}</p>
               </div>
               {dashboardData?.contact?.phone && (
                 <div className="flex p-2 items-center gap-2">
                   <Phone className="text-primary" />
-                  <p className={bodyStyles.m}>{dashboardData.contact.phone}</p>
+                  <p className={bodyStyles.lg}>{dashboardData.contact.phone}</p>
                 </div>
               )}
               {dashboardData?.contact?.address && (
                 <div className="flex p-2 items-center gap-2">
                   <MapPin className="text-primary" />
-                  <p className={bodyStyles.m}>{dashboardData.contact.address}</p>
+                  <p className={bodyStyles.lg}>{dashboardData.contact.address}</p>
                 </div>
               )}
             </div>
@@ -124,7 +131,7 @@ export default function MembershipDashboard() {
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
         data={dashboardData}
-        userId={user?.id}
+        userId={userId}
       />
     </div>
   );
