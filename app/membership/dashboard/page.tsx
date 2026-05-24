@@ -81,7 +81,7 @@ export default function MembershipDashboard() {
               </h3>
               <div className="flex p-2 items-center gap-2 mb-5">
                 <User className="text-primary" />
-                <p className={bodyStyles.m}>{dashboardData?.name ?? ''}</p>
+                <p className={bodyStyles.lg}>{dashboardData?.name ?? ''}</p>
               </div>
               <hr className="mb-4" />
               <h3 className="text-base md:text-lg lg:text-xl font-medium p-3">
@@ -89,18 +89,18 @@ export default function MembershipDashboard() {
               </h3>
               <div className="flex p-2 items-center gap-2">
                 <Mail className="text-primary" />
-                <p className={bodyStyles.m}>{dashboardData?.contact?.email ?? ''}</p>
+                <p className={bodyStyles.lg}>{dashboardData?.contact?.email ?? ''}</p>
               </div>
               {dashboardData?.contact?.phone && (
                 <div className="flex p-2 items-center gap-2">
                   <Phone className="text-primary" />
-                  <p className={bodyStyles.m}>{dashboardData.contact.phone}</p>
+                  <p className={bodyStyles.lg}>{dashboardData.contact.phone}</p>
                 </div>
               )}
               {dashboardData?.contact?.address && (
                 <div className="flex p-2 items-center gap-2">
                   <MapPin className="text-primary" />
-                  <p className={bodyStyles.m}>{dashboardData.contact.address}</p>
+                  <p className={bodyStyles.lg}>{dashboardData.contact.address}</p>
                 </div>
               )}
             </div>
