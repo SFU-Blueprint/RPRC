@@ -276,6 +276,8 @@ type SubmitApplicationReviewInput = {
   reviewDate: string;
   decision: Database['public']['Enums']['review_decision'];
   reason: string;
+  waiverDecision?: Database['public']['Enums']['review_decision'];
+  waiverReason?: string;
 };
 
 type SubmitApplicationReviewResult = {
@@ -362,6 +364,8 @@ export async function submitApplicationReview(
     decision: input.decision,
     reason: input.reason.trim(),
     created_at: reviewCreatedAt,
+    waiver_decision: input.waiverDecision ?? null,
+    waiver_note: input.waiverReason ?? null
   });
 
   if (insertError) {

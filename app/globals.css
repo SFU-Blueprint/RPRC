@@ -4,6 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --shadow-card: var(--shadow-card-value);
   --color-background: var(--background);
   --color-background-off-white: var(--background-off-white);
   --color-primary-black: var(--primary-black);
@@ -57,9 +58,7 @@
   --color-signup-neutral-800: var(--signup-neutral-800);
   --color-signup-neutral-900: var(--signup-neutral-900);
   --color-signup-neutral-950: var(--signup-neutral-950);
-  --color-signup-membership-option-selected: var(
-    --signup-membership-option-selected
-  );
+  --color-signup-membership-option-selected: var(--signup-membership-option-selected);
   --color-content-active: var(--content-active);
   --color-interactive-feature-stroke: var(--interactive-feature-stroke);
   --color-feedback-info: var(--feedback-info);
@@ -74,15 +73,9 @@
 
   --color-application-detail-blue-500: var(--application-detail-blue-500);
   --color-application-detail-blue-100: var(--application-detail-blue-100);
-  --color-application-detail-accent-green: var(
-    --application-detail-accent-green
-  );
-  --color-application-detail-text-primary: var(
-    --application-detail-text-primary
-  );
-  --color-application-detail-text-secondary: var(
-    --application-detail-text-secondary
-  );
+  --color-application-detail-accent-green: var(--application-detail-accent-green);
+  --color-application-detail-text-primary: var(--application-detail-text-primary);
+  --color-application-detail-text-secondary: var(--application-detail-text-secondary);
   --color-application-detail-border-100: var(--application-detail-border-100);
   --color-application-detail-border-50: var(--application-detail-border-50);
   --color-application-detail-background: var(--application-detail-background);
@@ -90,12 +83,8 @@
   --color-application-approved-border: var(--application-approved-border);
   --color-application-rejected: var(--application-rejected);
   --color-application-rejected-border: var(--application-rejected-border);
-  --color-application-rejected-icon-background: var(
-    --application-rejected-icon-background
-  );
-  --color-application-conflict-background: var(
-    --application-conflict-background
-  );
+  --color-application-rejected-icon-background: var(--application-rejected-icon-background);
+  --color-application-conflict-background: var(--application-conflict-background);
   --color-application-conflict-border: var(--application-conflict-border);
   --color-application-conflict-note: var(--application-conflict-note);
   --color-admin-navbar: var(--admin-navbar);
@@ -180,7 +169,7 @@
   --application-conflict-border: #e6a835;
   --application-conflict-note: #f5e0b8;
   --admin-navbar: #3a3226;
-
+  --shadow-card-value: 0px 1px 2px 0px #0000001A, 0px 1px 8px 1px #0000001A;
   --feedback-info: #d5d9f0;
   --feedback-info-accent: #6c78ca;
 }
@@ -231,5 +220,11 @@
   button:not(:disabled),
   [role='button']:not(:disabled) {
     cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .shadow-card {
+    box-shadow: var(--shadow-card);
   }
 }

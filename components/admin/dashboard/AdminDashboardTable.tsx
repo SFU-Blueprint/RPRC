@@ -78,7 +78,7 @@ export default function AdminDashboardTable({
             className="bg-[#F6F6F6] hover:bg-[#E9E9E8] cursor-pointer not-last:border-b not-last:border-[#BAB7B2] leading-6 tracking-[-0.31px] text-[16px]"
           >
             <td className="p-6 font-bold">{app.applicantName}</td>
-            <td className="p-6 font-normal">{app.type}</td>
+            <td className="p-6 font-normal">{app.type[0].toUpperCase() + app.type.slice(1)}</td>
             <td className="p-6 font-normal">
               {formatDateWithOrdinal(app.dateReceived)}
             </td>
