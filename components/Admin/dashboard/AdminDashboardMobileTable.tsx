@@ -1,6 +1,6 @@
 'use client';
 
-import { StatusChip } from '@/components/Admin';
+import { StatusChip } from '@/components/admin';
 import { formatDateWithOrdinal } from '@/lib/utils';
 import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
 import { useApplicationList } from '@/lib/hooks/useApplicationList';

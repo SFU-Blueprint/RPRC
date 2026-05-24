@@ -6,7 +6,7 @@ import {
   AdminSearchBar,
   AdminDashboardTable,
   AdminDashboardMobileTable,
-} from '@/components/Admin';
+} from '@/components/admin';
 import { Button } from '@/components/ui/button';
 import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
 import { getPagination } from '@/lib/utils/pagination-utils';

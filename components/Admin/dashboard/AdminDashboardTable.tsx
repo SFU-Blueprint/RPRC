@@ -1,6 +1,6 @@
 'use client';
 
-import { Table, StatusChip } from '@/components/Admin';
+import { Table, StatusChip } from '@/components/admin';
 import { formatDateWithOrdinal } from '@/lib/utils';
 import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
 import { ROUTES } from '@/lib/constants/routes';
