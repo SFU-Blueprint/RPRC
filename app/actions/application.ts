@@ -87,15 +87,11 @@ export async function submitIndividualApplication(
   // Check if user already has an application
   const { data: existingApp } = await supabase
     .from('applications')
-    .select('id, status')
+    .select('id')
     .eq('user_id', user.id)
     .maybeSingle();
 
-  if (
-    existingApp &&
-    existingApp.status !== ApplicationStatus.EXPIRES_SOON &&
-    existingApp.status !== ApplicationStatus.EXPIRED
-  ) {
+  if (existingApp) {
     return {
       success: false,
       error: 'You have already submitted an application',
@@ -205,39 +201,29 @@ export async function submitOrganizationApplication(
     };
   }
 
-  // Check if user already has an application that blocks resubmission
-  const { data: existingApp } = await supabase
-    .from('applications')
-    .select('id, status')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (
-    existingApp &&
-    existingApp.status !== ApplicationStatus.EXPIRES_SOON &&
-    existingApp.status !== ApplicationStatus.EXPIRED
-  ) {
-    return {
-      success: false,
-      error: 'You have already submitted an application',
-      code: ApplicationErrorCode.APPLICATION_EXISTS,
-    };
-  }
-
-  // Check if organization already exists by phone
-  const { data: existingOrg } = await supabase
+  // Check if organization already exists by phone or if user has already submitted an application
+  const { data: existing } = await supabase
     .from('organization_profiles')
-    .select('phone_num')
+    .select('*')
     .or(
-      `phone_num.eq.${phoneNumberWithAreaCode},phone_num.eq.${data.phoneNumber}`,
+      `phone_num.eq.${phoneNumberWithAreaCode},phone_num.eq.${data.phoneNumber},user_id.eq.${user.id}`,
     )
-    .not('user_id', 'eq', user.id)
     .maybeSingle();
 
-  if (existingOrg) {
+  if (existing) {
+    let errorMessage = 'Organization already exists';
+    if (existing.user_id === user.id) {
+      errorMessage = 'You have already submitted an application';
+    } else if (
+      existing.phone_num === phoneNumberWithAreaCode ||
+      existing.phone_num === data.phoneNumber
+    ) {
+      errorMessage = 'An organization with this phone number already exists';
+    }
+
     return {
       success: false,
-      error: 'An organization with this phone number already exists',
+      error: errorMessage,
       code: ApplicationErrorCode.APPLICATION_EXISTS,
     };
   }
