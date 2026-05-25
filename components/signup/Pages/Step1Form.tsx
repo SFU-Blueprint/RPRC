@@ -24,6 +24,7 @@ import { signup, resendConfirmationEmail } from '@/app/actions/auth';
 import { AuthErrorCode } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 import { scrollToFirstError } from '@/lib/utils';
+import { APPLICATION_FEES } from '@/lib/constants/processing-fees';
 
 export function Step1Form() {
   const {
@@ -305,7 +306,7 @@ export function Step1Form() {
         <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-4 md:gap-5 lg:gap-6 xl:gap-8">
           <MembershipInfoCard
             title="Individual"
-            price="$5/yr"
+            price={`$${APPLICATION_FEES.INDIVIDUAL}/yr`}
             description="This is the option for individuals who want to join the RPRC. the Membership fee may be waived in special cases. The $5 fee is due after application is approved."
             isSelected={formData.membershipType === 'individual'}
             onSelect={() => updateFormData({ membershipType: 'individual' })}
@@ -313,7 +314,7 @@ export function Step1Form() {
 
           <MembershipInfoCard
             title="Organization"
-            price="$25/yr"
+            price={`$${APPLICATION_FEES.ORGANIZATION}/yr`}
             description="This option is for organizations that want to join or work with the RPRC. The $25 organization fee is due after application is accepted."
             isSelected={formData.membershipType === 'organization'}
             onSelect={() => updateFormData({ membershipType: 'organization' })}
