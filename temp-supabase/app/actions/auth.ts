@@ -7,6 +7,9 @@ import { UserRole } from '@/lib/constants/enums'
 import { AuthErrorCode, type SignupResponse, type LoginResponse, type ForgotPasswordResponse, type ResetPasswordResponse, type ResendConfirmationResponse } from '@/lib/constants/error-types'
 import { ROUTES } from '@/lib/constants/routes'
 
+// Removed from ROUTES while Supabase is disabled; restore to routes.ts when re-enabling.
+const AUTH_CALLBACK = '/auth/callback'
+
 export async function signup(formData: FormData): Promise<SignupResponse> {
   const supabase = await createClient()
 
@@ -47,7 +50,7 @@ export async function signup(formData: FormData): Promise<SignupResponse> {
       data: {
         role: role,
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${ROUTES.AUTH_CALLBACK}`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${AUTH_CALLBACK}`,
     },
   })
 
@@ -243,7 +246,7 @@ export async function resendConfirmationEmail(formData: FormData): Promise<Resen
     type: 'signup',
     email: email,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${ROUTES.AUTH_CALLBACK}`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${AUTH_CALLBACK}`,
     },
   })
 

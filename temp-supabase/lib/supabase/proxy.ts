@@ -22,7 +22,16 @@
 
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { ROUTES, PROTECTED_ROUTES } from '@/lib/constants/routes'
+import { ROUTES } from '@/lib/constants/routes'
+
+// Defined locally because it was removed from lib/constants/routes.ts
+// while Supabase is disabled. Move back to routes.ts when restoring.
+const PROTECTED_ROUTES = [
+  ROUTES.MEMBERSHIP_FORM,
+  ROUTES.MEMBERSHIP_CONFIRMATION,
+  ROUTES.MEMBERSHIP_DASHBOARD,
+  ROUTES.MEMBERSHIP_RENEW,
+] as const
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
