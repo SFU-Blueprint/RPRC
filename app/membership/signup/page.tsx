@@ -3,8 +3,7 @@
 import { SignUpProvider, useSignUp } from '@/lib/contexts/SignUpContext';
 import { ProgressIndicator } from '@/components/signup/layout/ProgressIndicator';
 import { SignUpInfoBox } from '@/components/signup/cards/SignUpInfoBox';
-import { SIGNUP_STEPS } from './const';
-import { inter } from '@/app/fonts';
+import { SIGNUP_STEPS } from '@/lib/constants/signup';
 import { Step1Form } from '@/components/signup/Pages/Step1Form';
 import { Step2Form } from '@/components/signup/Pages/Step2Form';
 import { Step3Success } from '@/components/signup/Pages/Step3Success';

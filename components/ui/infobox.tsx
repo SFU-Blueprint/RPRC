@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { inter, bodyStyles } from '@/app/fonts';
+import { inter, bodyStyles } from '@/lib/fonts';
 
 type Props = {
   heading: string;

@@ -11,8 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { AlertCircle, Info, Mail, MapPin, Phone, User } from 'lucide-react';
-import { submitMembershipRenewal } from '@/app/actions/member-dashboard';
+import { Info, Mail, MapPin, Phone, User } from 'lucide-react';
 import type { MemberDashboardData } from '@/types/membership.types';
 
 interface MembershipInfoReviewModalProps {
@@ -22,7 +21,12 @@ interface MembershipInfoReviewModalProps {
     userId?: string;
 }
 
-export default function MembershipInfoReviewModal({ isOpen, onClose, data, userId }: MembershipInfoReviewModalProps) {
+export default function MembershipInfoReviewModal({
+    isOpen,
+    onClose,
+    data,
+    userId,
+}: MembershipInfoReviewModalProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -34,18 +38,20 @@ export default function MembershipInfoReviewModal({ isOpen, onClose, data, userI
             setError('User ID not found');
             return;
         }
-
         setError(null);
         setIsSubmitting(true);
         try {
-            const result = await submitMembershipRenewal(userId);
+            // const result = await submitMembershipRenewal(userId);
+            const result = await Promise.resolve<
+                { success: true } | { success: false; error: string }
+            >({ success: true });
             if (result.success) {
                 onClose();
                 router.push('/membership/renew-success');
             } else {
                 setError(result.error || 'Failed to submit renewal. Please try again.');
             }
-        } catch (err) {
+        } catch {
             setError('An unexpected error occurred. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -56,7 +62,9 @@ export default function MembershipInfoReviewModal({ isOpen, onClose, data, userI
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-semibold">Submit Membership Renewal</DialogTitle>
+                    <DialogTitle className="text-2xl font-semibold">
+                        Submit Membership Renewal
+                    </DialogTitle>
                 </DialogHeader>
                 <hr className="border-application-detail-border-50 mt-2 mb-2" />
                 <div className="rounded-3xl bg-feedback-info/70 border border-feedback-info-accent p-4">
@@ -69,12 +77,15 @@ export default function MembershipInfoReviewModal({ isOpen, onClose, data, userI
                         </DialogDescription>
                     </div>
                     <p className="mt-2 text-sm leading-5 text-content-secondary">
-                        Please ensure your information is accurate. If anything needs updating, go back and edit your profile before submitting your renewal.
+                        Please ensure your information is accurate. This local demo does not save or submit a
+                        renewal.
                     </p>
                 </div>
                 <div className="space-y-5 bg-white rounded-3xl p-4">
                     <div>
-                        <h3 className="text-lg font-semibold text-application-detail-text-primary">Personal Information</h3>
+                        <h3 className="text-lg font-semibold text-application-detail-text-primary">
+                            Personal Information
+                        </h3>
                         <div className="mt-3 space-y-3 text-content-secondary">
                             <div className="flex items-center gap-3">
                                 <User className="text-primary" />
@@ -100,38 +111,48 @@ export default function MembershipInfoReviewModal({ isOpen, onClose, data, userI
                     </div>
                     <hr className="border-application-detail-border-50" />
                     <div>
-                        <h3 className="text-lg font-semibold text-application-detail-text-primary">Membership Information</h3>
+                        <h3 className="text-lg font-semibold text-application-detail-text-primary">
+                            Membership Information
+                        </h3>
                         <div className="mt-4">
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {data.interests.map((interest, idx) => (
-                                    <span key={idx} className="rounded-full border border-content-secondary px-3 py-1.5 text-content-secondary text-xs">
+                                    <span
+                                        key={idx}
+                                        className="rounded-full border border-content-secondary px-3 py-1.5 text-content-secondary text-xs"
+                                    >
                                         {interest}
                                     </span>
                                 ))}
                             </div>
-                            <p className="rounded-2xl border border-application-detail-border-50 bg-card-background-gray p-4 text-content-primary text-sm">
+                            <p
+                                className="rounded-2xl border border-application-detail-border-50 bg-card-background-gray p-4 text-content-primary text-sm"
+                            >
                                 {data.reason}
                             </p>
                         </div>
                     </div>
                 </div>
-                {error && (
-                    <div className="rounded-3xl bg-surface-rejected border border-content-error p-4">
-                        <div className="flex items-start gap-3">
-                            <AlertCircle className="h-5 w-5 text-content-error flex-shrink-0 mt-0.5" />
-                            <div className="flex-1">
-                                <p className="text-sm font-semibold text-content-error">Error</p>
-                                <p className="mt-1 text-sm text-content-error">{error}</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
                 <DialogFooter className="mt-4 gap-3">
-                    <Button variant="outline" onClick={onClose} className="px-6 py-4" disabled={isSubmitting}>
+                    {error && (
+                        <p className="w-full text-sm text-destructive" role="alert">
+                            {error}
+                        </p>
+                    )}
+                    <Button
+                        variant="outline"
+                        onClick={onClose}
+                        className="px-6 py-4"
+                        disabled={isSubmitting}
+                    >
                         Go Back
                     </Button>
-                    <Button onClick={handleSubmit} className="px-6 py-4 bg-primary text-white hover:bg-primary-hover" disabled={isSubmitting}>
-                        {isSubmitting ? 'Submitting...' : 'Submit Renewal'}
+                    <Button
+                        onClick={handleSubmit}
+                        className="px-6 py-4 bg-primary text-white hover:bg-primary-hover"
+                        disabled={isSubmitting}
+                    >
+                        Continue (demo)
                     </Button>
                 </DialogFooter>
             </DialogContent>

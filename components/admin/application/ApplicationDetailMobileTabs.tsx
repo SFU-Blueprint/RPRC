@@ -1,4 +1,4 @@
-import { headerStyles } from "@/app/fonts"
+import { headerStyles } from "@/lib/fonts"
 import { MOBILE_TABS } from "@/lib/constants"
 
 export default function ApplicationDetailMobileTabs({

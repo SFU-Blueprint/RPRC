@@ -1,6 +1,6 @@
 'use client';
 
-import { inter } from '@/app/fonts';
+import { inter } from '@/lib/fonts';
 import { ReactNode, useState } from 'react';
 import { ColumnType } from '@/types/admin.types';
 import { Pagination } from '@/components/Pagination';

@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { inter } from '@/app/fonts';
+import { inter } from '@/lib/fonts';
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { type StatCardType, type StatCardsData } from '@/lib/constants/admin/dashboard';
 
@@ -32,7 +32,7 @@ function StatCard({ type, value }: StatCardProps) {
   return (
     <BackdropContainer
       className="flex-1 min-w-0 aspect-square md:aspect-auto flex flex-col items-center justify-center text-center
-        border-2 border-primary-black rounded-[16px] p-4 md:p-5 lg:p-6"
+        border-2 border-primary-black rounded-3xl p-4 md:p-5 lg:p-6"
     >
       {/* Mobile: icon on top, then number, then label. Desktop: icon + number in a row, label below */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-2 mb-1.5 md:gap-2">

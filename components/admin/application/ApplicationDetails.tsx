@@ -3,7 +3,7 @@ import { Mail, Phone, MapPin, Calendar, User, Building } from 'lucide-react';
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { APPLICATION_DETAIL_ICON_SIZES } from '@/lib/constants/admin';
 import { ApplicationType } from '@/lib/constants';
-import { robotoCondensed } from "@/app/fonts";
+import { robotoCondensed } from "@/lib/fonts";
 import { InfoBox } from "@/components/ui/infobox";
 
 type ApplicationDetailsProps = {

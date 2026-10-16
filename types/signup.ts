@@ -6,8 +6,8 @@ export type SignUpFormData = {
   // Step 1: Account Info
   email: string;
   password: string;
+  userId?: string;
   membershipType?: MembershipType;
-  userId?: string; // User ID from database after account creation
 
   // Step 2.1: Contact + Address Info
   fullName: string; // "Name" for Individual, "Organization Name" for Organization

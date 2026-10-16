@@ -8,7 +8,7 @@ import {
   headerStyles,
   bodyStyles,
   buttonStyles,
-} from '@/app/fonts';
+} from '@/lib/fonts';
 import { SuccessInfoCard } from '../cards/SuccessInfoCard';
 import { INFO_CARDS } from '@/lib/constants/membership';
 
@@ -40,15 +40,14 @@ export function Step3Success() {
       <h1
         className={`text-center text-gray-900 mb-4 sm:mb-5 ${headerStyles.lResponsive} ${robotoCondensed.className}`}
       >
-        Application Submitted Successfully!
+        Demo Application Complete
       </h1>
 
       {/* Thank You Text */}
       <p
         className={`text-center text-gray-700 mb-10 sm:mb-12 md:mb-14 leading-relaxed ${bodyStyles.lg}`}
       >
-        Thank you for applying to become a member of the Richmond Poverty
-        Reduction Coalition.
+        This is a local preview. Your account and application details were not saved.
       </p>
 
       {/* Info Cards - 4 columns */}

@@ -1,5 +1,5 @@
 import { SignUpFormData, ValidationErrors } from '@/types/signup';
-import { MEMBERSHIP_TYPES } from '@/app/membership/signup/const';
+import { MEMBERSHIP_TYPES } from '@/lib/constants/signup';
 
 /**
  * Regular expression patterns for validation

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { StepInfo } from '@/types/signup';
-import { robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
+import { robotoCondensed, headerStyles, bodyStyles } from '@/lib/fonts';
 import { LockIcon, FormIcon, CheckCircleIcon } from 'lucide-react';
 
 type ProgressIndicatorProps = {
@@ -17,7 +17,7 @@ export function ProgressIndicator({
   // Dynamic title based on step
   const title =
     currentStep === 3
-      ? 'Application Submitted!'
+      ? 'Demo Application Complete'
       : 'RPRC Membership Application';
 
   return (

@@ -13,15 +13,18 @@ import {
   headerStyles,
   bodyStyles,
   buttonStyles,
-} from '@/app/fonts';
+} from '@/lib/fonts';
 import { validateStep1, hasErrors } from '@/lib/api/helpers/signup-validation';
 import { PasswordInput } from '../inputs/PasswordInput';
 import { MembershipInfoCard } from '../cards/MembershipInfoCard';
 import { UserRole } from '@/lib/constants/enums';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signup, resendConfirmationEmail } from '@/app/actions/auth';
-import { AuthErrorCode } from '@/lib/constants/error-types';
+// import { signup, resendConfirmationEmail } from '@/app/actions/auth'; // backend calls are disabled for this local demo
+import {
+  AuthErrorCode,
+  type SignupResponse,
+  type ResendConfirmationResponse,
+} from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 import { scrollToFirstError } from '@/lib/utils';
 
@@ -36,7 +39,6 @@ export function Step1Form() {
     goToNextStep,
   } = useSignUp();
 
-  const router = useRouter();
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
@@ -64,7 +66,11 @@ export function Step1Form() {
       formDataObj.append('email', formData.email);
 
       // Call resend confirmation email action
-      const result = await resendConfirmationEmail(formDataObj);
+      // const result = await resendConfirmationEmail(formDataObj);
+      const result = await Promise.resolve<ResendConfirmationResponse>({
+        success: true,
+        message: 'Demo only: no confirmation email was sent.',
+      });
 
       if ('error' in result) {
         console.error(
@@ -121,7 +127,13 @@ export function Step1Form() {
       formDataObj.append('role', role);
 
       // Call server action
-      const result = await signup(formDataObj);
+      // const result = await signup(formDataObj);
+      const result = await Promise.resolve<SignupResponse>({
+        success: true,
+        userId: 'demo-user-id',
+        email: formData.email,
+        emailExists: false,
+      });
 
       if ('error' in result) {
         console.error('Signup error:', result.error, 'Code:', result.code);
@@ -173,26 +185,29 @@ export function Step1Form() {
         <h2
           className={`text-gray-900 mb-6 ${headerStyles.lResponsive} ${robotoCondensed.className}`}
         >
-          Check your email
+          Demo signup preview
         </h2>
         <div className="space-y-4">
           <p className={`text-gray-700 ${bodyStyles.m}`}>
-            We&apos;ve sent a confirmation email to:
+            Demo account confirmation preview for:
           </p>
           <p className={`font-semibold text-gray-900 ${bodyStyles.m}`}>
             {userEmail}
           </p>
           <p className={`text-gray-700 ${bodyStyles.m}`}>
-            Please click the link in the email to verify your account and
-            complete your registration.
+            No account or email was created in this local demo.
+            Continue to preview the application form.
           </p>
           <Alert variant="info" className="mt-6">
             <AlertDescription>
-              <strong>Note:</strong> The link will expire in 24 hours. If you
-              don&apos;t see the email, check your spam folder.
+              <strong>Demo:</strong> the mock signup succeeded; no real confirmation link was sent.
+              The resend button below only resets the mock countdown.
             </AlertDescription>
           </Alert>
 
+          <Button onClick={goToNextStep} size="lg" className="mt-4">
+            Continue demo application
+          </Button>
           {/* Resend Email Button */}
           <div className="mt-6 gap-1 flex flex-col items-start">
             <Button
@@ -327,7 +342,7 @@ export function Step1Form() {
             disabled={isSubmitting || !formData.membershipType}
             size="lg"
           >
-            {isSubmitting ? 'Creating account...' : 'Sign up'}
+            {isSubmitting ? 'Preparing demo...' : 'Create demo account'}
           </Button>
 
           {/* Already have account text */}

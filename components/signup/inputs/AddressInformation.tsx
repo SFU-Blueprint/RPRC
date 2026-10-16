@@ -4,9 +4,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from './FormInput';
 import { FormSelect } from './FormSelect';
-import { robotoCondensed, headerStyles } from '@/app/fonts';
+import { robotoCondensed, headerStyles } from '@/lib/fonts';
 import { State } from 'country-state-city';
-import { COUNTRIES } from '@/app/membership/signup/const';
+import { COUNTRIES } from '@/lib/constants/signup';
 
 export function AddressInformation() {
   const { formData, updateFormData, errors, hasAttemptedValidation } =

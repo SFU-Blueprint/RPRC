@@ -1,6 +1,6 @@
 'use client';
 
-import { buttonStyles } from '@/app/fonts';
+import { buttonStyles } from '@/lib/fonts';
 import {
   Dialog,
   DialogContent,

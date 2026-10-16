@@ -1,6 +1,6 @@
 'use client';
 
-import { robotoCondensed } from '@/app/fonts';
+import { robotoCondensed } from '@/lib/fonts';
 import { User as UserIcon, Users as UsersIcon } from 'lucide-react';
 import { UserRole } from '@/lib/constants/enums';
 

@@ -4,7 +4,7 @@ import React from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { FormInput } from '../inputs/FormInput';
 import { PhoneInput } from '../inputs/PhoneInput';
-import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/lib/fonts';
 import { FormRadioButton } from '../inputs/FormRadioButton';
 
 export function ContactInfoIndividual() {

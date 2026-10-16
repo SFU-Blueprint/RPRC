@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { robotoCondensed } from '@/app/fonts';
+import { robotoCondensed } from '@/lib/fonts';
 
 export default function AdminNavbar() {
   return (

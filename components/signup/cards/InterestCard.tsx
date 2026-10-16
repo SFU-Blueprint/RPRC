@@ -1,6 +1,6 @@
 'use client';
 
-import { inter, bodyStyles } from '@/app/fonts';
+import { inter, bodyStyles } from '@/lib/fonts';
 import { Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
