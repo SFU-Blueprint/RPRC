@@ -117,7 +117,7 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
           disabled={!isFormValid}
           className="bg-primary hover:bg-primary/90 cursor-pointer w-full"
         >
-          {isSubmitting ? 'Preparing…' : 'Preview Final Decision'}
+          Preview Final Decision
         </Button>
       </div>
 

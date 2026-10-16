@@ -195,7 +195,7 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
           disabled={!isFormValid}
           className="bg-primary hover:bg-primary/90 cursor-pointer w-full"
         >
-          {isSubmitting ? 'Preparing…' : 'Preview Review'}
+          Preview Review
         </Button>
       </div>
 
