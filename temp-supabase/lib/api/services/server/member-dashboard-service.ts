@@ -1,5 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
-import type { Database } from '@/types/database';
+import { createClient } from '@/temp-supabase/lib/supabase/server';
+import type { Database } from '@/temp-supabase/types/database';
 import type { MemberDashboardData } from '@/types/membership.types';
 
 

@@ -6,7 +6,7 @@ import {
   getCurrentAuthUser,
   signOutClient,
   subscribeToAuthChanges,
-} from '@/lib/api/services/auth-service';
+} from '@/temp-supabase/lib/api/services/auth-service';
 
 type AuthContextType = {
   user: User | null;

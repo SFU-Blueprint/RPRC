@@ -1,7 +1,7 @@
 'use client';
 
 import type { Session, User } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/temp-supabase/lib/supabase/client';
 
 export async function getCurrentAuthUser(): Promise<User | null> {
   const supabase = createClient();

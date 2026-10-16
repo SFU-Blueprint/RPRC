@@ -1,6 +1,6 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/temp-supabase/lib/supabase/client';
 import { ApplicationStatus } from '@/lib/constants/enums';
 
 export type MembershipInterestItem = {

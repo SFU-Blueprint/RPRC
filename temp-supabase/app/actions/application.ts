@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/temp-supabase/lib/supabase/server';
 import {
   ApplicationStatus,
   PhoneType,
@@ -14,8 +14,8 @@ import {
   ApplicationErrorCode,
   SubmitApplication,
 } from '@/lib/constants/application-errors';
-import { isAdmin } from '@/lib/helpers/auth-helper';
-import type { Database } from '@/types/database';
+import { isAdmin } from '@/temp-supabase/lib/helpers/auth-helper';
+import type { Database } from '@/temp-supabase/types/database';
 
 function formatPhoneWithAreaCode(phoneNumber: string): string {
   const normalized = phoneNumber.trim();

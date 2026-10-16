@@ -1,7 +1,7 @@
 'use server';
 
-import { getMemberDashboardData } from '@/lib/api/services/server/member-dashboard-service';
-import { createClient } from '@/lib/supabase/server';
+import { getMemberDashboardData } from '@/temp-supabase/lib/api/services/server/member-dashboard-service';
+import { createClient } from '@/temp-supabase/lib/supabase/server';
 import { ApplicationStatus } from '@/lib/constants/enums';
 import type { MemberDashboardData } from '@/types/membership.types';
 

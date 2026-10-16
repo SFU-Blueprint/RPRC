@@ -1,5 +1,5 @@
-import { createClient as createServerClient } from '@/lib/supabase/server';
-import { getCurrentAuthUser } from '@/lib/api/services/auth-service';
+import { createClient as createServerClient } from '@/temp-supabase/lib/supabase/server';
+import { getCurrentAuthUser } from '@/temp-supabase/lib/api/services/auth-service';
 
 /**
  * Get current user (server-side)

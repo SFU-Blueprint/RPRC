@@ -1,5 +1,5 @@
 import { ApplicationStatus } from '@/lib/constants/enums';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/temp-supabase/lib/supabase/server';
 import type {
   AdminDashboardStats,
   ApplicationRow,

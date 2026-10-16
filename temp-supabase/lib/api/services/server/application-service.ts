@@ -1,5 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
-import type { Database } from '@/types/database';
+import { createClient } from '@/temp-supabase/lib/supabase/server';
+import type { Database } from '@/temp-supabase/types/database';
 import type { AdminApplicationPageData } from '@/types/admin.types';
 
 export async function getAdminApplicationPageDataServer(
