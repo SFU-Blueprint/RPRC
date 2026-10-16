@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
-import { useAuth } from '@/lib/contexts/AuthContext';
 import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
 import { inter, robotoCondensed, headerStyles } from '@/app/fonts';
 import { validateStep2, hasErrors } from '@/lib/api/helpers/signup-validation';
@@ -16,10 +15,8 @@ import { MembershipWaiverSection } from '../cards/MembershipWaiverSection';
 import { OrganizationServicesSection } from '../domain/OrganizationServicesSection';
 import { InfoBox } from "@/components/ui/infobox";
 import { scrollToFirstError } from '@/lib/utils';
-import { submitIndividualApplication, submitOrganizationApplication } from '@/app/actions/application';
 import { toast } from 'sonner';
 import { UserRole } from '@/lib/constants/enums';
-import { getUserRoleById } from '@/lib/api/services/application-service';
 
 export function Step2Form() {
   const {
@@ -32,28 +29,8 @@ export function Step2Form() {
     goToNextStep,
   } = useSignUp();
 
-  const { user } = useAuth();
-  const [resolvedRole, setResolvedRole] = useState<string | undefined>(
-    user?.user_metadata?.role,
-  );
-
+  const userRole = formData.membershipType;
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-  useEffect(() => {
-    const fetchRole = async () => {
-      if (!user?.id) {
-        setResolvedRole(undefined);
-        return;
-      }
-
-      const role = await getUserRoleById(user.id);
-      setResolvedRole(role ?? user.user_metadata?.role);
-    };
-
-    fetchRole();
-  }, [user?.id, user?.user_metadata?.role]);
-
-  const userRole = resolvedRole ?? user?.user_metadata?.role;
 
   const handleSubmit = () => {
     setHasAttemptedValidation(true);
@@ -61,38 +38,15 @@ export function Step2Form() {
     const validationErrors = validateStep2(formData, userRole);
     if (hasErrors(validationErrors)) {
       setErrors(validationErrors);
-      console.error('Step 2 validation failed:', validationErrors);
       scrollToFirstError(validationErrors);
       return;
     }
     setShowConfirmModal(true);
   };
 
-  const handleConfirmSubmit = async () => {
-    const formDataObj = new FormData();
-
-    Object.entries(formData).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        formDataObj.append(key, JSON.stringify(value));
-      } else if (value !== undefined && value !== null) {
-        formDataObj.append(key, String(value));
-      }
-    });
-
-    // Call appropriate submission function based on user role
-    const submitFunction = isIndividual
-      ? submitIndividualApplication
-      : submitOrganizationApplication;
-
-    const result = await submitFunction(formDataObj);
-    if (!result.success) {
-      toast.error('Failed to submit your application, please try again', {
-        description: `Error: ${result.error}`
-      });
-    }
-
-    // Close modal
+  const handleConfirmSubmit = () => {
     setShowConfirmModal(false);
+    toast.success('Demo application submitted. No data was saved.');
     goToNextStep();
   };
 

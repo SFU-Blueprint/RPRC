@@ -1,5 +1,4 @@
-import { ApplicationStatus, ReviewDecision } from "@/lib/constants";
-import type { Database } from '@/types/database';
+import type { ApplicationStatus, ApplicationType as MembershipApplicationType, ReviewDecision } from '@/lib/constants/enums';
 
 /** Config for one status chip: color, label, and theme (ApplicationStatus or ReviewDecision). */
 export type StatusChipType = {
@@ -99,7 +98,7 @@ export type AdminReviewProps = {
 };
 
 export type AdminApplicationDetailsData = {
-  type: Database['public']['Enums']['application_type'];
+  type: MembershipApplicationType;
   interests: string[];
   reason: string;
   feeWaiverRequested?: boolean;
@@ -112,11 +111,20 @@ export type AdminApplicationDetailsData = {
   dateReceived: string;
 };
 
-export type ReviewHistoryItem = Database['public']['Tables']['application_reviews']['Row'];
+export type ReviewHistoryItem = {
+  id: string;
+  application_id: string;
+  reviewer_name: string;
+  decision: ReviewDecision;
+  reason: string;
+  created_at: string;
+  waiver_decision: ReviewDecision | null;
+  waiver_note: string | null;
+};
 
 export type AdminApplicationPageData = {
   headerName: string;
-  headerStatus: Database['public']['Enums']['application_status'] | null;
+  headerStatus: ApplicationStatus | null;
   details: AdminApplicationDetailsData;
   reviewHistory: ReviewHistoryItem[];
 };

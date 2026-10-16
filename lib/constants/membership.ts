@@ -6,30 +6,30 @@ export const INFO_CARDS = [
   {
     ID: 1,
     ICON: User,
-    HEADING: 'Check Your Email',
+    HEADING: 'No Email Sent',
     DESCRIPTION:
-      'A confirmation email has been sent to your registered email address, further about your application status will be sent here.',
+      'This demo does not create an account or send confirmation emails.',
   },
   {
     ID: 2,
     ICON: User,
     HEADING: 'View Your Profile',
     DESCRIPTION:
-      'All following steps will be done through the applicant profile including viewing membership status.',
+      'The profile button opens the sample member dashboard when the route is available.',
   },
   {
     ID: 3,
     ICON: Calendar,
-    HEADING: 'Review Period',
+    HEADING: 'Demo Only',
     DESCRIPTION:
-      'Our team will review your application within 14 business days.',
+      'This preview does not submit an application for review.',
   },
   {
     ID: 4,
     ICON: StepForward,
     HEADING: 'Next Steps',
     DESCRIPTION:
-      "Once approved, you'll receive payment instructions. After confirmation, your membership will be activated.",
+      "This demo does not generate approvals, payment instructions, or membership changes.",
   },
 ];
 

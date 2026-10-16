@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import { inter, robotoCondensed } from '@/app/fonts';
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
@@ -10,11 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-import { submitApplicationReview } from '@/app/actions/application';
 import { ReviewDecision } from '@/lib/constants/enums';
 import type { ReviewHistoryItem } from '@/types/admin.types';
 
 import SubmitReviewModal from './SubmitReviewModal';
+import { toast } from 'sonner';
 
 type SubmitReviewProps = {
   appId: string;
@@ -23,7 +22,6 @@ type SubmitReviewProps = {
 };
 
 export default function SubmitReview({ appId, reviewHistory, waiverRequested }: SubmitReviewProps) {
-  const router = useRouter();
 
   const [boardMemberName, setBoardMemberName] = useState('');
   const [reviewDate, setReviewDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -32,45 +30,14 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
   const [waiverDecision, setWaiverDecision] = useState<ReviewDecision | ''>('');
   const [waiverReason, setWaiverReason] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   const isFormValid = Boolean(boardMemberName && reviewDate && decision && reason);
   const showWaiverSection = (decision === ReviewDecision.APPROVE || decision === '') && waiverRequested;
 
-  const handleConfirmSubmit = async () => {
-    if (!isFormValid || isSubmitting) return;
-
-    setIsSubmitting(true);
-    setSubmitError('');
-
-    const result = await submitApplicationReview({
-      appId,
-      reviewerName: boardMemberName,
-      reviewDate,
-      decision: decision as ReviewDecision,
-      reason,
-      waiverDecision: waiverDecision as ReviewDecision || undefined,
-      waiverReason
-    });
-
-    setIsSubmitting(false);
-
-    if (!result.success) {
-      setIsModalOpen(false);
-      setSubmitError(result.error ?? 'Failed to submit review');
-      return;
-    }
-
-    // Reset form after successful submission
-    setBoardMemberName('');
-    setReviewDate(new Date().toISOString().slice(0, 10));
-    setDecision('');
-    setReason('');
-    setSubmitError('');
+  const handleConfirmSubmit = () => {
     setIsModalOpen(false);
-
-    router.refresh();
+    toast.info('Demo only: this review was not saved.');
   };
 
   return (
@@ -225,10 +192,10 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
         <Button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          disabled={!isFormValid || isSubmitting}
+          disabled={!isFormValid}
           className="bg-primary hover:bg-primary/90 cursor-pointer w-full"
         >
-          {isSubmitting ? 'Submitting…' : 'Submit Review'}
+          {isSubmitting ? 'Preparing…' : 'Preview Review'}
         </Button>
       </div>
 
@@ -238,7 +205,7 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
         action={decision as ReviewDecision}
         setModalOpen={setIsModalOpen}
         onConfirm={handleConfirmSubmit}
-        isSubmitting={isSubmitting}
+        isSubmitting={false}
       />
     </BackdropContainer>
   );

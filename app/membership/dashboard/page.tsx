@@ -1,45 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { inter, robotoCondensed, headerStyles, bodyStyles, buttonStyles, subheaderStyles } from '@/app/fonts';
-import { useAuth } from '@/lib/contexts/AuthContext';
-import { Spinner } from '@/components/ui/spinner';
 import { Info, Mail, MapPin, Phone, User } from 'lucide-react';
 import "@/app/globals.css";
 import MembershipStatusCard from '@/components/membership/MembershipStatusCard';
 import MembershipProfileBanner from '@/components/membership/MembershipProfileBanner';
 import MembershipInfoReviewModal from '@/components/membership/MembershipInfoReviewModal';
 import { ApplicationStatus } from '@/lib/constants/enums';
-import { fetchMemberDashboardData } from '@/app/actions/member-dashboard';
-import type { MemberDashboardData } from '@/types/membership.types';
+import { MEMBER_DASHBOARD } from '@/lib/mock-data/member-dashboard';
 
 export default function MembershipDashboard() {
-  const { user, loading } = useAuth();
-  const [dashboardData, setDashboardData] = useState<MemberDashboardData | null>(null);
-  const [dataLoading, setDataLoading] = useState(true);
+  const dashboardData = MEMBER_DASHBOARD;
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  useEffect(() => {
-    console.log('User ID:', user?.id); // Debugging line to check user ID
-    if (!user?.id) return;
-    fetchMemberDashboardData(user.id)
-      .then(data => {
-        setDashboardData(data);
-      })
-      .finally(() => setDataLoading(false));
-
-  }, [user?.id]);
-
-  if (loading || dataLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner className="size-6 text-gray-600" />
-      </div>
-    );
-  }
 
   return (
     <div className={`min-h-screen bg-background ${inter.className}`}>
+      <p className="px-6 pt-4 text-center text-sm text-muted-foreground">Demo profile data</p>
       <MembershipProfileBanner name={dashboardData?.name ?? ''} role={dashboardData?.type ?? null} />
       <div className='flex flex-col md:flex-row justify-center gap-8 md:gap-6 lg:gap-16 xl:gap-24 mt-8 md:mt-10 px-4 md:px-6 lg:px-12 xl:px-20 pb-16'>
         <div className='flex flex-col gap-8 md:gap-6 lg:gap-10 w-full md:w-auto md:shrink-0'>
@@ -124,7 +102,7 @@ export default function MembershipDashboard() {
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
         data={dashboardData}
-        userId={user?.id}
+
       />
     </div>
   );

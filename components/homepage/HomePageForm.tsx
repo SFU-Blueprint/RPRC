@@ -7,10 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
-import { subheaderStyles, bodyStyles } from '@/app/fonts';
+import { subheaderStyles } from '@/app/fonts';
 import { ROUTES } from '@/lib/constants/routes';
-import { login } from '@/app/actions/auth';
-import { AuthErrorCode } from '@/lib/constants/error-types';
 
 export const HomePageForm = () => {
   const [formData, setFormData] = useState({
@@ -20,45 +18,9 @@ export const HomePageForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setError('');
-
-    try {
-      const formDataObj = new FormData();
-      formDataObj.append('email', formData.email);
-      formDataObj.append('password', formData.password);
-
-      const result = await login(formDataObj);
-
-      if ('error' in result) {
-        console.error('Login error:', result.error, 'Code:', result.code);
-
-        // Show user-friendly error messages
-        if (result.code === AuthErrorCode.INVALID_CREDENTIALS) {
-          setError('Invalid email or password. Please try again.');
-        } else if (result.code === AuthErrorCode.VALIDATION_ERROR) {
-          setError('Please enter both email and password.');
-        } else {
-          setError(result.error || 'Failed to sign in. Please try again.');
-        }
-      }
-      // Success case handled by server action (redirects to dashboard)
-    } catch (error) {
-      if (
-        error &&
-        typeof error === 'object' &&
-        'digest' in error &&
-        String((error as { digest?: string }).digest).startsWith('NEXT_REDIRECT')
-      ) {
-        throw error;
-      }
-      console.error('Unexpected error during login:', error);
-      setError('An unexpected error occurred. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    setError('Sign in is unavailable while the membership backend is disabled.');
   };
 
   return (

@@ -17,7 +17,7 @@ export function ProgressIndicator({
   // Dynamic title based on step
   const title =
     currentStep === 3
-      ? 'Application Submitted!'
+      ? 'Demo Application Complete'
       : 'RPRC Membership Application';
 
   return (
