@@ -1,3 +1,25 @@
+/*
+ * Removed from lib/constants/routes.ts while Supabase is disabled. Restore when re-enabling:
+ *
+ * In ROUTES:
+ *   AUTH_CALLBACK: '/auth/callback',
+ *   API_APPLICATION: '/api/application',
+ *   API_APPLICATION_BY_ID: (id: string) => `/api/application/${id}`,
+ *   API_AUTH_LOGIN: '/api/auth/log-in',
+ *
+ * export const PROTECTED_ROUTES = [
+ *   ROUTES.MEMBERSHIP_FORM,
+ *   ROUTES.MEMBERSHIP_CONFIRMATION,
+ *   ROUTES.MEMBERSHIP_DASHBOARD,
+ *   ROUTES.MEMBERSHIP_RENEW,
+ * ] as const
+ * export const ADMIN_ROUTES = [ROUTES.ADMIN_DASHBOARD] as const
+ * export const PUBLIC_ROUTES = [
+ *   ROUTES.HOME, ROUTES.ERROR, ROUTES.MEMBERSHIP_SIGNUP, ROUTES.AUTH_CALLBACK,
+ *   ROUTES.AUTH_FORGOT_PASSWORD, ROUTES.AUTH_RESET_PASSWORD,
+ * ] as const
+ */
+
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { ROUTES, PROTECTED_ROUTES } from '@/lib/constants/routes'
