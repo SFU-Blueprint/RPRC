@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/lib/fonts';
 import Link from 'next/link';
 
 export default function ForgotPasswordPage() {

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
-import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/lib/fonts';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { exchangeCodeForSession } from '@/lib/api/services/auth-service';

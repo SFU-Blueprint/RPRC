@@ -1,7 +1,7 @@
 import React from 'react'
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { robotoCondensed } from '@/app/fonts';
+import { robotoCondensed } from '@/lib/fonts';
 import { ApplicationStatus } from '@/lib/constants/enums';
 
 const isApproved = (result: ApplicationStatus) =>

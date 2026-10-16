@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { SignUpFormData, ValidationErrors } from '@/types/signup';
-import { SIGNUP_INITIAL } from '@/app/membership/signup/const';
+import { SIGNUP_INITIAL } from '@/lib/constants/signup';
 
 /**
  * Context type definition

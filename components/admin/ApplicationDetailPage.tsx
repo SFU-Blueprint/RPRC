@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { inter, robotoCondensed } from '@/app/fonts';
+import { inter, robotoCondensed } from '@/lib/fonts';
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { APPLICATION_DETAILS_CONST, MOBILE_TABS } from '@/lib/constants/admin';
 import { ApplicationStatus } from '@/lib/constants/enums';
@@ -16,7 +16,7 @@ import SubmitReview from './application/SubmitReview';
 import ApplicationResult from './application/ApplicationResult';
 import ReviewHistory from './application/ReviewHistory';
 import { useIsMobile } from '@/lib/hooks/useIsMobile';
-import { headerStyles } from '@/app/fonts';
+import { headerStyles } from '@/lib/fonts';
 import { useState } from 'react';
 import ApplicationDetailMobileTabs from './application/ApplicationDetailMobileTabs';
 

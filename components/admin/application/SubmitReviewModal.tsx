@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { robotoCondensed } from '@/app/fonts';
+import { robotoCondensed } from '@/lib/fonts';
 import type { ReviewHistoryItem } from '@/types/admin.types';
 import { CONFIRM_REVIEW_TEXT } from '@/lib/constants/admin';
 import { ReviewDecision } from '@/lib/constants';

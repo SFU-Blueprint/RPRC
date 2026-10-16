@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { inter, robotoCondensed } from '@/app/fonts';
+import { inter, robotoCondensed } from '@/lib/fonts';
 import {
   AdminSearchBar,
   AdminDashboardTable,

@@ -1,6 +1,6 @@
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { AdminSection } from './AdminSection';
-import { robotoCondensed } from '@/app/fonts';
+import { robotoCondensed } from '@/lib/fonts';
 import { Clock } from 'lucide-react';
 import type { ReviewHistoryItem } from '@/types/admin.types';
 import AdminReview from './AdminReview';

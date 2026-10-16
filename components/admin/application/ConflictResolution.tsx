@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle } from 'lucide-react';
 
-import { inter, robotoCondensed } from '@/app/fonts';
+import { inter, robotoCondensed } from '@/lib/fonts';
 import { BackdropContainer } from '@/components/admin/layout/BackdropContainer';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';

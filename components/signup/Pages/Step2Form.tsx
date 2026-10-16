@@ -5,7 +5,7 @@ import '@/app/globals.css';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
-import { inter, robotoCondensed, headerStyles } from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles } from '@/lib/fonts';
 import { validateStep2, hasErrors } from '@/lib/api/helpers/signup-validation';
 import { ConfirmationModal } from '@/components/signup/layout/ConfirmationModal';
 import { ContactInfoIndividual } from '../domain/ContactInfoIndividual';

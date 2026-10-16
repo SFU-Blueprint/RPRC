@@ -4,11 +4,17 @@ import { usePathname } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 
 type RootNavbarProps = {
-  initialUser: {
+  initialUser?: {
     isAuthenticated: boolean;
     displayName: string;
     avatarHref: string;
   };
+};
+
+const PUBLIC_USER = {
+  isAuthenticated: false,
+  displayName: '',
+  avatarHref: '/',
 };
 
 export function RootNavbar({ initialUser }: RootNavbarProps) {
@@ -18,5 +24,5 @@ export function RootNavbar({ initialUser }: RootNavbarProps) {
     return null;
   }
 
-  return <Navbar initialUser={initialUser} />;
+  return <Navbar initialUser={PUBLIC_USER} />;
 }

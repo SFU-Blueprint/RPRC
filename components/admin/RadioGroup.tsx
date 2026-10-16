@@ -1,4 +1,4 @@
-import { inter } from '@/app/fonts';
+import { inter } from '@/lib/fonts';
 
 type Option = {
   label: string;

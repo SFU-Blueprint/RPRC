@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
-import { subheaderStyles, bodyStyles } from '@/app/fonts';
+import { subheaderStyles, bodyStyles } from '@/lib/fonts';
 import { ROUTES } from '@/lib/constants/routes';
 import { login } from '@/app/actions/auth';
 import { AuthErrorCode } from '@/lib/constants/error-types';

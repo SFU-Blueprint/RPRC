@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { inter, robotoCondensed, headerStyles, bodyStyles, buttonStyles, subheaderStyles } from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles, bodyStyles, buttonStyles, subheaderStyles } from '@/lib/fonts';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Spinner } from '@/components/ui/spinner';
 import { Info, Mail, MapPin, Phone, User } from 'lucide-react';

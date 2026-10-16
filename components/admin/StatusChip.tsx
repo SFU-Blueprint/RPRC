@@ -1,4 +1,4 @@
-import { inter } from '@/app/fonts';
+import { inter } from '@/lib/fonts';
 import { ApplicationStatus, ReviewDecision } from '@/lib/constants';
 import { STATUS_CHIPS } from '@/lib/constants/admin';
 

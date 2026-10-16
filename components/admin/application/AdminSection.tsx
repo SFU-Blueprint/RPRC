@@ -1,4 +1,4 @@
-import { inter, robotoCondensed } from '@/app/fonts';
+import { inter, robotoCondensed } from '@/lib/fonts';
 
 type AdminSectionProps = {
   title: string;

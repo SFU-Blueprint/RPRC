@@ -13,7 +13,7 @@ import {
   headerStyles,
   bodyStyles,
   buttonStyles,
-} from '@/app/fonts';
+} from '@/lib/fonts';
 import { validateStep1, hasErrors } from '@/lib/api/helpers/signup-validation';
 import { PasswordInput } from '../inputs/PasswordInput';
 import { MembershipInfoCard } from '../cards/MembershipInfoCard';

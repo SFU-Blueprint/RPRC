@@ -8,7 +8,7 @@ import {
   headerStyles,
   bodyStyles,
   buttonStyles,
-} from '@/app/fonts';
+} from '@/lib/fonts';
 import { SuccessInfoCard } from '../cards/SuccessInfoCard';
 import { INFO_CARDS } from '@/lib/constants/membership';
 

@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorType, ERROR_MESSAGES, type ErrorTypeValue } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
-import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/lib/fonts';
 import { AlertCircle } from 'lucide-react';
 
 function ErrorContent() {

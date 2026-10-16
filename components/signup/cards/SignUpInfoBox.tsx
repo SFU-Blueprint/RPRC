@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { inter, robotoCondensed, bodyStyles } from '@/app/fonts';
+import { inter, robotoCondensed, bodyStyles } from '@/lib/fonts';
 import '@/app/globals.css';
 export function SignUpInfoBox() {
   return (

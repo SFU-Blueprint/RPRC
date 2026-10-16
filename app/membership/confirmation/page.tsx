@@ -2,8 +2,8 @@
 
 import { SignUpProvider } from '@/lib/contexts/SignUpContext';
 import { ProgressIndicator } from '@/components/signup/layout/ProgressIndicator';
-import { SIGNUP_STEPS } from '../signup/const';
-import { inter } from '@/app/fonts';
+import { SIGNUP_STEPS } from '@/lib/constants/signup';
+import { inter } from '@/lib/fonts';
 import { Step3Success } from '@/components/signup/Pages/Step3Success';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Spinner } from '@/components/ui/spinner';

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { SignUpProvider, useSignUp } from '@/lib/contexts/SignUpContext';
-import { inter } from '@/app/fonts';
+import { inter } from '@/lib/fonts';
 import { Step2Form } from '@/components/signup/Pages/Step2Form';
 import { Step3Success } from '@/components/signup/Pages/Step3Success';
 import { useAuth } from '@/lib/contexts/AuthContext';

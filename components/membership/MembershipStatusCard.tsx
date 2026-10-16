@@ -1,6 +1,6 @@
 'use client';
 
-import { robotoCondensed, subheaderStyles, bodyStyles } from '@/app/fonts';
+import { robotoCondensed, subheaderStyles, bodyStyles } from '@/lib/fonts';
 import Link from 'next/link';
 import {
     MEMBERSHIP_STATUS_DESCRIPTION_TEXT,

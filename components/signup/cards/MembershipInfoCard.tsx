@@ -1,6 +1,6 @@
 'use client';
 
-import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
+import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/lib/fonts';
 
 type MembershipInfoCardProps = {
   title: string;

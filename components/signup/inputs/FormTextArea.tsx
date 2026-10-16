@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { AlertCircle } from 'lucide-react';
-import { robotoCondensed, headerStyles } from '@/app/fonts';
+import { robotoCondensed, headerStyles } from '@/lib/fonts';
 
 type FormTextAreaProps = {
   label: string;

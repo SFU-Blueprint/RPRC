@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { InterestCard } from './InterestCard';
-import { robotoCondensed, headerStyles } from '@/app/fonts';
+import { robotoCondensed, headerStyles } from '@/lib/fonts';
 import {
   getMembershipInterests,
   type MembershipInterestItem,

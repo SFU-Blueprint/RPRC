@@ -2,8 +2,8 @@
 
 import { SignUpProvider, useSignUp } from '@/lib/contexts/SignUpContext';
 import { ProgressIndicator } from '@/components/signup/layout/ProgressIndicator';
-import { SIGNUP_STEPS } from '../signup/const';
-import { inter } from '@/app/fonts';
+import { SIGNUP_STEPS } from '@/lib/constants/signup';
+import { inter } from '@/lib/fonts';
 import { Step2Form } from '@/components/signup/Pages/Step2Form';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { useEffect } from 'react';
