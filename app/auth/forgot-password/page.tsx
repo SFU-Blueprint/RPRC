@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { forgotPassword } from '@/app/actions/auth';
-import { AuthErrorCode } from '@/lib/constants/error-types';
+// import { forgotPassword } from '@/app/actions/auth'; // backend call is disabled for this local demo
+import { AuthErrorCode, type ForgotPasswordResponse } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,18 +36,22 @@ export default function ForgotPasswordPage() {
       const formDataObj = new FormData();
       formDataObj.append('email', email);
 
-      const result = await forgotPassword(formDataObj);
+      // const result = await forgotPassword(formDataObj);
+      const result = await Promise.resolve<ForgotPasswordResponse>({
+        success: true,
+        message: 'Demo only: no reset email was sent.',
+      });
 
       if ('error' in result) {
         console.error('Resend error:', result.error, 'Code:', result.code);
-        
+
         if (result.code === AuthErrorCode.RATE_LIMITED) {
           alert(result.error);
         } else {
           alert('Failed to resend email. Please try again or contact support.');
         }
       } else {
-        console.log('Password reset email resent successfully');
+        console.log('Demo reset request repeated; no email was sent');
         setResendCountdown(60);
       }
     } catch (error) {
@@ -66,7 +70,11 @@ export default function ForgotPasswordPage() {
     const formData = new FormData();
     formData.append('email', email);
 
-    const result = await forgotPassword(formData);
+    // const result = await forgotPassword(formData);
+    const result = await Promise.resolve<ForgotPasswordResponse>({
+      success: true,
+      message: 'Demo only: no reset email was sent.',
+    });
 
     if ('error' in result) {
       setError(result.error);
@@ -86,21 +94,21 @@ export default function ForgotPasswordPage() {
           <h2
             className={`text-gray-900 mb-6 text-center ${headerStyles.lResponsive} ${robotoCondensed.className}`}
           >
-            Check your email
+            Reset request preview
           </h2>
           <div className="space-y-4">
             <p className={`text-gray-700 ${bodyStyles.m}`}>
-              We&apos;ve sent a password reset link to:
+              Demo reset request prepared for:
             </p>
             <p className={`font-semibold text-gray-900 ${bodyStyles.m}`}>
               {email}
             </p>
             <p className={`text-gray-700 ${bodyStyles.m}`}>
-              Please click the link in the email to reset your password.
+              This local demo did not send an email or create a reset link.
             </p>
             <Alert variant="info" className="mt-6">
               <AlertDescription>
-                <strong>Note:</strong> The link will expire in 24 hours. If you don&apos;t see the email, check your spam folder.
+                <strong>Note:</strong> No real email was sent; the resend control only previews the countdown.
               </AlertDescription>
             </Alert>
 
@@ -115,8 +123,8 @@ export default function ForgotPasswordPage() {
                 {isResending
                   ? 'Resending...'
                   : resendCountdown > 0
-                  ? `Resend email in ${resendCountdown}s`
-                  : 'Resend email'}
+                  ? `Preview resend request in ${resendCountdown}s`
+                  : 'Preview resend request'}
               </Button>
               {resendCountdown === 0 && !isResending && (
                 <p className="text-sm text-muted-foreground">
@@ -181,7 +189,7 @@ export default function ForgotPasswordPage() {
             size="md"
             className="w-full"
           >
-            {isSubmitting ? 'Sending...' : 'Send reset link'}
+            {isSubmitting ? 'Sending...' : 'Preview reset request'}
           </Button>
 
           <div className="text-center">

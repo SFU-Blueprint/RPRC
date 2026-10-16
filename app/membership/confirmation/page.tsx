@@ -5,20 +5,8 @@ import { ProgressIndicator } from '@/components/signup/layout/ProgressIndicator'
 import { SIGNUP_STEPS } from '@/lib/constants/signup';
 import { inter } from '@/lib/fonts';
 import { Step3Success } from '@/components/signup/Pages/Step3Success';
-import { useAuth } from '@/lib/contexts/AuthContext';
-import { Spinner } from '@/components/ui/spinner';
 
 function MembershipFormConfirmation() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner className="size-6 text-gray-600" />
-      </div>
-    );
-  }
-
   return (
     <div className={inter.className}>
       {/* Progress Indicator */}

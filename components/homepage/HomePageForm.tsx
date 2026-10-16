@@ -7,10 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
-import { subheaderStyles, bodyStyles } from '@/lib/fonts';
+import { subheaderStyles } from '@/lib/fonts';
 import { ROUTES } from '@/lib/constants/routes';
-import { login } from '@/app/actions/auth';
-import { AuthErrorCode } from '@/lib/constants/error-types';
+import { AuthErrorCode, type LoginResponse } from '@/lib/constants/error-types';
 
 export const HomePageForm = () => {
   const [formData, setFormData] = useState({
@@ -30,21 +29,21 @@ export const HomePageForm = () => {
       formDataObj.append('email', formData.email);
       formDataObj.append('password', formData.password);
 
-      const result = await login(formDataObj);
+      // const result = await login(formDataObj);
+      const result: LoginResponse = {
+        error: 'Demo sign-in is disabled; no session was created.',
+        code: AuthErrorCode.INVALID_CREDENTIALS,
+      };
 
       if ('error' in result) {
-        console.error('Login error:', result.error, 'Code:', result.code);
-
-        // Show user-friendly error messages
         if (result.code === AuthErrorCode.INVALID_CREDENTIALS) {
-          setError('Invalid email or password. Please try again.');
+          setError('Sign-in is unavailable in this local demo.');
         } else if (result.code === AuthErrorCode.VALIDATION_ERROR) {
           setError('Please enter both email and password.');
         } else {
           setError(result.error || 'Failed to sign in. Please try again.');
         }
       }
-      // Success case handled by server action (redirects to dashboard)
     } catch (error) {
       if (
         error &&
@@ -54,7 +53,6 @@ export const HomePageForm = () => {
       ) {
         throw error;
       }
-      console.error('Unexpected error during login:', error);
       setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);

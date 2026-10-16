@@ -1,31 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useSignUp } from '@/lib/contexts/SignUpContext';
 import { InterestCard } from './InterestCard';
 import { robotoCondensed, headerStyles } from '@/lib/fonts';
-import {
-  getMembershipInterests,
-  type MembershipInterestItem,
-} from '@/lib/api/services/application-service';
-
+import { MEMBERSHIP_INTERESTS } from '@/lib/mock-data/membership-interests';
 export function MembershipInterests() {
   const { formData, updateFormData } = useSignUp();
-  const [membershipInterests, setMembershipInterests] = useState<
-    MembershipInterestItem[]
-  >([]);
-
-  useEffect(() => {
-    const fetchInterests = async () => {
-      try {
-        const data = await getMembershipInterests();
-        setMembershipInterests(data);
-      } catch (error) {
-        console.error('Error fetching interests:', error);
-      }
-    };
-    fetchInterests();
-  }, []);
+  const membershipInterests = MEMBERSHIP_INTERESTS;
 
   const toggleInterest = (interest: string) => {
     const currentInterests = formData.interests || [];

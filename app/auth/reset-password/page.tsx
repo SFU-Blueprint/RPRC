@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { resetPassword } from '@/app/actions/auth';
-import { AuthErrorCode, ErrorType } from '@/lib/constants/error-types';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -10,107 +9,100 @@ import { Spinner } from '@/components/ui/spinner';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/lib/fonts';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { exchangeCodeForSession } from '@/lib/api/services/auth-service';
+import { AuthErrorCode, type ResetPasswordResponse } from '@/lib/constants/error-types';
+// import { exchangeCodeForSession } from '@/lib/api/services/auth-service';
 
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [notice, setNotice] = useState('');
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Exchange code for session on mount
   useEffect(() => {
     const verifyResetLink = async () => {
-      // Check for Supabase error parameters in URL
       const urlError = searchParams.get('error');
       const errorCode = searchParams.get('error_code');
 
       if (urlError) {
-        console.error('Supabase error in URL, redirecting to error page');
-
-        // Redirect to error page with appropriate error type
         if (errorCode === 'otp_expired') {
-          router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_EXPIRED}`);
+          // router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_EXPIRED}`);
+          setNotice(
+            'This demo reset link has expired. Error page routing is disabled in this preview.',
+          );
         } else {
-          router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`);
+          // router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`);
+          setNotice(
+            'This demo reset link is invalid. Error page routing is disabled in this preview.',
+          );
         }
+        setIsLoading(false);
         return;
       }
 
       const code = searchParams.get('code');
 
       if (!code) {
-        console.error('No code provided in URL, redirecting to error page');
-        router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`);
+        // router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`);
+        setNotice(
+          'No reset code was provided. Error page routing is disabled in this preview.',
+        );
+        setIsLoading(false);
         return;
       }
 
-      const { error: exchangeError } = await exchangeCodeForSession(code);
+      // const { error: exchangeError } = await exchangeCodeForSession(code);
+      const { error: exchangeError } = await Promise.resolve<{
+        error: string | null;
+      }>({ error: null });
 
       if (exchangeError) {
-        console.error('Error exchanging code for session, redirecting to error page');
-        router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`);
+        // router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`);
+        setNotice(
+          'This demo reset link could not be verified. Error page routing is disabled in this preview.',
+        );
+        setIsLoading(false);
         return;
       }
 
+      setNotice('Demo reset link verified locally; no backend session was created.');
       setIsLoading(false);
     };
 
-    verifyResetLink();
+    void verifyResetLink();
   }, [searchParams, router]);
-
-  const validatePasswords = () => {
-    let isValid = true;
-
-    // Client-side validation is handled by PasswordInput component
-    // Just check if passwords match
-    if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
-      isValid = false;
-    } else {
-      setConfirmPasswordError('');
-    }
-
-    return isValid;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setHasAttemptedSubmit(true);
-    setIsSubmitting(true);
-    setError('');
-
-    if (!validatePasswords()) {
-      setIsSubmitting(false);
+    if (password !== confirmPassword) {
+      setConfirmPasswordError('Passwords do not match');
       return;
     }
+    setConfirmPasswordError('');
 
     const formData = new FormData();
     formData.append('password', password);
-
-    const result = await resetPassword(formData);
-
+    // const result = await resetPassword(formData);
+    const result = await Promise.resolve<ResetPasswordResponse>({
+      success: true,
+      message: 'Demo only: no account password was changed.',
+    });
     if ('error' in result) {
       if (result.code === AuthErrorCode.WEAK_PASSWORD) {
         setPasswordError(result.error);
       } else {
-        setError(result.error);
+        setNotice(result.error);
       }
-      setIsSubmitting(false);
     } else {
-      // Success - redirect to home with success message
-      router.push(`${ROUTES.HOME}?password_reset=success`);
+      setNotice(result.message);
     }
   };
 
-  // Loading state while exchanging code
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 py-8">
@@ -140,19 +132,15 @@ function ResetPasswordForm() {
         >
           Set new password
         </h2>
-
         <p className={`text-gray-700 mb-6 text-center ${bodyStyles.m}`}>
-          Enter your new password below.
+          Preview the password reset form.
         </p>
-
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertDescription>{error}</AlertDescription>
+        {notice && (
+          <Alert variant="info" className="mb-6">
+            <AlertDescription>{notice}</AlertDescription>
           </Alert>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Password with validation */}
           <PasswordInput
             label="New Password"
             value={password}
@@ -164,10 +152,8 @@ function ResetPasswordForm() {
             }}
             placeholder="Enter your new password"
             required
-            showRequirements={true}
+            showRequirements
           />
-
-          {/* Confirm Password */}
           <PasswordInput
             label="Confirm New Password"
             value={confirmPassword}
@@ -181,16 +167,14 @@ function ResetPasswordForm() {
             required
             showRequirements={false}
           />
-
           <Button
             type="submit"
-            disabled={isSubmitting || !password || !confirmPassword}
+            disabled={!password || !confirmPassword}
             size="lg"
             className="w-full"
           >
-            {isSubmitting ? 'Resetting password...' : 'Reset password'}
+            Preview password change
           </Button>
-
           <div className="text-center">
             <Link
               href={ROUTES.HOME}
@@ -207,11 +191,13 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <React.Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner className="size-6 text-gray-600" />
-      </div>
-    }>
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Spinner className="size-6 text-gray-600" />
+        </div>
+      }
+    >
       <ResetPasswordForm />
     </React.Suspense>
   );

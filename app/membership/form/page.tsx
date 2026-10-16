@@ -1,33 +1,12 @@
 'use client';
 
-import { SignUpProvider, useSignUp } from '@/lib/contexts/SignUpContext';
+import { SignUpProvider } from '@/lib/contexts/SignUpContext';
 import { ProgressIndicator } from '@/components/signup/layout/ProgressIndicator';
 import { SIGNUP_STEPS } from '@/lib/constants/signup';
 import { inter } from '@/lib/fonts';
 import { Step2Form } from '@/components/signup/Pages/Step2Form';
-import { useAuth } from '@/lib/contexts/AuthContext';
-import { useEffect } from 'react';
-import { Spinner } from '@/components/ui/spinner';
 
 function MembershipFormContent() {
-  const { user, loading } = useAuth();
-  const { updateFormData, formData } = useSignUp();
-
-  // Preset email when user is loaded
-  useEffect(() => {
-    if (user?.email && !formData.email) {
-      updateFormData({ email: user.email });
-    }
-  }, [user, formData.email, updateFormData]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner className="size-6 text-gray-600" />
-      </div>
-    );
-  }
-
   return (
     <div className={inter.className}>
       {/* Progress Indicator */}

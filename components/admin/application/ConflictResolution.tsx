@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AlertTriangle } from 'lucide-react';
 
 import { inter, robotoCondensed } from '@/lib/fonts';
@@ -10,11 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-import { submitApplicationReview } from '@/app/actions/application';
 import { ReviewDecision } from '@/lib/constants/enums';
 import type { ReviewHistoryItem } from '@/types/admin.types';
 
 import SubmitReviewModal from './SubmitReviewModal';
+import { toast } from 'sonner';
 
 type ConflictResolutionProps = {
   appId: string;
@@ -22,12 +21,10 @@ type ConflictResolutionProps = {
 };
 
 export default function ConflictResolution({ appId, reviewHistory }: ConflictResolutionProps) {
-  const router = useRouter();
 
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   const approvalCount = reviewHistory.filter(r => r.decision === ReviewDecision.APPROVE).length;
@@ -36,33 +33,33 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
   const isFormValid = Boolean(decision && reason.trim());
 
   const handleConfirmSubmit = async () => {
-    if (!isFormValid || isSubmitting) return;
-
-    setIsSubmitting(true);
+    if (!isFormValid) return;
     setSubmitError('');
 
-    const result = await submitApplicationReview({
-      appId,
-      reviewerName: 'Board Admin',
-      reviewDate: new Date().toISOString().slice(0, 10),
-      decision: decision as ReviewDecision,
-      reason,
+    // const result = await submitApplicationReview({
+    //   appId,
+    //   reviewerName: 'Board Admin',
+    //   reviewDate: new Date().toISOString().slice(0, 10),
+    //   decision: decision as ReviewDecision,
+    //   reason,
+    // });
+    const result = await Promise.resolve<
+      { success: true; reviewId: string } | { success: false; error: string }
+    >({
+      success: true,
+      reviewId: 'demo-review-id',
     });
-
-    setIsSubmitting(false);
 
     if (!result.success) {
       setIsModalOpen(false);
-      setSubmitError(result.error ?? 'Failed to submit review');
+      setSubmitError(result.error || 'Failed to submit review');
       return;
     }
 
     setDecision('');
     setReason('');
-    setSubmitError('');
     setIsModalOpen(false);
-
-    router.refresh();
+    toast.info('Demo only: this review was not saved.');
   };
 
   return (
@@ -142,10 +139,10 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
         <Button
           type="button"
           onClick={() => setIsModalOpen(true)}
-          disabled={!isFormValid || isSubmitting}
+          disabled={!isFormValid}
           className="bg-primary hover:bg-primary/90 cursor-pointer w-full"
         >
-          {isSubmitting ? 'Submitting…' : 'Submit Review'}
+          Preview Final Decision
         </Button>
       </div>
 
@@ -155,7 +152,7 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
         action={decision as ReviewDecision}
         setModalOpen={setIsModalOpen}
         onConfirm={handleConfirmSubmit}
-        isSubmitting={isSubmitting}
+        isSubmitting={false}
       />
     </BackdropContainer>
   );
