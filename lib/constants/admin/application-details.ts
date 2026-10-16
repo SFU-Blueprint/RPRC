@@ -1,3 +1,17 @@
+// Keep these exports available for legacy callers while storing mock records in the lib catalog.
+export {
+  APPLICATIONS_MOCK,
+  USERS_MOCK,
+  USER_ADDRESSES_MOCK,
+  INDIVIDUAL_PROFILES_MOCK,
+  INDIVIDUAL_APPLICATION_DETAILS_MOCK,
+  REVIEW_HISTORY_MOCK_ONE_APPROVAL,
+  REVIEW_HISTORY_MOCK_ONE_REJECT,
+  REVIEW_HISTORY_MOCK_CONFLICT,
+  REVIEW_HISTORY_MOCK_APPROVAL,
+  REVIEW_HISTORY_MOCK_NO_APPROVAL,
+} from '@/lib/mock-data/admin-application-records';
+
 export const APPLICATION_DETAIL_ICON_SIZES = {
   LARGE: 30,
   MEDIUM: 25,

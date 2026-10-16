@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
 import { subheaderStyles } from '@/app/fonts';
 import { ROUTES } from '@/lib/constants/routes';
+import { AuthErrorCode, type LoginResponse } from '@/lib/constants/error-types';
 
 export const HomePageForm = () => {
   const [formData, setFormData] = useState({
@@ -18,9 +19,44 @@ export const HomePageForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('Sign in is unavailable while the membership backend is disabled.');
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('email', formData.email);
+      formDataObj.append('password', formData.password);
+
+      // const result = await login(formDataObj);
+      const result: LoginResponse = {
+        error: 'Demo sign-in is disabled; no session was created.',
+        code: AuthErrorCode.INVALID_CREDENTIALS,
+      };
+
+      if ('error' in result) {
+        if (result.code === AuthErrorCode.INVALID_CREDENTIALS) {
+          setError('Sign-in is unavailable in this local demo.');
+        } else if (result.code === AuthErrorCode.VALIDATION_ERROR) {
+          setError('Please enter both email and password.');
+        } else {
+          setError(result.error || 'Failed to sign in. Please try again.');
+        }
+      }
+    } catch (error) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'digest' in error &&
+        String((error as { digest?: string }).digest).startsWith('NEXT_REDIRECT')
+      ) {
+        throw error;
+      }
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

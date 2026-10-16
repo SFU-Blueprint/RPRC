@@ -29,6 +29,7 @@ export function Step2Form() {
     goToNextStep,
   } = useSignUp();
 
+  // const userRole = await getUserRoleById(user.id);
   const userRole = formData.membershipType;
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -44,7 +45,27 @@ export function Step2Form() {
     setShowConfirmModal(true);
   };
 
-  const handleConfirmSubmit = () => {
+  const handleConfirmSubmit = async () => {
+    const formDataObj = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        formDataObj.append(key, JSON.stringify(value));
+      } else if (value !== undefined && value !== null) {
+        formDataObj.append(key, String(value));
+      }
+    });
+
+    // const result = await (isIndividual ? submitIndividualApplication : submitOrganizationApplication)(formDataObj);
+    const result = await Promise.resolve<
+      { success: true } | { success: false; error: string }
+    >({ success: true });
+    if (!result.success) {
+      toast.error('Failed to submit your application, please try again', {
+        description: `Error: ${result.error}`,
+      });
+      return;
+    }
+
     setShowConfirmModal(false);
     toast.success('Demo application submitted. No data was saved.');
     goToNextStep();

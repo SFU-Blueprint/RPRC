@@ -18,7 +18,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <RootNavbar />
         {children}
-        <Toaster position="top-center" richColors toastOptions={{ className: 'text-destructive border-destructive' }} />
+        <Toaster
+          position="top-center"
+          richColors
+          toastOptions={{
+            className: 'text-destructive border-destructive',
+          }}
+        />
       </body>
     </html>
   );

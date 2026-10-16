@@ -32,7 +32,32 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
 
   const isFormValid = Boolean(decision && reason.trim());
 
-  const handleConfirmSubmit = () => {
+  const handleConfirmSubmit = async () => {
+    if (!isFormValid) return;
+    setSubmitError('');
+
+    // const result = await submitApplicationReview({
+    //   appId,
+    //   reviewerName: 'Board Admin',
+    //   reviewDate: new Date().toISOString().slice(0, 10),
+    //   decision: decision as ReviewDecision,
+    //   reason,
+    // });
+    const result = await Promise.resolve<
+      { success: true; reviewId: string } | { success: false; error: string }
+    >({
+      success: true,
+      reviewId: 'demo-review-id',
+    });
+
+    if (!result.success) {
+      setIsModalOpen(false);
+      setSubmitError(result.error || 'Failed to submit review');
+      return;
+    }
+
+    setDecision('');
+    setReason('');
     setIsModalOpen(false);
     toast.info('Demo only: this review was not saved.');
   };

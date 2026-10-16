@@ -5,16 +5,31 @@ import { Clock } from 'lucide-react';
 import type { ReviewHistoryItem } from '@/types/admin.types';
 import AdminReview from './AdminReview';
 
-export default function ReviewHistory({ reviewHistory, isMobile }: { reviewHistory: ReviewHistoryItem[], isMobile: boolean }) {
+type ReviewHistoryProps = {
+  reviewHistory: ReviewHistoryItem[];
+  isMobile: boolean;
+};
 
+export default function ReviewHistory({
+  reviewHistory,
+  isMobile,
+}: ReviewHistoryProps) {
   return (
-    <BackdropContainer className={`bg-signup-neutral-50 shadow-card p-4 text w-full ${isMobile ? '' : 'mt-12'}`} >
-      <p className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}>Review History</p>
+    <BackdropContainer
+      className={`bg-signup-neutral-50 shadow-card p-4 text w-full ${isMobile ? '' : 'mt-12'}`}
+    >
+      <p
+        className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}
+      >
+        Review History
+      </p>
       {reviewHistory.length === 0 && (
         <BackdropContainer className="bg-signup-neutral-50 border border-application-detail-border-50 shadow-none mt-8">
           <div className="flex flex-col items-center gap-y-5">
             <Clock size={48} className="text-application-detail-text-secondary" />
-            <p className="text-application-detail-text-secondary">No Recent Reviews...</p>
+            <p className="text-application-detail-text-secondary">
+              No Recent Reviews...
+            </p>
           </div>
         </BackdropContainer>
       )}

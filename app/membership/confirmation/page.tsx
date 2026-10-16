@@ -7,7 +7,6 @@ import { inter } from '@/app/fonts';
 import { Step3Success } from '@/components/signup/Pages/Step3Success';
 
 function MembershipFormConfirmation() {
-
   return (
     <div className={inter.className}>
       {/* Progress Indicator */}

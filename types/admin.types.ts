@@ -1,4 +1,8 @@
-import type { ApplicationStatus, ApplicationType as MembershipApplicationType, ReviewDecision } from '@/lib/constants/enums';
+import type {
+  ApplicationStatus,
+  ApplicationType as MembershipApplicationType,
+  ReviewDecision,
+} from '@/lib/constants/enums';
 
 /** Config for one status chip: color, label, and theme (ApplicationStatus or ReviewDecision). */
 export type StatusChipType = {
@@ -19,8 +23,14 @@ export type ApplicationRow = {
 /** Result of: from('users').select('id, individual_profiles(name), organization_profiles(org_name)') */
 export type UserWithProfilesRow = {
   id: string;
-  individual_profiles: { name: string } | { name: string }[] | null;
-  organization_profiles: { org_name: string } | { org_name: string }[] | null;
+  individual_profiles:
+    | { name: string }
+    | { name: string }[]
+    | null;
+  organization_profiles:
+    | { org_name: string }
+    | { org_name: string }[]
+    | null;
 };
 
 /** Result of: from('application_reviews').select('application_id, reviewer_name, created_at') */
@@ -30,8 +40,11 @@ export type ReviewRow = {
   created_at: string;
 };
 
-/** First two reviewers per application (by created_at), used when mapping to ApplicationType */
-export type ReviewerPair = { reviewer1: string; reviewer2: string };
+/** First two reviewers per application (by created_at), used when mapping to ApplicationType. */
+export type ReviewerPair = {
+  reviewer1: string;
+  reviewer2: string;
+};
 
 export type ColumnType = {
   label: string;
@@ -118,8 +131,8 @@ export type ReviewHistoryItem = {
   decision: ReviewDecision;
   reason: string;
   created_at: string;
-  waiver_decision: ReviewDecision | null;
-  waiver_note: string | null;
+  waiver_decision?: ReviewDecision | null;
+  waiver_note?: string | null;
 };
 
 export type AdminApplicationPageData = {
