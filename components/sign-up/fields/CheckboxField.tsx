@@ -15,6 +15,14 @@ import type { BaseFieldProps } from '@/types/sign-up-fields.types';
 
 import { RequiredMarker } from './FormFieldShell';
 
+type CheckboxFieldProps<T extends FieldValues, TTransformed> = BaseFieldProps<
+  T,
+  TTransformed
+> & {
+  /** Extra hook for dependent fields, e.g. clearing a reason when unticked. */
+  onValueChange?: (checked: boolean) => void;
+};
+
 /** A single checkbox bound to a `boolean` value. */
 export function CheckboxField<T extends FieldValues, TTransformed = T>({
   control,
@@ -23,7 +31,8 @@ export function CheckboxField<T extends FieldValues, TTransformed = T>({
   description,
   required,
   className,
-}: BaseFieldProps<T, TTransformed>) {
+  onValueChange,
+}: CheckboxFieldProps<T, TTransformed>) {
   const ids = getFieldIds(name);
 
   return (
@@ -41,7 +50,10 @@ export function CheckboxField<T extends FieldValues, TTransformed = T>({
             name={field.name}
             ref={field.ref}
             checked={field.value === true}
-            onCheckedChange={(checked) => field.onChange(checked === true)}
+            onCheckedChange={(checked) => {
+              field.onChange(checked === true);
+              onValueChange?.(checked === true);
+            }}
             onBlur={field.onBlur}
             disabled={field.disabled}
             aria-required={required}

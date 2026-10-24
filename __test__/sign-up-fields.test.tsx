@@ -1,7 +1,6 @@
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import {
   act,
-  cleanup,
   fireEvent,
   render,
   screen,
@@ -26,15 +25,6 @@ import {
   organizationSchema,
   PHONE_TYPES,
 } from '@/lib/schema';
-
-// jsdom has no ResizeObserver; Radix (checkbox, radio) needs one to mount.
-globalThis.ResizeObserver ??= class {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-};
-
-afterEach(cleanup);
 
 const toOptions = (values: readonly string[]) =>
   values.map((value) => ({ value, label: value }));
