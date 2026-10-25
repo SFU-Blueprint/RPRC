@@ -1,14 +1,9 @@
-import React from 'react';
 import { User, Mail, MapPin, Phone } from 'lucide-react';
-import { robotoCondensed, bodyStyles, buttonStyles, subheaderStyles } from '@/lib/fonts';
+import { bodyStyles, buttonStyles, subheaderStyles } from '@/lib/fonts';
+import { getMembershipInterestLabel } from '@/lib/mock-data/membership-interests';
 import type { OrganizationMemberDashboardData } from '@/types/membership.types';
 
-type Props = {
-    data: OrganizationMemberDashboardData | null;
-    onEdit?: () => void;
-};
-
-export default function OrganizationProfile({ data, onEdit }: Props) {
+export default function OrganizationProfile({ data }: { data: OrganizationMemberDashboardData | null }) {
     if (!data) return null;
 
     return (
@@ -57,7 +52,7 @@ export default function OrganizationProfile({ data, onEdit }: Props) {
                             key={idx}
                             className={`${buttonStyles.textSmall} text-content-secondary rounded-4xl border p-3 px-6 border-content-secondary`}
                         >
-                            {interest}
+                            {getMembershipInterestLabel(interest)}
                         </p>
                     ))}
                 </div>

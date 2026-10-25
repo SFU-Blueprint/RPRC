@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo } from 'react';
+import { Controller, useForm, useWatch, type FieldErrors, type SubmitErrorHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { State } from 'country-state-city';
 import { InterestCard } from '@/components/signup/cards/InterestCard';
 import { FormInput } from '@/components/signup/inputs/FormInput';
@@ -11,26 +13,10 @@ import { PhoneInput } from '@/components/signup/inputs/PhoneInput';
 import { COUNTRIES } from '@/lib/constants/signup';
 import { bodyStyles, headerStyles, inter, robotoCondensed } from '@/lib/fonts';
 import { MEMBERSHIP_INTERESTS } from '@/lib/mock-data';
-import { hasErrors, validateStep2 } from '@/lib/api/helpers/signup-validation';
-import { scrollToFirstError } from '@/lib/utils';
-import type { MemberDashboardData } from '@/types/membership.types';
-import type { ValidationErrors } from '@/types/signup';
+import { memberProfileEditSchema, type MemberProfileEditInput, type MemberProfileEditValues } from '@/lib/schema/member-profile-edit.schema';
+import type { MemberDashboardData, OrganizationMemberDashboardData } from '@/types/membership.types';
 
-export type MembershipProfileEditValues = {
-  name: string;
-  phone: string;
-  phoneType: 'home' | 'cell';
-  mailingAddress: string;
-  city: string;
-  province: string;
-  country: string;
-  postalCode: string;
-  interests: string[];
-  reason: string;
-  representativeName?: string;
-  representativeEmail?: string;
-  servicesOffered?: string | null;
-};
+export type MembershipProfileEditValues = MemberProfileEditValues;
 
 type Props = {
   data: MemberDashboardData;
@@ -40,7 +26,8 @@ type Props = {
   onDirtyChange?: (isDirty: boolean) => void;
 };
 
-const normalize = (value: string) => value.trim();
+const normalize = (value?: string | null) => (value ?? '').trim();
+const phoneDigits = (value?: string | null) => (value ?? '').replace(/\D/g, '');
 
 const sameInterests = (first: string[], second: string[]) => {
   const normalizeList = (items: string[]) => items.map(normalize).filter(Boolean).sort();
@@ -48,6 +35,32 @@ const sameInterests = (first: string[], second: string[]) => {
   const secondList = normalizeList(second);
 
   return firstList.length === secondList.length && firstList.every((item, index) => item === secondList[index]);
+};
+
+function findFirstErrorPath(errors: FieldErrors<MemberProfileEditInput>, parent = ''): string | undefined {
+  for (const [key, value] of Object.entries(errors)) {
+    if (!value || typeof value !== 'object') continue;
+    const path = parent ? `${parent}.${key}` : key;
+    if ('message' in value && typeof value.message === 'string') return path;
+    const nestedPath = findFirstErrorPath(value as FieldErrors<MemberProfileEditInput>, path);
+    if (nestedPath) return nestedPath;
+  }
+
+  return undefined;
+}
+
+const errorTargetIds: Record<string, string> = {
+  phoneNumber: 'Phone Number',
+  'address.mailingAddress': 'Mailing Address',
+  'address.city': 'City',
+  'address.country': 'Country',
+  'address.province': 'Province',
+  'address.postalCode': 'Postal Code',
+  membershipInterests: 'membership-interests-heading',
+  motivation: 'Why do you want to be an RPRC member?',
+  representativeName: 'Organization Representative Name',
+  representativeEmail: 'Representative Email Address (if different from the one given above)',
+  programsOrServices: 'What programs or services does your organization offer?',
 };
 
 export default function MembershipProfileEditForm({
@@ -58,46 +71,71 @@ export default function MembershipProfileEditForm({
   onDirtyChange,
 }: Props) {
   const isOrganization = data.type === 'organization';
+  const organizationData = isOrganization ? data as OrganizationMemberDashboardData : null;
   const addressFields = data.contact.addressFields;
 
-  const initialValues = useMemo(() => ({
-    fullName: data.name ?? '',
-    email: data.contact.email ?? '',
-    phoneNumber: data.contact.phone ?? '',
-    phoneType: data.contact.phoneType ?? 'cell',
-    mailingAddress: addressFields?.mailingAddress || data.contact.address || '',
-    city: addressFields?.city ?? '',
-    province: addressFields?.province ?? '',
-    country: addressFields?.country || 'Canada',
-    postalCode: addressFields?.postalCode ?? '',
-    interests: data.interests ?? [],
-    whyrpcmember: data.reason ?? '',
-    representativeName: 'representativeName' in data ? data.representativeName ?? '' : '',
-    representativeEmail: 'representativeEmail' in data ? data.representativeEmail ?? '' : '',
-    organisationservices: 'servicesOffered' in data ? data.servicesOffered ?? '' : '',
-  }), [addressFields, data]);
+  const initialValues = useMemo<MemberProfileEditInput>(() => {
+    const membershipInterests = (data.interests ?? []) as MemberProfileEditInput['membershipInterests'];
+    const common = {
+      name: data.name ?? '',
+      email: data.contact.email ?? '',
+      phoneNumber: data.contact.phone ?? '',
+      phoneType: data.contact.phoneType ?? 'cell',
+      address: {
+        mailingAddress: addressFields?.mailingAddress ?? '',
+        city: addressFields?.city ?? '',
+        province: addressFields?.province ?? '',
+        country: addressFields?.country || 'Canada',
+        postalCode: addressFields?.postalCode ?? '',
+      },
+      membershipInterests,
+      motivation: data.reason ?? '',
+    };
 
-  const [values, setValues] = useState(initialValues);
-  const [errors, setErrors] = useState<ValidationErrors>({});
-  const [hasAttemptedValidation, setHasAttemptedValidation] = useState(false);
-  const membershipInterests = MEMBERSHIP_INTERESTS;
+    if (organizationData) {
+      return {
+        ...common,
+        role: 'organization',
+        representativeName: organizationData.representativeName ?? '',
+        representativeEmail: organizationData.representativeEmail ?? '',
+        programsOrServices: organizationData.servicesOffered ?? '',
+      };
+    }
 
+    return { ...common, role: 'individual' };
+  }, [addressFields, data, organizationData]);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { submitCount },
+    setValue,
+  } = useForm<MemberProfileEditInput, undefined, MemberProfileEditValues>({
+    resolver: zodResolver(memberProfileEditSchema),
+    defaultValues: initialValues,
+    mode: 'onSubmit',
+  });
+
+  const values = (useWatch({ control }) ?? initialValues) as MemberProfileEditInput;
+  const country = useWatch({ control, name: 'address.country' }) ?? initialValues.address.country;
   const changedFields = useMemo(() => {
     const fields: string[] = [];
 
-    if (normalize(values.fullName) !== normalize(initialValues.fullName)) fields.push('name');
-    if (normalize(values.phoneNumber) !== normalize(initialValues.phoneNumber)) fields.push('phone');
+    if (normalize(values.name) !== normalize(initialValues.name)) fields.push('name');
+    if (phoneDigits(values.phoneNumber) !== phoneDigits(initialValues.phoneNumber)) fields.push('phoneNumber');
     if (values.phoneType !== initialValues.phoneType) fields.push('phoneType');
-    if (normalize(values.mailingAddress) !== normalize(initialValues.mailingAddress)) fields.push('mailingAddress');
-    if (normalize(values.city) !== normalize(initialValues.city)) fields.push('city');
-    if (normalize(values.province) !== normalize(initialValues.province)) fields.push('province');
-    if (normalize(values.country) !== normalize(initialValues.country)) fields.push('country');
-    if (normalize(values.postalCode) !== normalize(initialValues.postalCode)) fields.push('postalCode');
-    if (!sameInterests(values.interests, initialValues.interests)) fields.push('interests');
-    if (normalize(values.whyrpcmember) !== normalize(initialValues.whyrpcmember)) fields.push('reason');
-    if (normalize(values.representativeName) !== normalize(initialValues.representativeName)) fields.push('representativeName');
-    if (normalize(values.representativeEmail) !== normalize(initialValues.representativeEmail)) fields.push('representativeEmail');
-    if (normalize(values.organisationservices) !== normalize(initialValues.organisationservices)) fields.push('servicesOffered');
+    if (normalize(values.address.mailingAddress) !== normalize(initialValues.address.mailingAddress)) fields.push('mailingAddress');
+    if (normalize(values.address.city) !== normalize(initialValues.address.city)) fields.push('city');
+    if (normalize(values.address.province) !== normalize(initialValues.address.province)) fields.push('province');
+    if (normalize(values.address.country) !== normalize(initialValues.address.country)) fields.push('country');
+    if (normalize(values.address.postalCode) !== normalize(initialValues.address.postalCode)) fields.push('postalCode');
+    if (!sameInterests(values.membershipInterests, initialValues.membershipInterests)) fields.push('membershipInterests');
+    if (normalize(values.motivation) !== normalize(initialValues.motivation)) fields.push('motivation');
+    if (values.role === 'organization' && initialValues.role === 'organization') {
+      if (normalize(values.representativeName) !== normalize(initialValues.representativeName)) fields.push('representativeName');
+      if (normalize(values.representativeEmail) !== normalize(initialValues.representativeEmail)) fields.push('representativeEmail');
+      if (normalize(values.programsOrServices) !== normalize(initialValues.programsOrServices)) fields.push('programsOrServices');
+    }
 
     return fields;
   }, [initialValues, values]);
@@ -106,144 +144,152 @@ export default function MembershipProfileEditForm({
     onDirtyChange?.(changedFields.length > 0);
   }, [changedFields.length, onDirtyChange]);
 
-  const countryCode =
-    values.country === 'Canada' ? 'CA' : values.country === 'United States' ? 'US' : '';
+  const countryCode = country === 'Canada' ? 'CA' : country === 'United States' ? 'US' : '';
+  const states = useMemo(
+    () => (countryCode ? State.getStatesOfCountry(countryCode).map((state) => state.name) : []),
+    [countryCode],
+  );
 
-  const states = useMemo(() => {
-    if (!countryCode) return [];
-    return State.getStatesOfCountry(countryCode).map((state) => state.name);
-  }, [countryCode]);
+  const handleInvalid: SubmitErrorHandler<MemberProfileEditInput> = (errors) => {
+    const firstErrorPath = findFirstErrorPath(errors);
+    if (!firstErrorPath) return;
 
-  const updateValues = (updates: Partial<typeof values>) => {
-    setValues((current) => ({ ...current, ...updates }));
+    const targetId = errorTargetIds[firstErrorPath] ?? firstErrorPath;
+    const element = document.getElementsByName(firstErrorPath)[0]
+      ?? document.getElementById(targetId);
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
-  const handleCountryChange = (country: string) => {
-    updateValues({ country, province: '' });
-  };
-
-  const toggleInterest = (interest: string) => {
-    updateValues({
-      interests: values.interests.includes(interest)
-        ? values.interests.filter((item) => item !== interest)
-        : [...values.interests, interest],
-    });
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleValidSubmit = async (submittedValues: MemberProfileEditValues) => {
     if (changedFields.length === 0 || isSaving) return;
-
-    setHasAttemptedValidation(true);
-
-    const validationErrors = validateStep2(values, data.type ?? undefined);
-    if (hasErrors(validationErrors)) {
-      setErrors(validationErrors);
-      scrollToFirstError(validationErrors);
-      return;
-    }
-
-    setErrors({});
-
-    await onSave({
-      name: values.fullName.trim(),
-      phone: values.phoneNumber.trim(),
-      phoneType: values.phoneType,
-      mailingAddress: values.mailingAddress.trim(),
-      city: values.city.trim(),
-      province: values.province.trim(),
-      country: values.country.trim(),
-      postalCode: values.postalCode.trim(),
-      interests: values.interests,
-      reason: values.whyrpcmember.trim(),
-      representativeName: values.representativeName.trim(),
-      representativeEmail: values.representativeEmail.trim(),
-      servicesOffered: values.organisationservices.trim(),
-    });
+    await onSave(submittedValues);
   };
+
+  const showValidation = submitCount > 0;
 
   return (
-    <form id={formId} onSubmit={handleSubmit} className="flex flex-col gap-8">
+    <form id={formId} onSubmit={handleSubmit(handleValidSubmit, handleInvalid)} className="flex flex-col gap-8">
       <section>
         <h3 className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}>
           Contact Information
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
-          <FormInput
-            name="fullName"
-            label={isOrganization ? 'Organization Name' : 'Name'}
-            type="text"
-            value={values.fullName}
-            onChange={(fullName) => updateValues({ fullName })}
-            error={errors.fullName}
-            required
-            showValidation={hasAttemptedValidation}
+          <Controller
+            control={control}
+            name="name"
+            render={({ field, fieldState }) => (
+              <FormInput
+                name="name"
+                label={isOrganization ? 'Organization Name' : 'Name'}
+                type="text"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+                required
+                showValidation={showValidation}
+              />
+            )}
           />
-          <FormInput
+          <Controller
+            control={control}
             name="email"
-            label={isOrganization ? 'Organization Email Address' : 'Email Address'}
-            type="email"
-            value={values.email}
-            onChange={() => { }}
-            error={errors.email}
-            required
-            disabled
-            showValidation={hasAttemptedValidation}
+            render={({ field, fieldState }) => (
+              <FormInput
+                name="email"
+                label={isOrganization ? 'Organization Email Address' : 'Email Address'}
+                type="email"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+                required
+                disabled
+                showValidation={showValidation}
+              />
+            )}
           />
         </div>
         {isOrganization && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
-            <FormInput
+            <Controller
+              control={control}
               name="representativeName"
-              label="Organization Representative Name"
-              type="text"
-              value={values.representativeName}
-              onChange={(representativeName) => updateValues({ representativeName })}
-              error={errors.representativeName}
-              required
-              showValidation={hasAttemptedValidation}
+              render={({ field, fieldState }) => (
+                <FormInput
+                  name="representativeName"
+                  label="Organization Representative Name"
+                  type="text"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  required
+                  showValidation={showValidation}
+                />
+              )}
             />
-            <FormInput
+            <Controller
+              control={control}
               name="representativeEmail"
-              label="Representative Email Address (if different from the one given above)"
-              type="email"
-              value={values.representativeEmail}
-              onChange={(representativeEmail) => updateValues({ representativeEmail })}
-              error={errors.representativeEmail}
-              showValidation={hasAttemptedValidation}
+              render={({ field, fieldState }) => (
+                <FormInput
+                  name="representativeEmail"
+                  label="Representative Email Address (if different from the one given above)"
+                  type="email"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  showValidation={showValidation}
+                />
+              )}
             />
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-          <PhoneInput
-            label="Phone Number"
-            value={values.phoneNumber}
-            onChange={(phoneNumber) => updateValues({ phoneNumber })}
-            error={errors.phoneNumber}
-            required
-            showValidation={hasAttemptedValidation}
+          <Controller
+            control={control}
+            name="phoneNumber"
+            render={({ field, fieldState }) => (
+              <PhoneInput
+                label="Phone Number"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+                required
+                showValidation={showValidation}
+              />
+            )}
           />
-          <div>
-            <label className={`block text-gray-700 mb-1 ${bodyStyles.m} ${inter.className}`}>
-              Phone Type <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-6 sm:gap-8 items-center min-h-10">
-              <FormRadioButton
-                name="phoneType"
-                label="Home"
-                value="home"
-                checked={values.phoneType === 'home'}
-                onChange={(phoneType) => updateValues({ phoneType: phoneType as 'home' | 'cell' })}
-              />
-              <FormRadioButton
-                name="phoneType"
-                label="Cell"
-                value="cell"
-                checked={values.phoneType === 'cell'}
-                onChange={(phoneType) => updateValues({ phoneType: phoneType as 'home' | 'cell' })}
-              />
-            </div>
-          </div>
+          <Controller
+            control={control}
+            name="phoneType"
+            render={({ field, fieldState }) => (
+              <div>
+                <label className={`block text-gray-700 mb-1 ${bodyStyles.m} ${inter.className}`}>
+                  Phone Type <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-6 sm:gap-8 items-center min-h-10">
+                  <FormRadioButton
+                    name="phoneType"
+                    label="Home"
+                    value="home"
+                    checked={field.value === 'home'}
+                    onChange={field.onChange}
+                  />
+                  <FormRadioButton
+                    name="phoneType"
+                    label="Cell"
+                    value="cell"
+                    checked={field.value === 'cell'}
+                    onChange={field.onChange}
+                  />
+                </div>
+                {showValidation && fieldState.error?.message && (
+                  <p className="mt-1 text-sm text-destructive" role="alert">
+                    {fieldState.error.message}
+                  </p>
+                )}
+              </div>
+            )}
+          />
         </div>
       </section>
 
@@ -252,102 +298,166 @@ export default function MembershipProfileEditForm({
           Address Information
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
-          <FormInput
-            name="mailingAddress"
-            label="Mailing Address"
-            type="text"
-            value={values.mailingAddress}
-            onChange={(mailingAddress) => updateValues({ mailingAddress })}
-            error={errors.mailingAddress}
-            required
-            showValidation={hasAttemptedValidation}
+          <Controller
+            control={control}
+            name="address.mailingAddress"
+            render={({ field, fieldState }) => (
+              <FormInput
+                name="address.mailingAddress"
+                label="Mailing Address"
+                type="text"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+                required
+                showValidation={showValidation}
+              />
+            )}
           />
-          <FormInput
-            name="city"
-            label="City"
-            type="text"
-            value={values.city}
-            onChange={(city) => updateValues({ city })}
-            error={errors.city}
-            required
-            showValidation={hasAttemptedValidation}
+          <Controller
+            control={control}
+            name="address.city"
+            render={({ field, fieldState }) => (
+              <FormInput
+                name="address.city"
+                label="City"
+                type="text"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+                required
+                showValidation={showValidation}
+              />
+            )}
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
-          <FormSelect
-            name="country"
-            label="Country"
-            options={COUNTRIES}
-            value={values.country}
-            onChange={handleCountryChange}
-            error={errors.country}
-            placeholder="Select a country"
-            required
-            showValidation={hasAttemptedValidation}
+          <Controller
+            control={control}
+            name="address.country"
+            render={({ field, fieldState }) => (
+              <FormSelect
+                name="address.country"
+                label="Country"
+                options={COUNTRIES}
+                value={field.value}
+                onChange={(nextCountry) => {
+                  field.onChange(nextCountry);
+                  setValue('address.province', '', { shouldDirty: true, shouldTouch: true });
+                }}
+                error={fieldState.error?.message}
+                placeholder="Select a country"
+                required
+                showValidation={showValidation}
+              />
+            )}
           />
-          <FormSelect
-            name="province"
-            label={values.country === 'United States' ? 'State' : 'Province'}
-            options={states}
-            value={values.province}
-            onChange={(province) => updateValues({ province })}
-            error={errors.province}
-            placeholder={`Select ${values.country === 'United States' ? 'a state' : 'a province'}`}
-            required
-            showValidation={hasAttemptedValidation}
+          <Controller
+            control={control}
+            name="address.province"
+            render={({ field, fieldState }) => (
+              <FormSelect
+                name="address.province"
+                label={country === 'United States' ? 'State' : 'Province'}
+                options={states}
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+                placeholder={`Select ${country === 'United States' ? 'a state' : 'a province'}`}
+                required
+                showValidation={showValidation}
+              />
+            )}
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-          <FormInput
-            name="postalCode"
-            label="Postal Code"
-            type="text"
-            value={values.postalCode}
-            onChange={(postalCode) => updateValues({ postalCode })}
-            error={errors.postalCode}
-            required
-            showValidation={hasAttemptedValidation}
+          <Controller
+            control={control}
+            name="address.postalCode"
+            render={({ field, fieldState }) => (
+              <FormInput
+                name="address.postalCode"
+                label="Postal Code"
+                type="text"
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+                required
+                showValidation={showValidation}
+              />
+            )}
           />
         </div>
       </section>
 
       <section>
-        <h3 className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}>
+        <h3 id="membership-interests-heading" className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}>
           Membership Interests
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-          {membershipInterests.map((interest) => (
-            <InterestCard
-              key={interest.id}
-              label={interest.name}
-              isSelected={values.interests.includes(interest.name)}
-              onToggle={() => toggleInterest(interest.name)}
-            />
-          ))}
-        </div>
+        <Controller
+          control={control}
+          name="membershipInterests"
+          render={({ field, fieldState }) => {
+            const selected = field.value as string[];
+            return (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                  {MEMBERSHIP_INTERESTS.map((interest) => (
+                    <InterestCard
+                      key={interest.id}
+                      label={interest.name}
+                      isSelected={selected.includes(interest.value)}
+                      onToggle={() => field.onChange(
+                        selected.includes(interest.value)
+                          ? selected.filter((item) => item !== interest.value)
+                          : [...selected, interest.value],
+                      )}
+                    />
+                  ))}
+                </div>
+                {showValidation && fieldState.error?.message && (
+                  <p className="mt-2 text-sm text-destructive" role="alert">
+                    {fieldState.error.message}
+                  </p>
+                )}
+              </>
+            );
+          }}
+        />
       </section>
 
-      <FormTextArea
-        label="Why do you want to be an RPRC member?"
-        value={values.whyrpcmember}
-        onChange={(whyrpcmember) => updateValues({ whyrpcmember })}
-        error={errors.whyrpcmember}
-        rows={6}
-        required
-        showValidation={hasAttemptedValidation}
+      <Controller
+        control={control}
+        name="motivation"
+        render={({ field, fieldState }) => (
+          <FormTextArea
+            label="Why do you want to be an RPRC member?"
+            value={field.value}
+            onChange={field.onChange}
+            error={fieldState.error?.message}
+            rows={6}
+            required
+            showValidation={showValidation}
+          />
+        )}
       />
 
       {isOrganization && (
-        <FormTextArea
-          label="What programs or services does your organization offer?"
-          value={values.organisationservices}
-          onChange={(organisationservices) => updateValues({ organisationservices })}
-          error={errors.organisationservices}
-          rows={5}
-          showValidation={hasAttemptedValidation}
+        <Controller
+          control={control}
+          name="programsOrServices"
+          render={({ field, fieldState }) => (
+            <FormTextArea
+              label="What programs or services does your organization offer?"
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              error={fieldState.error?.message}
+              rows={5}
+              showValidation={showValidation}
+            />
+          )}
         />
       )}
-
     </form>
   );
 }

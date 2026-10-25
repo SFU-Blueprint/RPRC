@@ -14,6 +14,7 @@ import {
 import { AlertCircle, Info, Mail, MapPin, Phone, User } from 'lucide-react';
 import type { MemberDashboardData, OrganizationMemberDashboardData } from '@/types/membership.types';
 import { bodyStyles } from '@/lib/fonts';
+import { getMembershipInterestLabel } from '@/lib/mock-data/membership-interests';
 
 interface MembershipActionModalProps {
     isOpen: boolean;
@@ -32,16 +33,8 @@ export default function MembershipActionModal({ isOpen, onClose, data }: Members
         setError(null);
         setIsSubmitting(true);
         try {
-            // const result = await submitMembershipRenewal();
-            const result: { success: true } | { success: false; error: string } = {
-                success: true,
-            };
-            if (result.success) {
-                onClose();
-                router.push('/membership/renew-success');
-            } else {
-                setError(result.error || 'Failed to submit renewal. Please try again.');
-            }
+            onClose();
+            router.push(`/membership/renew-success?demoRole=${data.type ?? 'individual'}`);
         } catch {
             setError('An unexpected error occurred. Please try again.');
         } finally {
@@ -139,7 +132,7 @@ export default function MembershipActionModal({ isOpen, onClose, data }: Members
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {data.interests.map((interest, idx) => (
                                     <span key={idx} className="rounded-full border border-content-secondary px-3 py-1.5 text-content-secondary text-sm">
-                                        {interest}
+                                        {getMembershipInterestLabel(interest)}
                                     </span>
                                 ))}
                             </div>

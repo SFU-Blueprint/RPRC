@@ -11,21 +11,25 @@ import IndividualProfile from '@/components/membership/profiles/IndividualProfil
 import OrganizationProfile from '@/components/membership/profiles/OrganizationProfile';
 import MembershipProfileEditForm, { type MembershipProfileEditValues } from '@/components/membership/MembershipProfileEditForm';
 import DiscardChangesModal from '@/components/membership/modals/DiscardChangesModal';
-import { ApplicationStatus, UserRole } from '@/lib/constants/enums';
-import { MEMBER_DASHBOARD } from '@/lib/mock-data';
+import { ApplicationStatus, ApplicationType, UserRole, type PhoneType } from '@/lib/constants/enums';
+import { MEMBER_DASHBOARD, ORGANIZATION_MEMBER_DASHBOARD } from '@/lib/mock-data';
 import type { MemberDashboardData, OrganizationMemberDashboardData } from '@/types/membership.types';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function MembershipDashboard() {
-  const [dashboardData, setDashboardData] = useState<MemberDashboardData | null>(
-    MEMBER_DASHBOARD,
-  );
+  const [profiles, setProfiles] = useState<Record<ApplicationType, MemberDashboardData>>({
+    [ApplicationType.INDIVIDUAL]: MEMBER_DASHBOARD,
+    [ApplicationType.ORGANIZATION]: ORGANIZATION_MEMBER_DASHBOARD,
+  });
+  const [selectedRole, setSelectedRole] = useState<ApplicationType>(ApplicationType.INDIVIDUAL);
   const [isMembershipActionModalOpen, setIsMembershipActionModalOpen] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [hasProfileChanges, setHasProfileChanges] = useState(false);
   const [isDiscardChangesModalOpen, setIsDiscardChangesModalOpen] = useState(false);
   const profileEditFormId = 'membership-profile-edit-form';
+  const dashboardData = profiles[selectedRole];
   const canEdit = dashboardData?.status === ApplicationStatus.ACTIVE
     || dashboardData?.status === ApplicationStatus.EXPIRED
     || dashboardData?.status === ApplicationStatus.EXPIRES_SOON;
@@ -52,45 +56,52 @@ export default function MembershipDashboard() {
   };
 
   const handleSaveProfile = async (values: MembershipProfileEditValues) => {
-    if (!dashboardData) return;
     if (!hasProfileChanges) return;
 
     setIsSavingProfile(true);
 
     try {
-      const updatedData: MemberDashboardData = {
+      const digits = values.phoneNumber.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+      const phone = `(${digits.slice(0, 3)})-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+      const addressFields = {
+        mailingAddress: values.address.mailingAddress,
+        city: values.address.city,
+        province: values.address.province,
+        country: values.address.country,
+        postalCode: values.address.postalCode,
+      };
+      const updatedData = {
         ...dashboardData,
+        type: values.role,
         name: values.name,
         contact: {
           ...dashboardData.contact,
-          phone: values.phone,
-          phoneType: values.phoneType,
+          phone,
+          phoneType: values.phoneType.toLowerCase() as PhoneType,
           address: [
-            values.mailingAddress,
-            values.city,
-            values.province,
-            values.country,
-            values.postalCode,
+            addressFields.mailingAddress,
+            addressFields.city,
+            addressFields.province,
+            addressFields.country,
+            addressFields.postalCode,
           ].filter(Boolean).join(', '),
-          addressFields: {
-            mailingAddress: values.mailingAddress,
-            city: values.city,
-            province: values.province,
-            country: values.country,
-            postalCode: values.postalCode,
-          },
+          addressFields,
         },
-        interests: values.interests,
-        reason: values.reason,
-        ...(dashboardData.type === UserRole.ORGANIZATION && {
-          representativeName: values.representativeName ?? '',
-          representativeEmail: values.representativeEmail ?? '',
-          servicesOffered: values.servicesOffered ?? '',
-        }),
+        interests: values.membershipInterests,
+        reason: values.motivation,
       };
+      const profile: MemberDashboardData = values.role === UserRole.ORGANIZATION
+        ? {
+            ...updatedData,
+            type: ApplicationType.ORGANIZATION,
+            representativeName: values.representativeName,
+            representativeEmail: values.representativeEmail ?? '',
+            servicesOffered: values.programsOrServices ?? '',
+          } as OrganizationMemberDashboardData
+        : { ...updatedData, type: ApplicationType.INDIVIDUAL };
 
       // Keep the profile editor interactive without persisting data in the local demo.
-      setDashboardData(updatedData);
+      setProfiles((current) => ({ ...current, [values.role]: profile }));
       setHasProfileChanges(false);
       setIsEditingProfile(false);
       toast.success('Demo profile updated locally. Changes are not saved.');
@@ -101,9 +112,6 @@ export default function MembershipDashboard() {
 
   return (
     <div className={`min-h-screen bg-background ${inter.className}`}>
-      <p className="px-6 pt-4 text-center text-sm text-muted-foreground">
-        Demo profile data
-      </p>
       <MembershipProfileBanner name={dashboardData?.name ?? ''} role={dashboardData?.type ?? null} />
       <div className='flex flex-col md:flex-row justify-center gap-8 md:gap-6 lg:gap-16 xl:gap-24 mt-8 md:mt-10 px-4 md:px-6 lg:px-12 xl:px-20 pb-16'>
         <div className='flex flex-col gap-8 md:gap-6 lg:gap-10 w-full md:w-auto md:shrink-0'>
@@ -127,10 +135,28 @@ export default function MembershipDashboard() {
         <div className='flex flex-col w-full md:max-w-sm lg:max-w-xl xl:max-w-2xl'>
           <div className='flex flex-col gap-10'>
             <div className='bg-white border rounded-2xl px-4 md:px-4 lg:px-5 py-6 md:py-6 lg:py-8 drop-shadow-sm'>
-              <div className='flex items-center justify-between mb-5'>
-                <h2 className={`${robotoCondensed.className} text-xl md:text-2xl lg:text-3xl font-medium p-3`}>Profile Information</h2>
+              <div className='flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-5'>
+                <div className='flex flex-wrap items-center gap-x-3 gap-y-2'>
+                  <h2 className={`${robotoCondensed.className} text-xl md:text-2xl lg:text-3xl font-medium p-3`}>Profile Information</h2>
+                  <div className="flex items-center gap-x-2 text-sm text-muted-foreground">
+                    <label htmlFor="demo-profile-role" className="sr-only">Profile type</label>
+                    <Select
+                      value={selectedRole}
+                      onValueChange={(value) => setSelectedRole(value as ApplicationType)}
+                      disabled={isEditingProfile || isSavingProfile || isMembershipActionModalOpen}
+                    >
+                      <SelectTrigger id="demo-profile-role" className="w-44 bg-white text-foreground">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={ApplicationType.INDIVIDUAL}>Individual</SelectItem>
+                        <SelectItem value={ApplicationType.ORGANIZATION}>Organization</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
                 {canEdit && (
-                  <div>
+                  <div className='shrink-0'>
                     {isEditingProfile ? (
                       <>
                         <button
@@ -178,9 +204,9 @@ export default function MembershipDashboard() {
                   />
                 )
               ) : dashboardData?.type === 'organization' ? (
-                <OrganizationProfile data={dashboardData as OrganizationMemberDashboardData} onEdit={handleEditProfile} />
+                <OrganizationProfile data={dashboardData as OrganizationMemberDashboardData} />
               ) : (
-                <IndividualProfile data={dashboardData} onEdit={handleEditProfile} />
+                <IndividualProfile data={dashboardData} />
               )}
             </div>
             <div>

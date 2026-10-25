@@ -1,13 +1,9 @@
 import { User, Mail, Phone, MapPin } from 'lucide-react';
 import { bodyStyles, buttonStyles, subheaderStyles } from '@/lib/fonts';
+import { getMembershipInterestLabel } from '@/lib/mock-data/membership-interests';
 import type { IndividualMemberDashboardData } from '@/types/membership.types';
 
-type Props = {
-    data: IndividualMemberDashboardData | null;
-    onEdit?: () => void;
-};
-
-export default function IndividualProfile({ data, onEdit }: Props) {
+export default function IndividualProfile({ data }: { data: IndividualMemberDashboardData | null }) {
     if (!data) return null;
 
     return (
@@ -43,7 +39,7 @@ export default function IndividualProfile({ data, onEdit }: Props) {
                             key={idx}
                             className={`${buttonStyles.textSmall} text-content-secondary rounded-4xl border p-3 px-6 border-content-secondary`}
                         >
-                            {interest}
+                            {getMembershipInterestLabel(interest)}
                         </p>
                     ))}
                 </div>

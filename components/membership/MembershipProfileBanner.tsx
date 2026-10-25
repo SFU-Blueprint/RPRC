@@ -4,10 +4,10 @@ import { robotoCondensed } from '@/lib/fonts';
 import { User as UserIcon, Users as UsersIcon } from 'lucide-react';
 import { UserRole } from '@/lib/constants/enums';
 
-interface MembershipProfileBannerProps {
+type MembershipProfileBannerProps = {
     name: string;
     role: UserRole | null;
-}
+};
 
 export default function MembershipProfileBanner({ name, role }: MembershipProfileBannerProps) {
     const Icon = role === UserRole.ORGANIZATION ? UsersIcon : UserIcon;
