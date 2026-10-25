@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 
+import type { ALLOWED_COUNTRIES } from '@/lib/constants/sign-up';
 import type { individualSchema, organizationSchema } from '@/lib/schema';
 
 /**
@@ -22,4 +23,4 @@ type SharedSignUpKey = Extract<
 export type SharedSignUpInput = Pick<IndividualSignUpInput, SharedSignUpKey>;
 
 /** Countries the address section offers (see `ALLOWED_COUNTRIES`). */
-export type AllowedCountry = 'Canada' | 'United States';
+export type AllowedCountry = (typeof ALLOWED_COUNTRIES)[number];

@@ -71,7 +71,7 @@ export function CheckboxGroupField<T extends FieldValues, TTransformed = T>({
               fieldState.invalid && ids.error,
             )}
           >
-            <FieldLegend variant="label">
+            <FieldLegend variant="label" className="flex gap-2">
               {label}
               {required && <RequiredMarker />}
             </FieldLegend>

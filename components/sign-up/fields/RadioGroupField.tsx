@@ -47,7 +47,7 @@ export function RadioGroupField<T extends FieldValues, TTransformed = T>({
       name={name}
       render={({ field, fieldState }) => (
         <FieldSet data-invalid={fieldState.invalid} className={className}>
-          <FieldLegend variant="label">
+          <FieldLegend variant="label" className="flex gap-2">
             {label}
             {required && <RequiredMarker />}
           </FieldLegend>

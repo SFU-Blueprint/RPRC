@@ -296,3 +296,187 @@ describe('CheckboxField', () => {
     await waitFor(() => expect(screen.getByText('true')).toBeDefined());
   });
 });
+
+async function submitHarness() {
+  await act(async () => {
+    fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
+  });
+}
+
+describe('field edge cases', () => {
+  test('TextField: whitespace only counts as empty', async () => {
+    render(<OrganizationHarness onSubmit={vi.fn()} />);
+    change('Name', '   ');
+    await submitHarness();
+    expect(screen.getByText('Name is required')).toBeDefined();
+  });
+
+  test('PasswordField: show/hide toggle switches the input type', () => {
+    render(<OrganizationHarness onSubmit={vi.fn()} />);
+    const password = byLabel('Password') as HTMLInputElement;
+
+    expect(password.type).toBe('password');
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Show password' })[0],
+    );
+    expect(password.type).toBe('text');
+    fireEvent.click(screen.getByRole('button', { name: 'Hide password' }));
+    expect(password.type).toBe('password');
+  });
+
+  test('PasswordField: a valid password ticks every rule; confirm has no rule list', () => {
+    render(<OrganizationHarness onSubmit={vi.fn()} />);
+    change('Password', PASSWORD);
+
+    // Only the password field shows rules: one list, five rules, all met.
+    const rules = screen.getAllByText(/^Password must/);
+    expect(rules).toHaveLength(5);
+    for (const rule of rules) expect(rule.textContent).toContain('(met)');
+  });
+
+  test.each([
+    ['a pasted number with country code', '16041234567', '(604) 123-4567'],
+    ['a pasted +1 number', '+1 (604) 123-4567', '(604) 123-4567'],
+    ['more than 10 digits', '604123456789', '(604) 123-4567'],
+    ['letters mixed in', 'abc604', '604'],
+    ['the first six digits', '604123', '(604) 123'],
+  ])('PhoneField: %s', (_label, typed, shown) => {
+    render(<OrganizationHarness onSubmit={vi.fn()} />);
+    change('Phone number', typed);
+    expect((byLabel('Phone number') as HTMLInputElement).value).toBe(shown);
+  });
+
+  test('PhoneField: a cleared number shows the schema error', async () => {
+    render(<OrganizationHarness onSubmit={vi.fn()} />);
+    change('Phone number', '6041234567');
+    change('Phone number', '');
+    await submitHarness();
+    expect(
+      screen.getByText(
+        'Enter a valid phone number in international format (+16041234567)',
+      ),
+    ).toBeDefined();
+  });
+
+  test('RadioGroupField: choosing Home submits Home', async () => {
+    const onSubmit = vi.fn();
+    render(<OrganizationHarness onSubmit={onSubmit} />);
+    fillValidOrganization();
+    fireEvent.click(screen.getByLabelText('Home'));
+    await submitHarness();
+    expect(onSubmit.mock.calls[0][0].phoneType).toBe('Home');
+  });
+
+  test('TextareaField: over the word limit turns the counter red and fails the schema', async () => {
+    render(<OrganizationHarness onSubmit={vi.fn()} />);
+    change('Why join?', 'word '.repeat(MOTIVATION_MAX_WORDS + 1));
+
+    const counter = screen.getByText(
+      `${MOTIVATION_MAX_WORDS + 1} / ${MOTIVATION_MAX_WORDS} words`,
+    );
+    expect(counter.className).toContain('text-destructive');
+
+    await submitHarness();
+    expect(
+      screen.getByText(
+        `Reason for joining must be at most ${MOTIVATION_MAX_WORDS} words`,
+      ),
+    ).toBeDefined();
+  });
+
+  test('TextareaField: whitespace only counts as empty', async () => {
+    render(<OrganizationHarness onSubmit={vi.fn()} />);
+    change('Why join?', '  \n  ');
+    await submitHarness();
+    expect(screen.getByText('Reason for joining is required')).toBeDefined();
+  });
+
+  test('CheckboxGroupField: unticking removes the value', async () => {
+    const onSubmit = vi.fn();
+    render(<OrganizationHarness onSubmit={onSubmit} />);
+    fillValidOrganization(); // ticks Housing and Health
+    fireEvent.click(screen.getByLabelText('Health'));
+    await submitHarness();
+    expect(onSubmit.mock.calls[0][0].membershipInterests).toEqual(['Housing']);
+  });
+});
+
+describe('SelectField edge cases', () => {
+  function SelectHarness({
+    options,
+    onValueChange,
+  }: {
+    options: { value: string; label: string }[];
+    onValueChange?: (value: string) => void;
+  }) {
+    const form = useForm<{ pick?: string }>();
+    return (
+      <SelectField
+        control={form.control}
+        name="pick"
+        label="Pick"
+        options={options}
+        onValueChange={onValueChange}
+      />
+    );
+  }
+
+  test('is disabled when there are no options', () => {
+    render(<SelectHarness options={[]} />);
+    expect(
+      screen.getByRole('combobox', { name: 'Pick' }).matches(':disabled'),
+    ).toBe(true);
+  });
+
+  test('calls onValueChange with the chosen value', () => {
+    const onValueChange = vi.fn();
+    render(
+      <SelectHarness
+        options={toOptions(['A', 'B'])}
+        onValueChange={onValueChange}
+      />,
+    );
+    fireEvent.keyDown(screen.getByRole('combobox', { name: 'Pick' }), {
+      key: 'Enter',
+    });
+    fireEvent.keyDown(screen.getByRole('option', { name: 'B' }), {
+      key: 'Enter',
+    });
+    expect(onValueChange).toHaveBeenCalledWith('B');
+  });
+});
+
+describe('CheckboxField edge cases', () => {
+  function ToggleHarness({
+    onValueChange,
+  }: {
+    onValueChange: (v: boolean) => void;
+  }) {
+    const form = useForm<{ agree?: boolean }>();
+    const agree = useWatch({ control: form.control, name: 'agree' });
+    return (
+      <>
+        <CheckboxField
+          control={form.control}
+          name="agree"
+          label="Agree"
+          onValueChange={onValueChange}
+        />
+        <output>{String(agree)}</output>
+      </>
+    );
+  }
+
+  test('unticking stores false and onValueChange reports each change', async () => {
+    const onValueChange = vi.fn();
+    render(<ToggleHarness onValueChange={onValueChange} />);
+    const box = screen.getByLabelText('Agree');
+
+    fireEvent.click(box);
+    await waitFor(() => expect(screen.getByText('true')).toBeDefined());
+    fireEvent.click(box);
+    await waitFor(() => expect(screen.getByText('false')).toBeDefined());
+
+    expect(onValueChange.mock.calls).toEqual([[true], [false]]);
+  });
+});

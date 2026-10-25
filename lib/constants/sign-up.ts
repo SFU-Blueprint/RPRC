@@ -4,8 +4,29 @@ import {
   type Interest,
   type PhoneType,
 } from '@/lib/schema';
+import type { DefaultValues } from 'react-hook-form';
+
 import type { FieldOption } from '@/types/sign-up-fields.types';
-import type { AllowedCountry } from '@/types/sign-up-form.types';
+import type {
+  AllowedCountry,
+  IndividualSignUpInput,
+  OrganizationSignUpInput,
+} from '@/types/sign-up-form.types';
+
+/** Page-level copy for the two sign-up forms. */
+export const SIGN_UP_FORM_COPY = {
+  INDIVIDUAL_HEADING: 'Individual Membership Application Form',
+  ORGANIZATION_HEADING: 'Organization Membership Application Form',
+  SUBMIT: 'Submit Application',
+  SUBMITTING: 'Submitting…',
+  /** Exact wording required by the issue. */
+  SUBMIT_FAILED: 'Submission failed. Try again later.',
+  NOTE_HEADING: 'Please Note',
+  NOTE_PRIMARY:
+    'To vote at the Annual General Meeting, members must be registered at least 30 days in advance.',
+  NOTE_SECONDARY:
+    'All memberships require renewal in January. Members who join after October 1 do not need to renew until January of the next calendar year',
+} as const;
 
 /** Section headings, rendered as the `<legend>` of each section. */
 export const SIGN_UP_SECTION_TITLES = {
@@ -64,10 +85,7 @@ export const PHONE_TYPE_OPTIONS: FieldOption<PhoneType>[] = PHONE_TYPES.map(
  * and the phone field (+1 numbers only). Every name is also a value the
  * schema's `countrySchema` accepts.
  */
-export const ALLOWED_COUNTRIES: readonly AllowedCountry[] = [
-  'Canada',
-  'United States',
-];
+export const ALLOWED_COUNTRIES = ['Canada', 'United States'] as const;
 
 export const DEFAULT_COUNTRY: AllowedCountry = 'Canada';
 
@@ -88,3 +106,16 @@ export const ADDRESS_LABELS: Record<
   Canada: { region: 'Province', postalCode: 'Postal Code' },
   'United States': { region: 'State', postalCode: 'ZIP Code' },
 };
+
+/** Starting values: phone type and country preselected, as in the old form. */
+const SHARED_SIGN_UP_DEFAULTS = {
+  phoneType: 'Cell',
+  address: { country: DEFAULT_COUNTRY },
+  membershipInterests: [],
+} satisfies DefaultValues<IndividualSignUpInput & OrganizationSignUpInput>;
+
+export const INDIVIDUAL_SIGN_UP_DEFAULTS: DefaultValues<IndividualSignUpInput> =
+  { ...SHARED_SIGN_UP_DEFAULTS, waiverRequest: false };
+
+export const ORGANIZATION_SIGN_UP_DEFAULTS: DefaultValues<OrganizationSignUpInput> =
+  { ...SHARED_SIGN_UP_DEFAULTS };

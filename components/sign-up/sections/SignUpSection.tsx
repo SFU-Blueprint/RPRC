@@ -32,7 +32,8 @@ export function SignUpSection({
     <FieldSet className="gap-5">
       <FieldLegend
         className={cn(
-          'mb-0 text-primary-black',
+          // A <legend> ignores the fieldset's flex gap, so it needs its own margin.
+          'mb-5 text-primary-black sm:mb-6',
           headerStyles.mResponsive,
           robotoCondensed.className,
         )}
