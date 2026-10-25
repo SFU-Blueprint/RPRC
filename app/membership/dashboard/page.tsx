@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { inter, robotoCondensed, headerStyles, bodyStyles, buttonStyles } from '@/app/fonts';
 import { Spinner } from '@/components/ui/spinner';
 import { Info } from 'lucide-react';
-import "@/app/globals.css";
+import '@/app/globals.css';
 import MembershipStatusCard from '@/components/membership/MembershipStatusCard';
 import MembershipProfileBanner from '@/components/membership/MembershipProfileBanner';
 import MembershipActionModal from '@/components/membership/modals/MembershipActionModal';
@@ -12,14 +12,13 @@ import IndividualProfile from '@/components/membership/profiles/IndividualProfil
 import OrganizationProfile from '@/components/membership/profiles/OrganizationProfile';
 import MembershipProfileEditForm, { type MembershipProfileEditValues } from '@/components/membership/MembershipProfileEditForm';
 import DiscardChangesModal from '@/components/membership/modals/DiscardChangesModal';
-import { ApplicationStatus } from '@/lib/constants/enums';
+import { ApplicationStatus, UserRole, type PhoneType } from '@/lib/constants/enums';
 import {
   fetchMemberDashboardData,
   submitIndividualMembershipProfileUpdate,
   submitOrganizationMembershipProfileUpdate,
 } from '@/app/actions/member-dashboard';
 import type { MemberDashboardData, OrganizationMemberDashboardData } from '@/types/membership.types';
-import { UserRole } from '@/lib/constants/enums';
 import { toast } from 'sonner';
 
 export default function MembershipDashboard() {
@@ -79,25 +78,30 @@ export default function MembershipDashboard() {
     setIsSavingProfile(true);
 
     try {
-      const submitFunction = dashboardData.type === UserRole.INDIVIDUAL
-        ? submitIndividualMembershipProfileUpdate
-        : submitOrganizationMembershipProfileUpdate;
-
-      const result = await submitFunction({
+      // Zod outputs E.164 (+16041234567); the server action re-adds the +1 prefix used by signup.
+      const digits = values.phoneNumber.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+      const phone = `(${digits.slice(0, 3)})-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+      const shared = {
         name: values.name,
-        phone: values.phone,
-        phoneType: values.phoneType,
-        mailingAddress: values.mailingAddress,
-        city: values.city,
-        province: values.province,
-        country: values.country,
-        postalCode: values.postalCode,
-        interests: values.interests,
-        reason: values.reason,
-        representativeName: values.representativeName ?? '',
-        representativeEmail: values.representativeEmail,
-        servicesOffered: values.servicesOffered,
-      });
+        phone,
+        phoneType: values.phoneType.toLowerCase() as PhoneType,
+        mailingAddress: values.address.mailingAddress,
+        city: values.address.city,
+        province: values.address.province,
+        country: values.address.country,
+        postalCode: values.address.postalCode,
+        interests: values.membershipInterests,
+        reason: values.motivation,
+      };
+
+      const result = values.role === UserRole.ORGANIZATION
+        ? await submitOrganizationMembershipProfileUpdate({
+          ...shared,
+          representativeName: values.representativeName,
+          representativeEmail: values.representativeEmail,
+          servicesOffered: values.programsOrServices ?? '',
+        })
+        : await submitIndividualMembershipProfileUpdate(shared);
 
       if (!result.success) {
         toast.error('Failed to save membership profile', {
@@ -149,10 +153,10 @@ export default function MembershipDashboard() {
         <div className='flex flex-col w-full md:max-w-sm lg:max-w-xl xl:max-w-2xl'>
           <div className='flex flex-col gap-10'>
             <div className='bg-white border rounded-2xl px-4 md:px-4 lg:px-5 py-6 md:py-6 lg:py-8 drop-shadow-sm'>
-              <div className='flex items-center justify-between mb-5'>
+              <div className='flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-5'>
                 <h2 className={`${robotoCondensed.className} text-xl md:text-2xl lg:text-3xl font-medium p-3`}>Profile Information</h2>
                 {canEdit && (
-                  <div>
+                  <div className='shrink-0'>
                     {isEditingProfile ? (
                       <>
                         <button
@@ -200,9 +204,9 @@ export default function MembershipDashboard() {
                   />
                 )
               ) : dashboardData?.type === 'organization' ? (
-                <OrganizationProfile data={dashboardData as OrganizationMemberDashboardData} onEdit={handleEditProfile} />
+                <OrganizationProfile data={dashboardData as OrganizationMemberDashboardData} />
               ) : (
-                <IndividualProfile data={dashboardData} onEdit={handleEditProfile} />
+                <IndividualProfile data={dashboardData} />
               )}
             </div>
             <div>

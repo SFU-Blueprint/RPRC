@@ -15,6 +15,7 @@ import { AlertCircle, Info, Mail, MapPin, Phone, User } from 'lucide-react';
 import { submitMembershipRenewal } from '@/app/actions/member-dashboard';
 import type { MemberDashboardData, OrganizationMemberDashboardData } from '@/types/membership.types';
 import { bodyStyles } from '@/app/fonts';
+import { getMembershipInterestLabel } from '@/lib/constants/membership-interests';
 
 interface MembershipActionModalProps {
     isOpen: boolean;
@@ -137,7 +138,7 @@ export default function MembershipActionModal({ isOpen, onClose, data }: Members
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {data.interests.map((interest, idx) => (
                                     <span key={idx} className="rounded-full border border-content-secondary px-3 py-1.5 text-content-secondary text-sm">
-                                        {interest}
+                                        {getMembershipInterestLabel(interest)}
                                     </span>
                                 ))}
                             </div>
