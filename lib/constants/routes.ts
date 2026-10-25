@@ -15,11 +15,16 @@ export const ROUTES = {
   DONATE: '/donate',
 
   // Membership
-  MEMBERSHIP_SIGNUP: '/membership/signup',
+  // points to new signup flow for consistency.
+  MEMBERSHIP_SIGNUP: '/sign-up',
   MEMBERSHIP_FORM: '/membership/form',
   MEMBERSHIP_CONFIRMATION: '/membership/confirmation',
   MEMBERSHIP_DASHBOARD: '/membership/dashboard',
   MEMBERSHIP_RENEW: '/membership/renew',
+
+  // Sign-up forms (one page each: account + application)
+  SIGN_UP_INDIVIDUAL: '/sign-up/individual',
+  SIGN_UP_ORGANIZATION: '/sign-up/organization',
 
   // Auth
   AUTH_CALLBACK: '/auth/callback',
@@ -54,6 +59,8 @@ export const PUBLIC_ROUTES = [
   ROUTES.HOME,
   ROUTES.ERROR,
   ROUTES.MEMBERSHIP_SIGNUP,
+  ROUTES.SIGN_UP_INDIVIDUAL,
+  ROUTES.SIGN_UP_ORGANIZATION,
   ROUTES.AUTH_CALLBACK,
   ROUTES.AUTH_FORGOT_PASSWORD,
   ROUTES.AUTH_RESET_PASSWORD,
