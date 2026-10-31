@@ -32,8 +32,8 @@ export function MembershipInterests() {
           <InterestCard
             key={interest.id}
             label={interest.name}
-            isSelected={formData.interests?.includes(interest.name) || false}
-            onToggle={() => toggleInterest(interest.name)}
+            isSelected={formData.interests?.includes(interest.value) || false}
+            onToggle={() => toggleInterest(interest.value)}
           />
         ))}
       </div>

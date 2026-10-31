@@ -58,7 +58,6 @@ export const STATUS_CONFIG: Record<
     borderColor: string;
     validUntilText?: string;
     ctaText?: string;
-    ctaHref?: string;
     ctaColor?: string;
     ctaTextColor?: string;
   }
@@ -75,7 +74,6 @@ export const STATUS_CONFIG: Record<
     labelText: 'text-warning',
     borderColor: 'border-warning-stroke',
     ctaText: MEMBERSHIP_STATUS_CTA.EXPIRES_SOON,
-    ctaHref: ROUTES.MEMBERSHIP_RENEW,
     ctaColor: 'bg-warning-stroke hover:bg-warning-stroke/90',
     ctaTextColor: 'text-white',
   },
@@ -86,7 +84,6 @@ export const STATUS_CONFIG: Record<
     labelText: 'text-content-error',
     borderColor: 'border-destructive-default',
     ctaText: MEMBERSHIP_STATUS_CTA.EXPIRED,
-    ctaHref: ROUTES.MEMBERSHIP_RENEW,
     ctaColor: 'bg-destructive-default hover:bg-destructive-default/90',
     ctaTextColor: 'text-white',
   },
@@ -108,7 +105,6 @@ export const STATUS_CONFIG: Record<
     labelText: 'text-warning',
     borderColor: 'border-warning-stroke',
     ctaText: MEMBERSHIP_STATUS_CTA.PAYMENT_PENDING,
-    ctaHref: '#',
     ctaColor: 'bg-warning-stroke hover:bg-warning-stroke/90',
     ctaTextColor: 'text-white',
   },
@@ -118,7 +114,6 @@ export const STATUS_CONFIG: Record<
     labelText: 'text-content-error',
     borderColor: 'border-destructive-default',
     ctaText: MEMBERSHIP_STATUS_CTA.REJECTED,
-    ctaHref: ROUTES.MEMBERSHIP_RENEW,
     ctaColor: 'bg-destructive-default hover:bg-destructive-default/90',
     ctaTextColor: 'text-white',
   },

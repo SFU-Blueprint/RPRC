@@ -70,8 +70,11 @@ export type ReviewDecision = (typeof ReviewDecision)[keyof typeof ReviewDecision
  */
 export const MembershipInterest = {
   HEALTH: 'Health',
+  EDUCATION: 'Education',
   ENVIRONMENT: 'Environment',
-  ARTS_CULTURE: 'Arts + Culture',
+  ARTS_CULTURE: 'Arts+Culture',
+  HOUSING: 'Housing',
+  OTHER: 'Other',
 } as const;
 
 export type MembershipInterest =
