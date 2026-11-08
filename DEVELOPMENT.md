@@ -222,7 +222,8 @@ CI (`.github/workflows/ci.yml`) automatically runs:
 - ✅ Migrations applied to a fresh database, plus schema linting
 - ✅ `types/database.ts` matches the migrations
 - ✅ Migration history matches the dev project (`db push --dry-run`)
-- ✅ Drift detection: the dev schema matches the migrations on `dev`
+- ✅ Drift detection: the dev schema matches the migrations on `dev`. This only covers the `public`
+  schema, so pg_cron jobs and the triggers on `auth.users` aren't checked.
 
 ### Step 8: After Merge
 

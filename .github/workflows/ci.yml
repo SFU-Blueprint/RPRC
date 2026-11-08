@@ -41,9 +41,9 @@ jobs:
       # Only files changed in this PR: much of the existing code predates Prettier.
       - name: Prettier (changed files)
         run: |
-          git diff --name-only --diff-filter=ACMR "origin/${{ github.base_ref }}...HEAD" \
-            | grep -E '\.(ts|tsx|js|jsx|mjs|cjs|json|md|css)$' \
-            | xargs -r npx prettier --check
+          git diff -z --name-only --diff-filter=ACMR "origin/${{ github.base_ref }}...HEAD" \
+            | grep -zE '\.(ts|tsx|js|jsx|mjs|cjs|json|md|css)$' \
+            | xargs -0 -r npx prettier --check
 
       - name: Tests
         run: npx vitest run --passWithNoTests
@@ -100,6 +100,8 @@ jobs:
       # Fails if the dev schema differs from what the base branch's migrations produce, which
       # usually means someone changed the schema in the dashboard without writing a migration.
       # (Compared against the base branch because this PR's new migrations aren't on dev yet.)
+      # Only the `public` schema is compared: changes to the pg_cron jobs or to the triggers on
+      # auth.users are not caught here.
       - name: Check dev for schema drift
         if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != ''
         run: |
