@@ -34,6 +34,76 @@ We have 2 Supabase projects:
 
 ---
 
+## Local Full-Stack Development
+
+`npm run dev` runs the app against a local Supabase stack in Docker. The stack has its own
+database, auth and email inbox, so you can sign up, submit applications, review them as admin and
+work with payment states without touching shared data. `make dev` is `npm install` followed by `npm run dev`.
+
+### One-time setup
+
+1. Install Docker Desktop and make sure it is running.
+2. `cp .env.example .env.local`. The Supabase values in `.env.example` are the local stack's
+   defaults. If `npx supabase status` shows different keys, use those.
+3. `npm run dev`. The first run downloads the Supabase images, which takes a few minutes.
+
+`npm run dev` runs `supabase start`, which does nothing if the stack is already running, then
+`next dev`. Stop the stack with `npm run db:stop` when you're done; your local data is kept.
+
+To run the app against the hosted dev project instead, replace the three Supabase values in
+`.env.local` with that project's URL and keys (Dashboard → Project Settings → API) and run
+`npx next dev`.
+
+**Windows troubleshooting:** if Docker is running but `http://127.0.0.1:54321` hangs, WSL is
+forwarding the ports from your Ubuntu distro and the forward is broken. In Docker Desktop, go to
+Settings → Resources → WSL integration and turn the distro off, or set `localhostForwarding=false`
+in `%USERPROFILE%\.wslconfig`. Then run `wsl --shutdown` and restart Docker Desktop. Give WSL at
+least 4 GB of memory (`memory=6GB` under `[wsl2]` in `.wslconfig`).
+
+### Local services
+
+| Service         | URL                                                       |
+| --------------- | --------------------------------------------------------- |
+| App             | http://localhost:3000                                     |
+| Supabase Studio | http://127.0.0.1:54323                                    |
+| Mailpit (email) | http://127.0.0.1:54324 (signup confirmations, resets)     |
+| Postgres        | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
+
+### Seeded accounts
+
+`supabase/seed.sql` runs on the first `supabase start` and on every `npm run db:reset`. All
+accounts use the password `password123`.
+
+| Email               | Role         | State                                          |
+| ------------------- | ------------ | ---------------------------------------------- |
+| `admin@rprc.test`   | admin        | Can open `/admin` and review applications      |
+| `review@rprc.test`  | individual   | Application `to_review` (requests fee waiver)  |
+| `org@rprc.test`     | organization | Application `to_review`                        |
+| `pending@rprc.test` | individual   | Application `payment_pending` (payment flow)   |
+| `member@rprc.test`  | individual   | Application `active`, with a succeeded payment |
+
+### Testing each flow locally
+
+- **Sign up:** register any new email. The confirmation email shows up in Mailpit. Click the link
+  to confirm, then log in.
+- **Application submission:** log in as the new account and complete the membership form.
+- **Admin review:** log in as `admin@rprc.test` and open `/admin`. An application needs two
+  reviews: two approvals move it to `payment_pending`, two rejections to `rejected`, and a split
+  to `conflict`. You can submit both reviews from the same admin account.
+- **Start over:** `npm run db:reset` re-runs all migrations and the seed.
+
+### Generating types
+
+- `npm run types` generates `types/database.ts` from the local database. Use this after writing a
+  migration and running `npm run db:reset`.
+- `npm run types:remote` generates them from the hosted dev project. Run `npx supabase login`
+  once first.
+
+Because migrations are the source of truth, both should produce the same file once your migration
+has been deployed.
+
+---
+
 ## Daily Development Workflow
 
 ### Starting Your Day
