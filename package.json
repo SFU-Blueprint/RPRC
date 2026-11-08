@@ -9,6 +9,7 @@
     "types": "supabase gen types typescript --local --schema public > types/database.ts && prettier --write types/database.ts",
     "types:remote": "supabase gen types typescript --project-id jxvpwuyzthaetqydjmgv --schema public > types/database.ts && prettier --write types/database.ts",
     "lint": "eslint",
+    "type-check": "tsc --noEmit",
     "format": "prettier . --write",
     "test": "vitest",
     "db:start": "supabase start",

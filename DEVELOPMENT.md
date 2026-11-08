@@ -100,7 +100,8 @@ accounts use the password `password123`.
   once first.
 
 Because migrations are the source of truth, both should produce the same file once your migration
-has been deployed.
+has been deployed. CI regenerates the types from the migrations on every PR and fails if the
+committed `types/database.ts` doesn't match, so commit the regenerated file with your migration.
 
 ---
 
@@ -214,14 +215,14 @@ git push
 
 ### Step 7: Open Pull Request
 
-CI automatically runs:
+CI (`.github/workflows/ci.yml`) automatically runs:
 
-- ✅ Migration validation
-- ✅ Schema linting
-- ✅ Drift detection
-- ✅ Code linting
-- ✅ Type checking
-- ✅ Build
+- ✅ Code linting, type checking, tests and build
+- ✅ Prettier on the files your PR changes
+- ✅ Migrations applied to a fresh database, plus schema linting
+- ✅ `types/database.ts` matches the migrations
+- ✅ Migration history matches the dev project (`db push --dry-run`)
+- ✅ Drift detection: the dev schema matches the migrations on `dev`
 
 ### Step 8: After Merge
 

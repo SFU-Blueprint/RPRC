@@ -2,64 +2,112 @@ name: CI (PR → dev)
 
 on:
   pull_request:
-    branches: ["dev"]
+    branches: ['dev']
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  SUPABASE_CLI_VERSION: 2.122.0
 
 jobs:
-  ci:
+  app:
+    name: Lint, type-check, test, build
     runs-on: ubuntu-latest
-
     env:
-      SUPABASE_DB_PASSWORD: "postgres"
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-
+      # Local stack defaults (same as .env.example). The build only needs them to be set.
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v6
         with:
           node-version: v24.12.0
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
-      - uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Start Supabase
-        run: supabase start
-
-      - name: Validate migrations
-        run: supabase db push --dry-run
-
-      - name: Lint schema
-        run: supabase db lint
-
-      - name: Check schema drift
-        run: bash ./scripts/check-schema-diff.sh
+      - name: Lint
+        run: npm run lint
 
       - name: Type check
         run: npm run type-check
 
-      - uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            ts:
-              - "**/*.ts"
-              - "**/*.tsx"
+      # Only files changed in this PR: much of the existing code predates Prettier.
+      - name: Prettier (changed files)
+        run: |
+          git diff --name-only --diff-filter=ACMR "origin/${{ github.base_ref }}...HEAD" \
+            | grep -E '\.(ts|tsx|js|jsx|mjs|cjs|json|md|css)$' \
+            | xargs -r npx prettier --check
 
-      - name: Lint changed files
-        if: steps.changes.outputs.ts == 'true'
-        run: npm run lint
-
-      - name: Prettier format check
-        run: npm run format:check
+      - name: Tests
+        run: npx vitest run --passWithNoTests
 
       - name: Build
         run: npm run build
 
-      - name: Tests
-        run: npm test
+  database:
+    name: Migrations, schema lint, generated types
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_RPRC_DEV_ID }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: v24.12.0
+          cache: npm
+
+      - run: npm ci
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      # Applies every migration plus supabase/seed.sql to a fresh database.
+      - name: Apply migrations to a fresh database
+        run: supabase db start
+
+      - name: Lint schema
+        run: supabase db lint --local --fail-on error
+
+      - name: Check types/database.ts is up to date
+        run: |
+          npm run types
+          if ! git diff --exit-code -- types/database.ts; then
+            echo "::error file=types/database.ts::types/database.ts is out of date with the migrations. Run \`npm run db:reset && npm run types\` and commit the result."
+            exit 1
+          fi
+
+      # The steps below talk to the hosted dev project. Skipped when secrets are unavailable (forks).
+      - name: Link dev project
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != ''
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Check migration history matches dev
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != ''
+        run: supabase db push --dry-run
+
+      # Fails if the dev schema differs from what the base branch's migrations produce, which
+      # usually means someone changed the schema in the dashboard without writing a migration.
+      # (Compared against the base branch because this PR's new migrations aren't on dev yet.)
+      - name: Check dev for schema drift
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_ID != ''
+        run: |
+          rm -rf supabase/migrations
+          git checkout -q "origin/${{ github.base_ref }}" -- supabase/migrations
+          supabase db diff --linked --schema public --file ci_drift_check
+          if ls supabase/migrations/*_ci_drift_check.sql >/dev/null 2>&1; then
+            echo "::error::The dev database differs from the migrations on ${{ github.base_ref }}:"
+            cat supabase/migrations/*_ci_drift_check.sql
+            exit 1
+          fi
