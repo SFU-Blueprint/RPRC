@@ -9,6 +9,7 @@
     "types": "node scripts/gen-types.mjs",
     "types:remote": "node scripts/gen-types.mjs --remote",
     "lint": "eslint",
+    "type-check": "tsc --noEmit",
     "format": "prettier . --write",
     "test": "vitest",
     "db:start": "supabase start",
