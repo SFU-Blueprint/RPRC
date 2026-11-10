@@ -360,7 +360,6 @@ export type Database = {
           email: string;
           id: string;
           role: Database['public']['Enums']['user_role'];
-          status: string | null;
           updated_at: string;
         };
         ComputedFields: never;
@@ -369,7 +368,6 @@ export type Database = {
           email: string;
           id?: string;
           role: Database['public']['Enums']['user_role'];
-          status?: string | null;
           updated_at?: string;
         };
         Update: {
@@ -377,7 +375,6 @@ export type Database = {
           email?: string;
           id?: string;
           role?: Database['public']['Enums']['user_role'];
-          status?: string | null;
           updated_at?: string;
         };
         Relationships: [];
@@ -469,16 +466,6 @@ export type Database = {
         | 'rejected'
         | 'expires_soon';
       application_type: 'individual' | 'organization';
-      approval_decision: 'approved' | 'rejected';
-      approval_status: 'to_review' | 'completed' | 'rejected';
-      membership_interest:
-        | 'Health'
-        | 'Environment'
-        | 'Education'
-        | 'Arts+Culture'
-        | 'Housing'
-        | 'Other';
-      payment_status: 'pending' | 'approved' | 'rejected';
       payment_transaction_status:
         | 'requires_payment_method'
         | 'requires_confirmation'
@@ -490,7 +477,6 @@ export type Database = {
       phone_type: 'home' | 'cell';
       review_decision: 'approve' | 'reject';
       user_role: 'admin' | 'individual' | 'organization';
-      user_status: 'pending' | 'approved' | 'rejected';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -631,17 +617,6 @@ export const Constants = {
         'expires_soon',
       ],
       application_type: ['individual', 'organization'],
-      approval_decision: ['approved', 'rejected'],
-      approval_status: ['to_review', 'completed', 'rejected'],
-      membership_interest: [
-        'Health',
-        'Environment',
-        'Education',
-        'Arts+Culture',
-        'Housing',
-        'Other',
-      ],
-      payment_status: ['pending', 'approved', 'rejected'],
       payment_transaction_status: [
         'requires_payment_method',
         'requires_confirmation',
@@ -654,7 +629,6 @@ export const Constants = {
       phone_type: ['home', 'cell'],
       review_decision: ['approve', 'reject'],
       user_role: ['admin', 'individual', 'organization'],
-      user_status: ['pending', 'approved', 'rejected'],
     },
   },
 } as const;
