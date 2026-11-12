@@ -1,28 +1,38 @@
-'use server'
+'use server';
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { UserRole } from '@/lib/constants/enums'
-import { AuthErrorCode, type SignupResponse, type LoginResponse, type ForgotPasswordResponse, type ResetPasswordResponse, type ResendConfirmationResponse } from '@/lib/constants/error-types'
-import { ROUTES } from '@/lib/constants/routes'
-import { headers } from 'next/headers'
-import type { IndividualSignUpValues, OrganizationSignUpValues } from '@/types/sign-up-form.types'
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { UserRole } from '@/lib/constants/enums';
+import {
+  AuthErrorCode,
+  type SignupResponse,
+  type LoginResponse,
+  type ForgotPasswordResponse,
+  type ResetPasswordResponse,
+  type ResendConfirmationResponse,
+} from '@/lib/constants/error-types';
+import { ROUTES } from '@/lib/constants/routes';
+import { headers } from 'next/headers';
+import type {
+  IndividualSignUpValues,
+  OrganizationSignUpValues,
+} from '@/types/sign-up-form.types';
 
 export async function signup(formData: FormData): Promise<SignupResponse> {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   // Extract form data
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const role = formData.get('role') as UserRole
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const role = formData.get('role') as UserRole;
 
   // Validate inputs
   if (!email || !password || !role) {
     return {
       error: 'Email, password, and role are required',
-      code: AuthErrorCode.VALIDATION_ERROR
-    }
+      code: AuthErrorCode.VALIDATION_ERROR,
+    };
   }
 
   // Check if email already exists in users table
@@ -30,7 +40,7 @@ export async function signup(formData: FormData): Promise<SignupResponse> {
     .from('users')
     .select('email')
     .eq('email', email)
-    .single()
+    .single();
 
   if (existingUser) {
     return {
@@ -38,7 +48,7 @@ export async function signup(formData: FormData): Promise<SignupResponse> {
       userId: '', // Empty string since we don't create a new user
       email: email,
       emailExists: true,
-    }
+    };
   }
 
   // Sign up with Supabase
@@ -51,35 +61,40 @@ export async function signup(formData: FormData): Promise<SignupResponse> {
       },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${ROUTES.AUTH_CALLBACK}`,
     },
-  })
+  });
 
   if (error) {
-    console.error('Signup error:', error)
+    console.error('Signup error:', error);
 
     // Handle specific Supabase auth errors
-    if (error.message?.includes('already registered') ||
-      error.message?.includes('User already registered')) {
-      console.log('Email already exists via Supabase (returning 200 with emailExists flag):', email)
+    if (
+      error.message?.includes('already registered') ||
+      error.message?.includes('User already registered')
+    ) {
+      console.log(
+        'Email already exists via Supabase (returning 200 with emailExists flag):',
+        email,
+      );
       // Return 200 status to avoid console errors, but include flag to show user message
       return {
         success: true,
         userId: '',
         email: email,
         emailExists: true, // Flag to show "email exists" message to user
-      }
+      };
     }
 
     return {
       error: error.message || 'Failed to create account',
-      code: AuthErrorCode.SERVER_ERROR
-    }
+      code: AuthErrorCode.SERVER_ERROR,
+    };
   }
 
   if (!data.user) {
     return {
       error: 'Failed to create account',
-      code: AuthErrorCode.SERVER_ERROR
-    }
+      code: AuthErrorCode.SERVER_ERROR,
+    };
   }
 
   // Return success with user info
@@ -87,157 +102,169 @@ export async function signup(formData: FormData): Promise<SignupResponse> {
     success: true,
     userId: data.user.id,
     email: data.user.email,
-  }
+  };
 }
 
 export async function login(formData: FormData): Promise<LoginResponse> {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
 
   // Validate inputs
   if (!email || !password) {
     return {
       error: 'Email and password are required',
-      code: AuthErrorCode.VALIDATION_ERROR
-    }
+      code: AuthErrorCode.VALIDATION_ERROR,
+    };
   }
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
-  })
-
+  });
 
   if (error) {
-    console.error('Login error:', error.message)
+    console.error('Login error:', error.message);
 
     // Handle specific auth errors
     if (error.message?.includes('Invalid login credentials')) {
       return {
         error: 'Invalid email or password',
-        code: AuthErrorCode.INVALID_CREDENTIALS
-      }
+        code: AuthErrorCode.INVALID_CREDENTIALS,
+      };
     }
 
     return {
       error: error.message || 'Failed to sign in',
-      code: AuthErrorCode.SERVER_ERROR
-    }
+      code: AuthErrorCode.SERVER_ERROR,
+    };
   }
 
   if (!data.user) {
     return {
       error: 'Failed to sign in',
-      code: AuthErrorCode.SERVER_ERROR
-    }
+      code: AuthErrorCode.SERVER_ERROR,
+    };
   }
   // Routing destinations are centralized in lib/supabase/proxy.ts.
-  revalidatePath(ROUTES.HOME, 'layout')
-  redirect(ROUTES.HOME)
+  revalidatePath(ROUTES.HOME, 'layout');
+  redirect(ROUTES.HOME);
 }
 
 export async function signout() {
-  const supabase = await createClient()
-  await supabase.auth.signOut()
-  revalidatePath(ROUTES.HOME, 'layout')
-  redirect(ROUTES.HOME)
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  revalidatePath(ROUTES.HOME, 'layout');
+  redirect(ROUTES.HOME);
 }
 
-export async function forgotPassword(formData: FormData): Promise<ForgotPasswordResponse> {
-  const supabase = await createClient()
+export async function forgotPassword(
+  formData: FormData,
+): Promise<ForgotPasswordResponse> {
+  const supabase = await createClient();
 
-  const email = formData.get('email') as string
+  const email = formData.get('email') as string;
 
   // Validate input
   if (!email) {
     return {
       error: 'Email is required',
-      code: AuthErrorCode.VALIDATION_ERROR
-    }
+      code: AuthErrorCode.VALIDATION_ERROR,
+    };
   }
 
   // Send password reset email
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${ROUTES.AUTH_RESET_PASSWORD}`,
-  })
+  });
 
   if (error) {
-    console.error('Forgot password error:', error)
+    console.error('Forgot password error:', error);
 
     // Handle rate limiting
-    if (error.message?.includes('rate limit') || error.message?.includes('too many')) {
+    if (
+      error.message?.includes('rate limit') ||
+      error.message?.includes('too many')
+    ) {
       return {
-        error: 'Please wait before requesting another email. Try again in 1 minute.',
-        code: AuthErrorCode.RATE_LIMITED
-      }
+        error:
+          'Please wait before requesting another email. Try again in 1 minute.',
+        code: AuthErrorCode.RATE_LIMITED,
+      };
     }
 
     return {
       error: error.message || 'Failed to send reset email',
-      code: AuthErrorCode.SERVER_ERROR
-    }
+      code: AuthErrorCode.SERVER_ERROR,
+    };
   }
 
   return {
     success: true,
-    message: 'Password reset email sent successfully'
-  }
+    message: 'Password reset email sent successfully',
+  };
 }
 
-export async function resetPassword(formData: FormData): Promise<ResetPasswordResponse> {
-  const supabase = await createClient()
+export async function resetPassword(
+  formData: FormData,
+): Promise<ResetPasswordResponse> {
+  const supabase = await createClient();
 
-  const password = formData.get('password') as string
+  const password = formData.get('password') as string;
 
   // Basic validation - detailed validation handled by PasswordInput component
   if (!password) {
     return {
       error: 'Password is required',
-      code: AuthErrorCode.VALIDATION_ERROR
-    }
+      code: AuthErrorCode.VALIDATION_ERROR,
+    };
   }
 
   // Update password
   const { error } = await supabase.auth.updateUser({
     password: password,
-  })
+  });
 
   if (error) {
-    console.error('Reset password error:', error)
+    console.error('Reset password error:', error);
 
     // Handle Supabase password policy errors as backup
-    if (error.message?.includes('Password') || error.message?.includes('weak')) {
+    if (
+      error.message?.includes('Password') ||
+      error.message?.includes('weak')
+    ) {
       return {
         error: error.message,
-        code: AuthErrorCode.WEAK_PASSWORD
-      }
+        code: AuthErrorCode.WEAK_PASSWORD,
+      };
     }
 
     return {
       error: error.message || 'Failed to reset password',
-      code: AuthErrorCode.SERVER_ERROR
-    }
+      code: AuthErrorCode.SERVER_ERROR,
+    };
   }
 
   return {
     success: true,
-    message: 'Password reset successfully'
-  }
+    message: 'Password reset successfully',
+  };
 }
 
-export async function resendConfirmationEmail(formData: FormData): Promise<ResendConfirmationResponse> {
-  const supabase = await createClient()
+export async function resendConfirmationEmail(
+  formData: FormData,
+): Promise<ResendConfirmationResponse> {
+  const supabase = await createClient();
 
-  const email = formData.get('email') as string
+  const email = formData.get('email') as string;
 
   // Validate input
   if (!email) {
     return {
       error: 'Email is required',
-      code: AuthErrorCode.VALIDATION_ERROR
-    }
+      code: AuthErrorCode.VALIDATION_ERROR,
+    };
   }
 
   // Resend confirmation email using Supabase's built-in resend method
@@ -247,37 +274,44 @@ export async function resendConfirmationEmail(formData: FormData): Promise<Resen
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${ROUTES.AUTH_CALLBACK}`,
     },
-  })
+  });
 
   if (error) {
-    console.error('Resend confirmation error:', error)
+    console.error('Resend confirmation error:', error);
 
     // Handle rate limiting
-    if (error.message?.includes('rate limit') || error.message?.includes('too many')) {
+    if (
+      error.message?.includes('rate limit') ||
+      error.message?.includes('too many')
+    ) {
       return {
-        error: 'Please wait before requesting another email. Try again in 1 minute.',
-        code: AuthErrorCode.RATE_LIMITED
-      }
+        error:
+          'Please wait before requesting another email. Try again in 1 minute.',
+        code: AuthErrorCode.RATE_LIMITED,
+      };
     }
 
     // Handle email not found or already confirmed
-    if (error.message?.includes('not found') || error.message?.includes('already confirmed')) {
+    if (
+      error.message?.includes('not found') ||
+      error.message?.includes('already confirmed')
+    ) {
       return {
         error: 'Email not found or already confirmed',
-        code: AuthErrorCode.EMAIL_NOT_FOUND
-      }
+        code: AuthErrorCode.EMAIL_NOT_FOUND,
+      };
     }
 
     return {
       error: error.message || 'Failed to resend confirmation email',
-      code: AuthErrorCode.SERVER_ERROR
-    }
+      code: AuthErrorCode.SERVER_ERROR,
+    };
   }
 
   return {
     success: true,
-    message: 'Confirmation email resent successfully'
-  }
+    message: 'Confirmation email resent successfully',
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -285,45 +319,41 @@ export async function resendConfirmationEmail(formData: FormData): Promise<Resen
 //
 // The single-page sign-up forms (/sign-up/individual, /sign-up/organization)
 // submit account + application together through these two actions. For now
-// they only log the values (without passwords) to the server terminal. Replace
-// their bodies with the real Supabase calls; the forms will not need to change.
+// they only wait briefly and resolve. Replace their bodies with the real
+// Supabase calls; the forms will not need to change.
 // ---------------------------------------------------------------------------
 
 /** Long enough to see the form's disabled "submitting" state. */
-const SIGN_UP_PLACEHOLDER_DELAY_MS = 1000
-
-const SIGN_UP_SECRET_FIELDS = new Set(['password', 'confirmPassword'])
-
-function withoutSecrets(values: object): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.entries(values).filter(([key]) => !SIGN_UP_SECRET_FIELDS.has(key))
-  )
-}
+const SIGN_UP_PLACEHOLDER_DELAY_MS = 1000;
 
 /** Development only: open the form with `?simulate=failure` to test the error path. */
 async function shouldSimulateSignUpFailure(): Promise<boolean> {
-  if (process.env.NODE_ENV === 'production') return false
+  if (process.env.NODE_ENV === 'production') return false;
 
-  const referer = (await headers()).get('referer')
-  if (!referer) return false
+  const referer = (await headers()).get('referer');
+  if (!referer) return false;
 
-  return new URL(referer).searchParams.get('simulate') === 'failure'
+  return new URL(referer).searchParams.get('simulate') === 'failure';
 }
 
-async function placeholderSignUp(kind: string, values: object): Promise<void> {
-  console.log(`[sign-up placeholder] ${kind} application`, withoutSecrets(values))
-
-  await new Promise((resolve) => setTimeout(resolve, SIGN_UP_PLACEHOLDER_DELAY_MS))
+async function placeholderSignUp(): Promise<void> {
+  await new Promise((resolve) =>
+    setTimeout(resolve, SIGN_UP_PLACEHOLDER_DELAY_MS),
+  );
 
   if (await shouldSimulateSignUpFailure()) {
-    throw new Error('Simulated sign-up failure')
+    throw new Error('Simulated sign-up failure');
   }
 }
 
-export async function signUpIndividual(values: IndividualSignUpValues): Promise<void> {
-  await placeholderSignUp('individual', values)
+export async function signUpIndividual(
+  values: IndividualSignUpValues,
+): Promise<void> {
+  await placeholderSignUp();
 }
 
-export async function signUpOrganization(values: OrganizationSignUpValues): Promise<void> {
-  await placeholderSignUp('organization', values)
+export async function signUpOrganization(
+  values: OrganizationSignUpValues,
+): Promise<void> {
+  await placeholderSignUp();
 }

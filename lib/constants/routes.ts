@@ -1,6 +1,6 @@
 /**
  * Application Routes Constants
- * 
+ *
  * Centralized route definitions for the entire application.
  * Use these constants instead of hardcoded strings for better maintainability.
  */
@@ -39,7 +39,7 @@ export const ROUTES = {
   API_APPLICATION: '/api/application',
   API_APPLICATION_BY_ID: (id: string) => `/api/application/${id}`,
   API_AUTH_LOGIN: '/api/auth/log-in',
-} as const
+} as const;
 
 // Protected routes that require authentication
 export const PROTECTED_ROUTES = [
@@ -47,12 +47,10 @@ export const PROTECTED_ROUTES = [
   ROUTES.MEMBERSHIP_CONFIRMATION,
   ROUTES.MEMBERSHIP_DASHBOARD,
   ROUTES.MEMBERSHIP_RENEW,
-] as const
+] as const;
 
 // Admin routes that require admin role
-export const ADMIN_ROUTES = [
-  ROUTES.ADMIN_DASHBOARD,
-] as const
+export const ADMIN_ROUTES = [ROUTES.ADMIN_DASHBOARD] as const;
 
 // Public routes accessible without authentication
 export const PUBLIC_ROUTES = [
@@ -64,7 +62,7 @@ export const PUBLIC_ROUTES = [
   ROUTES.AUTH_CALLBACK,
   ROUTES.AUTH_FORGOT_PASSWORD,
   ROUTES.AUTH_RESET_PASSWORD,
-] as const
+] as const;
 
 // Type helper for route values
-export type RouteValue = typeof ROUTES[keyof typeof ROUTES]
+export type RouteValue = (typeof ROUTES)[keyof typeof ROUTES];

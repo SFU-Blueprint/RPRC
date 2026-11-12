@@ -41,18 +41,14 @@ const organization = {
   organizationEmail: 'info@foodbank.org',
 } as unknown as OrganizationSignUpValues;
 
-let log: ReturnType<typeof vi.spyOn>;
-
 beforeEach(() => {
   vi.useFakeTimers();
   referer.value = 'http://localhost:3000/sign-up/individual';
-  log = vi.spyOn(console, 'log').mockImplementation(() => {});
 });
 
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllEnvs();
-  log.mockRestore();
 });
 
 /** Runs an action while advancing the placeholder delay. */
@@ -70,20 +66,15 @@ describe('sign-up placeholder actions (app/actions/auth.ts)', () => {
     ['individual', () => signUpIndividual(individual)],
     ['organization', () => signUpOrganization(organization)],
   ])(
-    '%s: resolves and logs the values without passwords',
-    async (kind, call) => {
+    '%s: resolves without logging the submitted values',
+    async (_kind, call) => {
+      const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+
       const result = await run(call());
 
       expect(result.ok).toBe(true);
-      expect(log).toHaveBeenCalledTimes(1);
-      const [message, logged] = log.mock.calls[0];
-      expect(message).toBe(`[sign-up placeholder] ${kind} application`);
-      expect(logged).not.toHaveProperty('password');
-      expect(logged).not.toHaveProperty('confirmPassword');
-      expect(logged).toMatchObject({
-        email: 'jane@example.com',
-        name: 'Jane Doe',
-      });
+      expect(log).not.toHaveBeenCalled();
+      log.mockRestore();
     },
   );
 

@@ -1,6 +1,6 @@
-/** placeholder page until design is finalized 
+/** placeholder page until design is finalized
  * a copy of the membership/signup without the email and pass fields.
-*/
+ */
 import type { Metadata } from 'next';
 
 import { MembershipTypeChooser } from '@/components/sign-up/MembershipTypeChooser';
