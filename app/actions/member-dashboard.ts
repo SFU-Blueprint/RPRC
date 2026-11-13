@@ -160,6 +160,19 @@ export async function submitMembershipRenewal(): Promise<{
       };
     }
 
+    // The review outcome counts every review on the application, so the
+    // previous round's reviews have to go before it is reviewed again.
+    // Delete them first: if the status update below then fails, the
+    // application keeps its finished status and only loses its review history.
+    const { error: deleteError } = await supabase
+      .from('application_reviews')
+      .delete()
+      .eq('application_id', application.id);
+
+    if (deleteError) {
+      return { success: false, error: 'Failed to submit renewal' };
+    }
+
     // Only move the row if it is still in the status we checked.
     const { data: updated, error: updateError } = await supabase
       .from('applications')
