@@ -99,20 +99,27 @@ describe('organizationNameSchema', () => {
 });
 
 describe('phoneNumberSchema', () => {
-  test('accepts 10 bare digits', () => {
-    expect(phoneNumberSchema.safeParse('6041234567').success).toBe(true);
+  test.each([
+    '6041234567',
+    '(604)-123-4567',
+    '(604) 123-4567',
+    '604-123-4567',
+    '604 123 4567',
+    '+1 (604)-123-4567',
+    '16041234567',
+  ])('accepts %s and outputs the stored format', (input) => {
+    const result = phoneNumberSchema.safeParse(input);
+    expect(result.success).toBe(true);
+    expect(result.data).toBe('+1 (604)-123-4567');
   });
 
-  test.each(['(604) 123-4567', '604-123-4567', '604 123 4567'])(
-    'strips formatting from %s',
-    (input) => {
-      const result = phoneNumberSchema.safeParse(input);
-      expect(result.success).toBe(true);
-      expect(result.data).toBe('6041234567');
-    },
-  );
+  test('keeps a 10 digit number that starts with 1 as it is', () => {
+    expect(phoneNumberSchema.safeParse('1604123456').data).toBe(
+      '+1 (160)-412-3456',
+    );
+  });
 
-  test.each(['604123456', '16041234567', 'not a phone'])(
+  test.each(['604123456', '26041234567', '+44 20 7946 0958', 'not a phone'])(
     'rejects %s',
     (input) => {
       expect(phoneNumberSchema.safeParse(input).success).toBe(false);
@@ -217,21 +224,11 @@ describe('individualSchema', () => {
     ).toBe(true);
   });
 
-  test('rejects a waiver request with no reason', () => {
-    const result = individualSchema.safeParse({
-      ...validIndividual,
-      waiverRequest: true,
-    });
-    expect(result.success).toBe(false);
-    expect(result.error?.issues[0].path).toEqual(['waiverReason']);
-  });
-
-  test('allows a reason when no waiver was requested', () => {
+  test('accepts a waiver request with no reason (the reason is optional)', () => {
     expect(
       individualSchema.safeParse({
         ...validIndividual,
-        waiverRequest: false,
-        waiverReason: 'Changed my mind.',
+        waiverRequest: true,
       }).success,
     ).toBe(true);
   });

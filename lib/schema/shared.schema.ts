@@ -19,8 +19,28 @@ const PERSON_NAME_REGEX = /^[\p{L}][\p{L}\s.'-]*$/u;
  */
 const ORGANIZATION_NAME_REGEX = /^[\p{L}\p{N}][\p{L}\p{N}\s.,&'()/-]*$/u;
 
-/** 10 digit North American number, matching what `PhoneInput` stores. */
+/** 10 digit North American number, the same rule as `validatePhone`. */
 const PHONE_NUMBER_REGEX = /^\d{10}$/;
+
+/**
+ * The digits of a phone number, without a leading country code `1`, so an
+ * already stored `+1 (604)-123-4567` reads back as `6041234567`.
+ */
+export function toPhoneDigits(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  return digits.length === 11 && digits.startsWith('1')
+    ? digits.slice(1)
+    : digits;
+}
+
+/**
+ * The format phone numbers are stored in: `+1 (604)-123-4567`, the same as the
+ * existing signup (`PhoneInput` plus `formatPhoneWithAreaCode`). Expects the
+ * 10 digits from `toPhoneDigits`.
+ */
+export function formatStoredPhone(digits: string): string {
+  return `+1 (${digits.slice(0, 3)})-${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
 
 export const emailSchema = z
   .email({ error: 'Enter a valid email address' })
@@ -47,16 +67,17 @@ export const organizationNameSchema = z
   });
 
 /**
- * Stored and submitted as 10 digits with no country code, matching
- * `validatePhone` and the existing rows. Any formatting the user types
- * (spaces, brackets, hyphens) is stripped before validating.
+ * Accepts any formatting (spaces, brackets, hyphens, a leading `+1`) and
+ * requires exactly 10 digits, like `validatePhone`. Outputs the stored format,
+ * `+1 (604)-123-4567`, so callers can pass the parsed value straight to the DB.
  */
 export const phoneNumberSchema = z
   .string({ error: 'Phone number is required' })
-  .transform((value) => value.replace(/\D/g, ''))
-  .refine((value) => PHONE_NUMBER_REGEX.test(value), {
-    error: 'Enter a valid 10 digit phone number (e.g. 6041234567)',
-  });
+  .transform(toPhoneDigits)
+  .refine((digits) => PHONE_NUMBER_REGEX.test(digits), {
+    error: 'Phone number must be 10 digits',
+  })
+  .transform(formatStoredPhone);
 
 /** Lowercase to match the `phone_type` enum in the database. */
 export const PHONE_TYPES = ['home', 'cell'] as const;

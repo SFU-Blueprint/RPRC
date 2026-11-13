@@ -15,13 +15,18 @@ import {
   SubmitApplication,
 } from '@/lib/constants/application-errors';
 import { isAdmin } from '@/lib/helpers/auth-helper';
+import { phoneNumberSchema } from '@/lib/schema/shared.schema';
 import type { Database } from '@/types/database';
 
-function formatPhoneWithAreaCode(phoneNumber: string): string {
-  const normalized = phoneNumber.trim();
-  if (!normalized) return normalized;
-  if (normalized.startsWith('+1')) return normalized;
-  return `+1 ${normalized}`;
+const INVALID_PHONE_RESPONSE = {
+  success: false,
+  error: 'Phone number must be 10 digits',
+  code: ApplicationErrorCode.VALIDATION_ERROR,
+} as const;
+
+/** The stored format (`+1 (604)-123-4567`), or null if it isn't 10 digits. */
+function toStoredPhone(phoneNumber: string | null): string | null {
+  return phoneNumberSchema.safeParse(phoneNumber ?? '').data ?? null;
 }
 
 /**
@@ -48,7 +53,6 @@ export async function submitIndividualApplication(
     membershipwaiver: formData.get('membershipwaiver') === 'true',
     waiverreason: formData.get('waiverreason') as string | undefined,
   };
-  const phoneNumberWithAreaCode = formatPhoneWithAreaCode(data.phoneNumber);
 
   // Validate required fields
   const requiredFields = [
@@ -71,6 +75,9 @@ export async function submitIndividualApplication(
       code: ApplicationErrorCode.VALIDATION_ERROR,
     };
   }
+
+  const storedPhone = toStoredPhone(data.phoneNumber);
+  if (!storedPhone) return INVALID_PHONE_RESPONSE;
 
   const {
     data: { user },
@@ -106,7 +113,7 @@ export async function submitIndividualApplication(
       {
         p_user_id: user.id,
         p_name: data.fullName,
-        p_phone_num: phoneNumberWithAreaCode,
+        p_phone_num: storedPhone,
         p_phone_type: data.phoneType,
         p_mailing_address: data.mailingAddress,
         p_city: data.city,
@@ -127,9 +134,7 @@ export async function submitIndividualApplication(
     return {
       success: false,
       error:
-        error instanceof Error
-          ? error.message
-          : 'Failed to create application',
+        error instanceof Error ? error.message : 'Failed to create application',
       code: ApplicationErrorCode.SERVER_ERROR,
     };
   }
@@ -161,10 +166,13 @@ export async function submitOrganizationApplication(
     interests: JSON.parse(formData.get('interests') as string) as string[],
     whyrpcmember: formData.get('whyrpcmember') as string,
     organisationservices: formData.get('organisationservices') as string,
-    representativeName: formData.get('representativeName') as string | undefined,
-    representativeEmail: formData.get('representativeEmail') as string | undefined,
+    representativeName: formData.get('representativeName') as
+      | string
+      | undefined,
+    representativeEmail: formData.get('representativeEmail') as
+      | string
+      | undefined,
   };
-  const phoneNumberWithAreaCode = formatPhoneWithAreaCode(data.phoneNumber);
 
   // Validate required fields
   const requiredFields = [
@@ -189,6 +197,10 @@ export async function submitOrganizationApplication(
     };
   }
 
+  // Validated, so it only contains digits, spaces, "+", "(", ")" and "-".
+  const storedPhone = toStoredPhone(data.phoneNumber);
+  if (!storedPhone) return INVALID_PHONE_RESPONSE;
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -201,23 +213,29 @@ export async function submitOrganizationApplication(
     };
   }
 
-  // Check if organization already exists by phone or if user has already submitted an application
-  const { data: existing } = await supabase
+  // Check if organization already exists by phone or if user has already submitted an application.
+  // The phone must be double-quoted: PostgREST reserves "(" and ")" inside or(), and an unquoted
+  // "+1 (604)-..." silently matches nothing.
+  const { data: matches, error: existingError } = await supabase
     .from('organization_profiles')
-    .select('*')
-    .or(
-      `phone_num.eq.${phoneNumberWithAreaCode},phone_num.eq.${data.phoneNumber},user_id.eq.${user.id}`,
-    )
-    .maybeSingle();
+    .select('user_id, phone_num')
+    .or(`phone_num.eq."${storedPhone}",user_id.eq.${user.id}`)
+    .limit(2);
 
-  if (existing) {
+  if (existingError) {
+    console.error('Organization duplicate check error:', existingError);
+    return {
+      success: false,
+      error: 'Failed to submit application',
+      code: ApplicationErrorCode.SERVER_ERROR,
+    };
+  }
+
+  if (matches && matches.length > 0) {
     let errorMessage = 'Organization already exists';
-    if (existing.user_id === user.id) {
+    if (matches.some((row) => row.user_id === user.id)) {
       errorMessage = 'You have already submitted an application';
-    } else if (
-      existing.phone_num === phoneNumberWithAreaCode ||
-      existing.phone_num === data.phoneNumber
-    ) {
+    } else if (matches.some((row) => row.phone_num === storedPhone)) {
       errorMessage = 'An organization with this phone number already exists';
     }
 
@@ -237,7 +255,7 @@ export async function submitOrganizationApplication(
         p_org_name: data.fullName,
         p_org_rep_name: data.representativeName || null,
         p_org_rep_email: data.representativeEmail || null,
-        p_phone_num: phoneNumberWithAreaCode,
+        p_phone_num: storedPhone,
         p_phone_type: data.phoneType,
         p_mailing_address: data.mailingAddress,
         p_city: data.city,
@@ -258,9 +276,7 @@ export async function submitOrganizationApplication(
     return {
       success: false,
       error:
-        error instanceof Error
-          ? error.message
-          : 'Failed to create application',
+        error instanceof Error ? error.message : 'Failed to create application',
       code: ApplicationErrorCode.SERVER_ERROR,
     };
   }
@@ -286,7 +302,9 @@ type SubmitApplicationReviewResult = {
 };
 
 function getNextApplicationStatus(
-  reviews: Array<Pick<Database['public']['Tables']['application_reviews']['Row'], 'decision'>>,
+  reviews: Array<
+    Pick<Database['public']['Tables']['application_reviews']['Row'], 'decision'>
+  >,
 ): Database['public']['Enums']['application_status'] {
   const approveCount = reviews.filter(
     (review) => review.decision === ReviewDecision.APPROVE,
@@ -343,8 +361,14 @@ export async function submitApplicationReview(
     .eq('id', input.appId)
     .single();
 
-  if (application?.status === 'payment_pending' || application?.status === 'rejected') {
-    return { success: false, error: 'This application has already been finalized' };
+  if (
+    application?.status === 'payment_pending' ||
+    application?.status === 'rejected'
+  ) {
+    return {
+      success: false,
+      error: 'This application has already been finalized',
+    };
   }
 
   const { data: existingReviews, error: reviewsError } = await supabase
@@ -356,17 +380,21 @@ export async function submitApplicationReview(
     return { success: false, error: reviewsError.message };
   }
 
-  const reviewCreatedAt = new Date(`${input.reviewDate}T00:00:00.000Z`).toISOString();
+  const reviewCreatedAt = new Date(
+    `${input.reviewDate}T00:00:00.000Z`,
+  ).toISOString();
 
-  const { error: insertError } = await supabase.from('application_reviews').insert({
-    application_id: input.appId,
-    reviewer_name: input.reviewerName.trim(),
-    decision: input.decision,
-    reason: input.reason.trim(),
-    created_at: reviewCreatedAt,
-    waiver_decision: input.waiverDecision ?? null,
-    waiver_note: input.waiverReason ?? null
-  });
+  const { error: insertError } = await supabase
+    .from('application_reviews')
+    .insert({
+      application_id: input.appId,
+      reviewer_name: input.reviewerName.trim(),
+      decision: input.decision,
+      reason: input.reason.trim(),
+      created_at: reviewCreatedAt,
+      waiver_decision: input.waiverDecision ?? null,
+      waiver_note: input.waiverReason ?? null,
+    });
 
   if (insertError) {
     return { success: false, error: insertError.message };
@@ -374,7 +402,10 @@ export async function submitApplicationReview(
 
   const allReviews = [
     ...(existingReviews ?? []),
-    { decision: input.decision as Database['public']['Enums']['review_decision'] },
+    {
+      decision:
+        input.decision as Database['public']['Enums']['review_decision'],
+    },
   ];
   const nextStatus = getNextApplicationStatus(allReviews);
   const isFinalized =
