@@ -35,7 +35,8 @@ export const ApplicationType = {
   ORGANIZATION: 'organization',
 } as const;
 
-export type ApplicationType = (typeof ApplicationType)[keyof typeof ApplicationType];
+export type ApplicationType =
+  (typeof ApplicationType)[keyof typeof ApplicationType];
 
 /**
  * Application Status Enum
@@ -51,7 +52,8 @@ export const ApplicationStatus = {
   EXPIRES_SOON: 'expires_soon',
 } as const;
 
-export type ApplicationStatus = (typeof ApplicationStatus)[keyof typeof ApplicationStatus];
+export type ApplicationStatus =
+  (typeof ApplicationStatus)[keyof typeof ApplicationStatus];
 
 /**
  * Review Decision Enum
@@ -62,20 +64,8 @@ export const ReviewDecision = {
   REJECT: 'reject',
 } as const;
 
-export type ReviewDecision = (typeof ReviewDecision)[keyof typeof ReviewDecision];
-
-/**
- * Membership Interest Enum
- * Shared list for interest chips/options
- */
-export const MembershipInterest = {
-  HEALTH: 'Health',
-  ENVIRONMENT: 'Environment',
-  ARTS_CULTURE: 'Arts + Culture',
-} as const;
-
-export type MembershipInterest =
-  (typeof MembershipInterest)[keyof typeof MembershipInterest];
+export type ReviewDecision =
+  (typeof ReviewDecision)[keyof typeof ReviewDecision];
 
 /**
  * Payment Transaction Status Enum
@@ -91,14 +81,15 @@ export const PaymentTransactionStatus = {
   FAILED: 'failed',
 } as const;
 
-export type PaymentTransactionStatus = (typeof PaymentTransactionStatus)[keyof typeof PaymentTransactionStatus];
+export type PaymentTransactionStatus =
+  (typeof PaymentTransactionStatus)[keyof typeof PaymentTransactionStatus];
 
 /**
  * Helper function to check if a value is a valid enum value
  */
 export function isValidEnumValue<T extends Record<string, string>>(
   enumObj: T,
-  value: string
+  value: string,
 ): value is T[keyof T] {
   return Object.values(enumObj).includes(value);
 }
@@ -107,7 +98,7 @@ export function isValidEnumValue<T extends Record<string, string>>(
  * Helper function to get all enum values as an array
  */
 export function getEnumValues<T extends Record<string, string>>(
-  enumObj: T
+  enumObj: T,
 ): T[keyof T][] {
   return Object.values(enumObj) as T[keyof T][];
 }
