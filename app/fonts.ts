@@ -30,8 +30,7 @@ export const headerStyles = {
   // Desktop (responsive)
   xsResponsive:
     'text-[12px] md:text-[14px] font-medium leading-[1] md:leading-[1.1]',
-  sResponsive:
-    'text-sm md:text-md font-medium leading-[1] md:leading-[1.1]',
+  sResponsive: 'text-sm md:text-md font-medium leading-[1] md:leading-[1.1]',
   mResponsive:
     'text-md md:text-xl font-normal md:font-medium leading-[1] md:leading-[1.1]',
   lResponsive:

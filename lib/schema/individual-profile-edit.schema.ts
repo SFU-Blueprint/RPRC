@@ -9,5 +9,9 @@ export const individualProfileEditSchema = z.object({
   ...profileEditCommonFields,
 });
 
-export type IndividualProfileEditInput = z.input<typeof individualProfileEditSchema>;
-export type IndividualProfileEditValues = z.output<typeof individualProfileEditSchema>;
+export type IndividualProfileEditInput = z.input<
+  typeof individualProfileEditSchema
+>;
+export type IndividualProfileEditValues = z.output<
+  typeof individualProfileEditSchema
+>;

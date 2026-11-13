@@ -1,7 +1,15 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import MembershipProfileEditForm, { type MembershipProfileEditValues } from '@/components/membership/MembershipProfileEditForm';
+import MembershipProfileEditForm, {
+  type MembershipProfileEditValues,
+} from '@/components/membership/MembershipProfileEditForm';
 import { ApplicationStatus, ApplicationType } from '@/lib/constants/enums';
 import type { MemberDashboardData } from '@/types/membership.types';
 
@@ -11,12 +19,14 @@ const MEMBER_DASHBOARD: MemberDashboardData = {
   status: ApplicationStatus.ACTIVE,
   type: ApplicationType.INDIVIDUAL,
   interests: ['Health', 'Environment'],
-  reason: 'I want to support community led poverty reduction and help make services more accessible in Richmond.',
+  reason:
+    'I want to support community led poverty reduction and help make services more accessible in Richmond.',
   contact: {
     email: 'leighton.kramer@example.com',
     phone: '+1 (604)-555-1234',
     phoneType: 'cell',
-    address: '123 Example Street, New Westminster, British Columbia, Canada, V3L 1A1',
+    address:
+      '123 Example Street, New Westminster, British Columbia, Canada, V3L 1A1',
     addressFields: {
       mailingAddress: '123 Example Street',
       city: 'New Westminster',
@@ -83,8 +93,8 @@ describe('MembershipProfileEditForm', () => {
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
     expect(onSave.mock.calls[0][0]).toMatchObject({
       role: 'individual',
-      phoneNumber: '+16045551234',
-      phoneType: 'Cell',
+      phoneNumber: '+1 (604)-555-1234',
+      phoneType: 'cell',
       address: {
         mailingAddress: '123 Example Street',
         city: 'New Westminster',

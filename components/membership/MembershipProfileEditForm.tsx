@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import { Controller, useForm, useWatch, type FieldErrors, type SubmitErrorHandler } from 'react-hook-form';
+import {
+  Controller,
+  useForm,
+  useWatch,
+  type FieldErrors,
+  type SubmitErrorHandler,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { State } from 'country-state-city';
 import { InterestCard } from '@/components/signup/cards/InterestCard';
@@ -13,8 +19,15 @@ import { PhoneInput } from '@/components/signup/inputs/PhoneInput';
 import { COUNTRIES } from '@/app/membership/signup/const';
 import { bodyStyles, headerStyles, inter, robotoCondensed } from '@/app/fonts';
 import { MEMBERSHIP_INTERESTS } from '@/lib/constants/membership-interests';
-import { memberProfileEditSchema, type MemberProfileEditInput, type MemberProfileEditValues } from '@/lib/schema/member-profile-edit.schema';
-import type { MemberDashboardData, OrganizationMemberDashboardData } from '@/types/membership.types';
+import {
+  memberProfileEditSchema,
+  type MemberProfileEditInput,
+  type MemberProfileEditValues,
+} from '@/lib/schema/member-profile-edit.schema';
+import type {
+  MemberDashboardData,
+  OrganizationMemberDashboardData,
+} from '@/types/membership.types';
 
 export type MembershipProfileEditValues = MemberProfileEditValues;
 
@@ -37,19 +50,29 @@ const toLocalPhone = (value?: string | null) => {
 };
 
 const sameInterests = (first: string[], second: string[]) => {
-  const normalizeList = (items: string[]) => items.map(normalize).filter(Boolean).sort();
+  const normalizeList = (items: string[]) =>
+    items.map(normalize).filter(Boolean).sort();
   const firstList = normalizeList(first);
   const secondList = normalizeList(second);
 
-  return firstList.length === secondList.length && firstList.every((item, index) => item === secondList[index]);
+  return (
+    firstList.length === secondList.length &&
+    firstList.every((item, index) => item === secondList[index])
+  );
 };
 
-function findFirstErrorPath(errors: FieldErrors<MemberProfileEditInput>, parent = ''): string | undefined {
+function findFirstErrorPath(
+  errors: FieldErrors<MemberProfileEditInput>,
+  parent = '',
+): string | undefined {
   for (const [key, value] of Object.entries(errors)) {
     if (!value || typeof value !== 'object') continue;
     const path = parent ? `${parent}.${key}` : key;
     if ('message' in value && typeof value.message === 'string') return path;
-    const nestedPath = findFirstErrorPath(value as FieldErrors<MemberProfileEditInput>, path);
+    const nestedPath = findFirstErrorPath(
+      value as FieldErrors<MemberProfileEditInput>,
+      path,
+    );
     if (nestedPath) return nestedPath;
   }
 
@@ -66,7 +89,8 @@ const errorTargetIds: Record<string, string> = {
   membershipInterests: 'membership-interests-heading',
   motivation: 'Why do you want to be an RPRC member?',
   representativeName: 'Organization Representative Name',
-  representativeEmail: 'Representative Email Address (if different from the one given above)',
+  representativeEmail:
+    'Representative Email Address (if different from the one given above)',
   programsOrServices: 'What programs or services does your organization offer?',
 };
 
@@ -78,11 +102,14 @@ export default function MembershipProfileEditForm({
   onDirtyChange,
 }: Props) {
   const isOrganization = data.type === 'organization';
-  const organizationData = isOrganization ? data as OrganizationMemberDashboardData : null;
+  const organizationData = isOrganization
+    ? (data as OrganizationMemberDashboardData)
+    : null;
   const addressFields = data.contact.addressFields;
 
   const initialValues = useMemo<MemberProfileEditInput>(() => {
-    const membershipInterests = (data.interests ?? []) as MemberProfileEditInput['membershipInterests'];
+    const membershipInterests = (data.interests ??
+      []) as MemberProfileEditInput['membershipInterests'];
     const common = {
       name: data.name ?? '',
       email: data.contact.email ?? '',
@@ -123,25 +150,73 @@ export default function MembershipProfileEditForm({
     mode: 'onSubmit',
   });
 
-  const values = (useWatch({ control }) ?? initialValues) as MemberProfileEditInput;
-  const country = useWatch({ control, name: 'address.country' }) ?? initialValues.address.country;
+  const values = (useWatch({ control }) ??
+    initialValues) as MemberProfileEditInput;
+  const country =
+    useWatch({ control, name: 'address.country' }) ??
+    initialValues.address.country;
   const changedFields = useMemo(() => {
     const fields: string[] = [];
 
-    if (normalize(values.name) !== normalize(initialValues.name)) fields.push('name');
-    if (phoneDigits(values.phoneNumber) !== phoneDigits(initialValues.phoneNumber)) fields.push('phoneNumber');
+    if (normalize(values.name) !== normalize(initialValues.name))
+      fields.push('name');
+    if (
+      phoneDigits(values.phoneNumber) !== phoneDigits(initialValues.phoneNumber)
+    )
+      fields.push('phoneNumber');
     if (values.phoneType !== initialValues.phoneType) fields.push('phoneType');
-    if (normalize(values.address.mailingAddress) !== normalize(initialValues.address.mailingAddress)) fields.push('mailingAddress');
-    if (normalize(values.address.city) !== normalize(initialValues.address.city)) fields.push('city');
-    if (normalize(values.address.province) !== normalize(initialValues.address.province)) fields.push('province');
-    if (normalize(values.address.country) !== normalize(initialValues.address.country)) fields.push('country');
-    if (normalize(values.address.postalCode) !== normalize(initialValues.address.postalCode)) fields.push('postalCode');
-    if (!sameInterests(values.membershipInterests, initialValues.membershipInterests)) fields.push('membershipInterests');
-    if (normalize(values.motivation) !== normalize(initialValues.motivation)) fields.push('motivation');
-    if (values.role === 'organization' && initialValues.role === 'organization') {
-      if (normalize(values.representativeName) !== normalize(initialValues.representativeName)) fields.push('representativeName');
-      if (normalize(values.representativeEmail) !== normalize(initialValues.representativeEmail)) fields.push('representativeEmail');
-      if (normalize(values.programsOrServices) !== normalize(initialValues.programsOrServices)) fields.push('programsOrServices');
+    if (
+      normalize(values.address.mailingAddress) !==
+      normalize(initialValues.address.mailingAddress)
+    )
+      fields.push('mailingAddress');
+    if (
+      normalize(values.address.city) !== normalize(initialValues.address.city)
+    )
+      fields.push('city');
+    if (
+      normalize(values.address.province) !==
+      normalize(initialValues.address.province)
+    )
+      fields.push('province');
+    if (
+      normalize(values.address.country) !==
+      normalize(initialValues.address.country)
+    )
+      fields.push('country');
+    if (
+      normalize(values.address.postalCode) !==
+      normalize(initialValues.address.postalCode)
+    )
+      fields.push('postalCode');
+    if (
+      !sameInterests(
+        values.membershipInterests,
+        initialValues.membershipInterests,
+      )
+    )
+      fields.push('membershipInterests');
+    if (normalize(values.motivation) !== normalize(initialValues.motivation))
+      fields.push('motivation');
+    if (
+      values.role === 'organization' &&
+      initialValues.role === 'organization'
+    ) {
+      if (
+        normalize(values.representativeName) !==
+        normalize(initialValues.representativeName)
+      )
+        fields.push('representativeName');
+      if (
+        normalize(values.representativeEmail) !==
+        normalize(initialValues.representativeEmail)
+      )
+        fields.push('representativeEmail');
+      if (
+        normalize(values.programsOrServices) !==
+        normalize(initialValues.programsOrServices)
+      )
+        fields.push('programsOrServices');
     }
 
     return fields;
@@ -151,23 +226,32 @@ export default function MembershipProfileEditForm({
     onDirtyChange?.(changedFields.length > 0);
   }, [changedFields.length, onDirtyChange]);
 
-  const countryCode = country === 'Canada' ? 'CA' : country === 'United States' ? 'US' : '';
+  const countryCode =
+    country === 'Canada' ? 'CA' : country === 'United States' ? 'US' : '';
   const states = useMemo(
-    () => (countryCode ? State.getStatesOfCountry(countryCode).map((state) => state.name) : []),
+    () =>
+      countryCode
+        ? State.getStatesOfCountry(countryCode).map((state) => state.name)
+        : [],
     [countryCode],
   );
 
-  const handleInvalid: SubmitErrorHandler<MemberProfileEditInput> = (errors) => {
+  const handleInvalid: SubmitErrorHandler<MemberProfileEditInput> = (
+    errors,
+  ) => {
     const firstErrorPath = findFirstErrorPath(errors);
     if (!firstErrorPath) return;
 
     const targetId = errorTargetIds[firstErrorPath] ?? firstErrorPath;
-    const element = document.getElementsByName(firstErrorPath)[0]
-      ?? document.getElementById(targetId);
+    const element =
+      document.getElementsByName(firstErrorPath)[0] ??
+      document.getElementById(targetId);
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
-  const handleValidSubmit = async (submittedValues: MemberProfileEditValues) => {
+  const handleValidSubmit = async (
+    submittedValues: MemberProfileEditValues,
+  ) => {
     if (changedFields.length === 0 || isSaving) return;
     await onSave(submittedValues);
   };
@@ -175,9 +259,15 @@ export default function MembershipProfileEditForm({
   const showValidation = submitCount > 0;
 
   return (
-    <form id={formId} onSubmit={handleSubmit(handleValidSubmit, handleInvalid)} className="flex flex-col gap-8">
+    <form
+      id={formId}
+      onSubmit={handleSubmit(handleValidSubmit, handleInvalid)}
+      className="flex flex-col gap-8"
+    >
       <section>
-        <h3 className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}>
+        <h3
+          className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
+        >
           Contact Information
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
@@ -203,7 +293,11 @@ export default function MembershipProfileEditForm({
             render={({ field, fieldState }) => (
               <FormInput
                 name="email"
-                label={isOrganization ? 'Organization Email Address' : 'Email Address'}
+                label={
+                  isOrganization
+                    ? 'Organization Email Address'
+                    : 'Email Address'
+                }
                 type="email"
                 value={field.value}
                 onChange={field.onChange}
@@ -270,7 +364,9 @@ export default function MembershipProfileEditForm({
             name="phoneType"
             render={({ field, fieldState }) => (
               <div>
-                <label className={`block text-gray-700 mb-1 ${bodyStyles.m} ${inter.className}`}>
+                <label
+                  className={`block text-gray-700 mb-1 ${bodyStyles.m} ${inter.className}`}
+                >
                   Phone Type <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-6 sm:gap-8 items-center min-h-10">
@@ -301,7 +397,9 @@ export default function MembershipProfileEditForm({
       </section>
 
       <section>
-        <h3 className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}>
+        <h3
+          className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
+        >
           Address Information
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 mb-4 md:mb-5">
@@ -350,7 +448,10 @@ export default function MembershipProfileEditForm({
                 value={field.value}
                 onChange={(nextCountry) => {
                   field.onChange(nextCountry);
-                  setValue('address.province', '', { shouldDirty: true, shouldTouch: true });
+                  setValue('address.province', '', {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                  });
                 }}
                 error={fieldState.error?.message}
                 placeholder="Select a country"
@@ -398,7 +499,10 @@ export default function MembershipProfileEditForm({
       </section>
 
       <section>
-        <h3 id="membership-interests-heading" className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}>
+        <h3
+          id="membership-interests-heading"
+          className={`text-gray-900 mb-5 sm:mb-6 ${headerStyles.mResponsive} ${robotoCondensed.className}`}
+        >
           Membership Interests
         </h3>
         <Controller
@@ -414,11 +518,13 @@ export default function MembershipProfileEditForm({
                       key={interest.id}
                       label={interest.name}
                       isSelected={selected.includes(interest.value)}
-                      onToggle={() => field.onChange(
-                        selected.includes(interest.value)
-                          ? selected.filter((item) => item !== interest.value)
-                          : [...selected, interest.value],
-                      )}
+                      onToggle={() =>
+                        field.onChange(
+                          selected.includes(interest.value)
+                            ? selected.filter((item) => item !== interest.value)
+                            : [...selected, interest.value],
+                        )
+                      }
                     />
                   ))}
                 </div>

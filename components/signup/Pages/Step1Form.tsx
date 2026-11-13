@@ -334,10 +334,7 @@ export function Step1Form() {
           {/* Already have account text */}
           <p className={`text-gray-700 text-center ${bodyStyles.m}`}>
             Already have an account?{' '}
-            <Link
-              href={ROUTES.HOME}
-              className="font-medium underline"
-            >
+            <Link href={ROUTES.HOME} className="font-medium underline">
               Sign in here
             </Link>
           </p>

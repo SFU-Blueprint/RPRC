@@ -1,7 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { inter, robotoCondensed, headerStyles, bodyStyles, buttonStyles } from '@/app/fonts';
+import {
+  inter,
+  robotoCondensed,
+  headerStyles,
+  bodyStyles,
+  buttonStyles,
+} from '@/app/fonts';
 import { Spinner } from '@/components/ui/spinner';
 import { Info } from 'lucide-react';
 import '@/app/globals.css';
@@ -10,15 +16,23 @@ import MembershipProfileBanner from '@/components/membership/MembershipProfileBa
 import MembershipActionModal from '@/components/membership/modals/MembershipActionModal';
 import IndividualProfile from '@/components/membership/profiles/IndividualProfile';
 import OrganizationProfile from '@/components/membership/profiles/OrganizationProfile';
-import MembershipProfileEditForm, { type MembershipProfileEditValues } from '@/components/membership/MembershipProfileEditForm';
+import MembershipProfileEditForm, {
+  type MembershipProfileEditValues,
+} from '@/components/membership/MembershipProfileEditForm';
 import DiscardChangesModal from '@/components/membership/modals/DiscardChangesModal';
-import { ApplicationStatus, UserRole, type PhoneType } from '@/lib/constants/enums';
+import { ApplicationStatus, UserRole } from '@/lib/constants/enums';
+import {
+  PROFILE_EDITABLE_STATUSES,
+  RESUBMITTABLE_STATUSES,
+} from '@/lib/constants/membership-status-rules';
 import {
   fetchMemberDashboardData,
-  submitIndividualMembershipProfileUpdate,
-  submitOrganizationMembershipProfileUpdate,
+  submitMembershipProfileUpdate,
 } from '@/app/actions/member-dashboard';
-import type { MemberDashboardData, OrganizationMemberDashboardData } from '@/types/membership.types';
+import type {
+  MemberDashboardData,
+  OrganizationMemberDashboardData,
+} from '@/types/membership.types';
 import { toast } from 'sonner';
 
 export default function MembershipDashboard() {
@@ -26,23 +40,25 @@ export default function MembershipDashboard() {
   // const { user, loading } = useAuth();
   const [authLoading, setAuthLoading] = useState(true);
 
-  const [dashboardData, setDashboardData] = useState<MemberDashboardData | null>(null);
+  const [dashboardData, setDashboardData] =
+    useState<MemberDashboardData | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
-  const [isMembershipActionModalOpen, setIsMembershipActionModalOpen] = useState(false);
+  const [isMembershipActionModalOpen, setIsMembershipActionModalOpen] =
+    useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [hasProfileChanges, setHasProfileChanges] = useState(false);
-  const [isDiscardChangesModalOpen, setIsDiscardChangesModalOpen] = useState(false);
-  const [canEdit, setCanEdit] = useState(false);
+  const [isDiscardChangesModalOpen, setIsDiscardChangesModalOpen] =
+    useState(false);
   const profileEditFormId = 'membership-profile-edit-form';
+  const status = (dashboardData?.status ?? null) as ApplicationStatus | null;
+  const canEdit = !!status && PROFILE_EDITABLE_STATUSES.includes(status);
+  const canResubmit = !!status && RESUBMITTABLE_STATUSES.includes(status);
 
   useEffect(() => {
     fetchMemberDashboardData()
-      .then(data => {
+      .then((data) => {
         setDashboardData(data);
-        if (data?.status === ApplicationStatus.ACTIVE || data?.status === ApplicationStatus.EXPIRED || data?.status === ApplicationStatus.EXPIRES_SOON) {
-          setCanEdit(true);
-        }
       })
       .finally(() => {
         setAuthLoading(false);
@@ -78,30 +94,8 @@ export default function MembershipDashboard() {
     setIsSavingProfile(true);
 
     try {
-      // Zod outputs E.164 (+16041234567); the server action re-adds the +1 prefix used by signup.
-      const digits = values.phoneNumber.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
-      const phone = `(${digits.slice(0, 3)})-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
-      const shared = {
-        name: values.name,
-        phone,
-        phoneType: values.phoneType.toLowerCase() as PhoneType,
-        mailingAddress: values.address.mailingAddress,
-        city: values.address.city,
-        province: values.address.province,
-        country: values.address.country,
-        postalCode: values.address.postalCode,
-        interests: values.membershipInterests,
-        reason: values.motivation,
-      };
-
-      const result = values.role === UserRole.ORGANIZATION
-        ? await submitOrganizationMembershipProfileUpdate({
-          ...shared,
-          representativeName: values.representativeName,
-          representativeEmail: values.representativeEmail,
-          servicesOffered: values.programsOrServices ?? '',
-        })
-        : await submitIndividualMembershipProfileUpdate(shared);
+      // The server action validates these again with the same schema.
+      const result = await submitMembershipProfileUpdate(values);
 
       if (!result.success) {
         toast.error('Failed to save membership profile', {
@@ -130,48 +124,68 @@ export default function MembershipDashboard() {
 
   return (
     <div className={`min-h-screen bg-background ${inter.className}`}>
-      <MembershipProfileBanner name={dashboardData?.name ?? ''} role={dashboardData?.type ?? null} />
-      <div className='flex flex-col md:flex-row justify-center gap-8 md:gap-6 lg:gap-16 xl:gap-24 mt-8 md:mt-10 px-4 md:px-6 lg:px-12 xl:px-20 pb-16'>
-        <div className='flex flex-col gap-8 md:gap-6 lg:gap-10 w-full md:w-auto md:shrink-0'>
+      <MembershipProfileBanner
+        name={dashboardData?.name ?? ''}
+        role={dashboardData?.type ?? null}
+      />
+      <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-6 lg:gap-16 xl:gap-24 mt-8 md:mt-10 px-4 md:px-6 lg:px-12 xl:px-20 pb-16">
+        <div className="flex flex-col gap-8 md:gap-6 lg:gap-10 w-full md:w-auto md:shrink-0">
           {dashboardData?.status && (
             <MembershipStatusCard
               status={dashboardData.status as ApplicationStatus}
               dateFinalized={dashboardData?.dateFinalized ?? ''}
               ctaDisabled={isEditingProfile || isSavingProfile}
               role={dashboardData?.type as UserRole}
-              onConfirmInfo={() => setIsMembershipActionModalOpen(true)}
+              onConfirmInfo={
+                canResubmit
+                  ? () => setIsMembershipActionModalOpen(true)
+                  : undefined
+              }
             />
           )}
-          <div className='bg-feedback-info px-4 md:px-4 lg:px-5 py-6 md:py-6 lg:py-8 border rounded-sm border-l-10 border-l-feedback-info-accent w-full md:max-w-xs lg:max-w-md'>
+          <div className="bg-feedback-info px-4 md:px-4 lg:px-5 py-6 md:py-6 lg:py-8 border rounded-sm border-l-10 border-l-feedback-info-accent w-full md:max-w-xs lg:max-w-md">
             <div className={`flex gap-2 items-center mb-3`}>
               <Info className="text-application-detail-blue-500" />
               <h2 className={`${headerStyles.xs} font-medium`}>Need Help?</h2>
             </div>
-            <p className={`${bodyStyles.m}`}>For assistance, email - <a href="mailto:info@richmondprc.org" className="underline hover:opacity-75">info@richmondprc.org</a></p>
+            <p className={`${bodyStyles.m}`}>
+              For assistance, email -{' '}
+              <a
+                href="mailto:info@richmondprc.org"
+                className="underline hover:opacity-75"
+              >
+                info@richmondprc.org
+              </a>
+            </p>
           </div>
         </div>
-        <div className='flex flex-col w-full md:max-w-sm lg:max-w-xl xl:max-w-2xl'>
-          <div className='flex flex-col gap-10'>
-            <div className='bg-white border rounded-2xl px-4 md:px-4 lg:px-5 py-6 md:py-6 lg:py-8 drop-shadow-sm'>
-              <div className='flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-5'>
-                <h2 className={`${robotoCondensed.className} text-xl md:text-2xl lg:text-3xl font-medium p-3`}>Profile Information</h2>
+        <div className="flex flex-col w-full md:max-w-sm lg:max-w-xl xl:max-w-2xl">
+          <div className="flex flex-col gap-10">
+            <div className="bg-white border rounded-2xl px-4 md:px-4 lg:px-5 py-6 md:py-6 lg:py-8 drop-shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-5">
+                <h2
+                  className={`${robotoCondensed.className} text-xl md:text-2xl lg:text-3xl font-medium p-3`}
+                >
+                  Profile Information
+                </h2>
                 {canEdit && (
-                  <div className='shrink-0'>
+                  <div className="shrink-0">
                     {isEditingProfile ? (
                       <>
                         <button
-                          type='submit'
+                          type="submit"
                           form={profileEditFormId}
-                          className={`${buttonStyles.text} border-b-2 mr-4 ${hasProfileChanges && !isSavingProfile
-                            ? 'text-black border-black hover:opacity-75'
-                            : 'text-content-secondary border-content-secondary opacity-50 cursor-not-allowed'
-                            }`}
+                          className={`${buttonStyles.text} border-b-2 mr-4 ${
+                            hasProfileChanges && !isSavingProfile
+                              ? 'text-black border-black hover:opacity-75'
+                              : 'text-content-secondary border-content-secondary opacity-50 cursor-not-allowed'
+                          }`}
                           disabled={!hasProfileChanges || isSavingProfile}
                         >
                           {isSavingProfile ? 'Saving...' : 'Save'}
                         </button>
                         <button
-                          type='button'
+                          type="button"
                           className={`${buttonStyles.text} text-black border-b-2 border-black hover:opacity-75 mr-4`}
                           onClick={handleCancelEdit}
                           disabled={isSavingProfile}
@@ -181,7 +195,7 @@ export default function MembershipDashboard() {
                       </>
                     ) : (
                       <button
-                        type='button'
+                        type="button"
                         className={`${buttonStyles.text} text-black border-b-2 border-black hover:opacity-75 mr-4`}
                         onClick={handleEditProfile}
                       >
@@ -204,14 +218,21 @@ export default function MembershipDashboard() {
                   />
                 )
               ) : dashboardData?.type === 'organization' ? (
-                <OrganizationProfile data={dashboardData as OrganizationMemberDashboardData} />
+                <OrganizationProfile
+                  data={dashboardData as OrganizationMemberDashboardData}
+                />
               ) : (
                 <IndividualProfile data={dashboardData} />
               )}
             </div>
             <div>
-              <a className={`text-destructive-default underline p-3`}>Delete Profile</a>
-              <p className='p-3 text-content-secondary'>You can delete your profile if you wish to cancel your membership.</p>
+              <a className={`text-destructive-default underline p-3`}>
+                Delete Profile
+              </a>
+              <p className="p-3 text-content-secondary">
+                You can delete your profile if you wish to cancel your
+                membership.
+              </p>
             </div>
           </div>
         </div>

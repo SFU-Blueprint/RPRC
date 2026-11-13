@@ -16,7 +16,11 @@ type Props = {
   onDiscard: () => void;
 };
 
-export default function DiscardChangesModal({ isOpen, onClose, onDiscard }: Props) {
+export default function DiscardChangesModal({
+  isOpen,
+  onClose,
+  onDiscard,
+}: Props) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
@@ -28,7 +32,8 @@ export default function DiscardChangesModal({ isOpen, onClose, onDiscard }: Prop
             Discard Changes?
           </DialogTitle>
           <DialogDescription className="max-w-[480px] text-base leading-6 text-content-secondary">
-            You have unsaved changes. If you leave now, your progress will be lost.
+            You have unsaved changes. If you leave now, your progress will be
+            lost.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4 gap-3">
