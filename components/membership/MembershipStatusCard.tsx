@@ -1,11 +1,11 @@
 'use client';
 
 import { robotoCondensed, subheaderStyles, bodyStyles } from '@/app/fonts';
-import Link from 'next/link';
 import { MembershipStatusDescription } from '@/components/membership/MembershipStatusDescription';
 
 import { STATUS_CONFIG } from '@/lib/constants/membership';
 import { ApplicationStatus, UserRole } from '@/lib/constants/enums';
+import { useStripeCheckout } from '@/lib/hooks/useStripeCheckout';
 
 interface MembershipStatusProps {
   status: ApplicationStatus;
@@ -23,6 +23,7 @@ export default function MembershipStatusCard({
   onConfirmInfo,
 }: MembershipStatusProps) {
   const config = STATUS_CONFIG[status];
+  const { isStarting, error, startCheckout } = useStripeCheckout();
 
   // Determine valid until date based on status and finalized date of application (date accepted)
   // For active memberships, valid until December 31 of the following year if accepted after September,
@@ -42,14 +43,11 @@ export default function MembershipStatusCard({
   }
 
   const handleCTAClick = () => {
-    if (onConfirmInfo) {
-      onConfirmInfo();
+    if (status === ApplicationStatus.PAYMENT_PENDING) {
+      void startCheckout();
       return;
     }
-
-    if (status === ApplicationStatus.PAYMENT_PENDING) {
-      window.open('#', '_blank'); // stripe link to be added
-    }
+    onConfirmInfo?.();
   };
 
   return (
@@ -79,11 +77,16 @@ export default function MembershipStatusCard({
         <button
           type="button"
           onClick={handleCTAClick}
-          disabled={ctaDisabled}
+          disabled={ctaDisabled || isStarting}
           className={`mt-6 w-full py-2 rounded-xl text-center block disabled:opacity-50 ${config.ctaColor ?? 'bg-primary'} ${config.ctaTextColor ?? 'text-white'} ${robotoCondensed.className} text-lg font-normal transition-colors`}
         >
-          {config.ctaText}
+          {isStarting ? 'Connecting to Stripe…' : config.ctaText}
         </button>
+      )}
+      {error && (
+        <p role="alert" className="mt-3 text-sm text-destructive">
+          {error}
+        </p>
       )}
     </div>
   );

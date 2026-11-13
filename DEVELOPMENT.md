@@ -90,6 +90,17 @@ accounts use the password `password123`.
 - **Admin review:** log in as `admin@rprc.test` and open `/admin`. An application needs two
   reviews: two approvals move it to `payment_pending`, two rejections to `rejected`, and a split
   to `conflict`. You can submit both reviews from the same admin account.
+- **Payments (optional):** needs Stripe test-mode keys and the local service-role key.
+  1. Put `STRIPE_SECRET_KEY=sk_test_...` in `.env.local`, and `SUPABASE_SERVICE_ROLE_KEY` (the
+     `SERVICE_ROLE_KEY` from `npx supabase status`).
+  2. In a second terminal, run `stripe login` once, then `npm run stripe:listen`. Copy the
+     `whsec_...` it prints into `STRIPE_WEBHOOK_SECRET` in `.env.local` and restart the dev server.
+  3. Log in as `pending@rprc.test` and pay with card `4242 4242 4242 4242`, any future date, any CVC.
+
+  Without the webhook listener, the payment return page still confirms the payment. The listener
+  covers the case where the browser never comes back from Stripe. See
+  `docs/stripe-membership-payments.md`.
+
 - **Start over:** `npm run db:reset` re-runs all migrations and the seed.
 
 ### Generating types
