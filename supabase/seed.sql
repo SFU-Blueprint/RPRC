@@ -51,12 +51,12 @@ from new_users;
 -- Profiles and addresses
 -- ---------------------------------------------------------------------------
 insert into public.individual_profiles (user_id, name, phone_num, phone_type) values
-  ('00000000-0000-4000-a000-000000000002', 'Riley Review', '(604)-555-0102', 'cell'),
-  ('00000000-0000-4000-a000-000000000004', 'Pat Pending', '(604)-555-0104', 'cell'),
-  ('00000000-0000-4000-a000-000000000005', 'Morgan Member', '(604)-555-0105', 'home');
+  ('00000000-0000-4000-a000-000000000002', 'Riley Review', '+1 (604)-555-0102', 'cell'),
+  ('00000000-0000-4000-a000-000000000004', 'Pat Pending', '+1 (604)-555-0104', 'cell'),
+  ('00000000-0000-4000-a000-000000000005', 'Morgan Member', '+1 (604)-555-0105', 'home');
 
 insert into public.organization_profiles (user_id, org_name, org_rep_name, org_rep_email, phone_num, phone_type) values
-  ('00000000-0000-4000-a000-000000000003', 'Richmond Food Collective', 'Jordan Rep', 'jordan@example.org', '(604)-555-0103', 'cell');
+  ('00000000-0000-4000-a000-000000000003', 'Richmond Food Collective', 'Jordan Rep', 'jordan@example.org', '+1 (604)-555-0103', 'cell');
 
 insert into public.user_addresses (user_id, mailing_address, city, country, province, postal_code)
 select id, '7700 Minoru Blvd', 'Richmond', 'Canada', 'British Columbia', 'V6Y 1Z5'

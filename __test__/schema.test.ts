@@ -113,6 +113,12 @@ describe('phoneNumberSchema', () => {
     expect(result.data).toBe('+1 (604)-123-4567');
   });
 
+  test('keeps a 10 digit number that starts with 1 as it is', () => {
+    expect(phoneNumberSchema.safeParse('1604123456').data).toBe(
+      '+1 (160)-412-3456',
+    );
+  });
+
   test.each(['604123456', '26041234567', '+44 20 7946 0958', 'not a phone'])(
     'rejects %s',
     (input) => {
