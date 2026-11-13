@@ -28,10 +28,6 @@ export const individualSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     error: 'Passwords do not match',
     path: ['confirmPassword'],
-  })
-  .refine((data) => !data.waiverRequest || Boolean(data.waiverReason), {
-    error: 'Please tell us why you are requesting a waiver',
-    path: ['waiverReason'],
   });
 
 export type IndividualApplication = z.infer<typeof individualSchema>;
