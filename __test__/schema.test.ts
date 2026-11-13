@@ -6,6 +6,11 @@ import { interestsSchema } from '@/lib/schema/interests.schema';
 import { motivationSchema } from '@/lib/schema/motivation.schema';
 import { organizationSchema } from '@/lib/schema/organization.schema';
 import { passwordSchema } from '@/lib/schema/password.schema';
+import {
+  nameSchema,
+  organizationNameSchema,
+  phoneNumberSchema,
+} from '@/lib/schema/shared.schema';
 
 const validAddress = {
   mailingAddress: '1234 No. 3 Rd, Unit #205',
@@ -20,8 +25,8 @@ const validIndividual = {
   name: "Mary-Jane O'Connor",
   password: 'Abcdefghijklm1!',
   confirmPassword: 'Abcdefghijklm1!',
-  phoneNumber: '+16041234567',
-  phoneType: 'Cell',
+  phoneNumber: '6041234567',
+  phoneType: 'cell',
   address: validAddress,
   membershipInterests: ['Health'],
   motivation: 'I want to help reduce poverty in Richmond.',
@@ -29,12 +34,13 @@ const validIndividual = {
 
 const validOrganization = {
   email: 'rep@example.com',
+  organizationName: 'Richmond Food Bank Society',
   name: 'John Doe',
   organizationEmail: 'contact@example.org',
   password: 'Abcdefghijklm1!',
   confirmPassword: 'Abcdefghijklm1!',
-  phoneNumber: '+16041234567',
-  phoneType: 'Home',
+  phoneNumber: '6041234567',
+  phoneType: 'home',
   address: validAddress,
   membershipInterests: ['Education', 'Housing'],
   motivation: 'We serve Richmond families.',
@@ -64,6 +70,63 @@ describe('passwordSchema', () => {
   });
 });
 
+describe('nameSchema', () => {
+  test.each(["Mary-Jane O'Connor", 'Renée Lévesque', 'J. R. Smith'])(
+    'accepts %s',
+    (name) => {
+      expect(nameSchema.safeParse(name).success).toBe(true);
+    },
+  );
+
+  test('rejects a name containing digits', () => {
+    expect(nameSchema.safeParse('John 2nd').success).toBe(false);
+  });
+});
+
+describe('organizationNameSchema', () => {
+  test.each([
+    'Richmond Food Bank Society',
+    'A & W Canada',
+    'Community Services (est. 1983)',
+    '2nd Chance Housing',
+  ])('accepts %s', (name) => {
+    expect(organizationNameSchema.safeParse(name).success).toBe(true);
+  });
+
+  test('rejects an empty organization name', () => {
+    expect(organizationNameSchema.safeParse('   ').success).toBe(false);
+  });
+});
+
+describe('phoneNumberSchema', () => {
+  test.each([
+    '6041234567',
+    '(604)-123-4567',
+    '(604) 123-4567',
+    '604-123-4567',
+    '604 123 4567',
+    '+1 (604)-123-4567',
+    '16041234567',
+  ])('accepts %s and outputs the stored format', (input) => {
+    const result = phoneNumberSchema.safeParse(input);
+    expect(result.success).toBe(true);
+    expect(result.data).toBe('+1 (604)-123-4567');
+  });
+
+  test('keeps a 10 digit number that starts with 1 as it is', () => {
+    expect(phoneNumberSchema.safeParse('1604123456').data).toBe(
+      '+1 (160)-412-3456',
+    );
+  });
+
+  test.each(['604123456', '26041234567', '+44 20 7946 0958', 'not a phone'])(
+    'rejects %s',
+    (input) => {
+      expect(phoneNumberSchema.safeParse(input).success).toBe(false);
+    },
+  );
+});
+
 describe('addressSchema', () => {
   test.each(['V5K 1A1', 'V5K1A1', '98101', '98101-1234'])(
     'accepts postal code %s',
@@ -81,11 +144,9 @@ describe('addressSchema', () => {
   });
 
   test('rejects a country that is not on the list', () => {
-    const result = addressSchema.safeParse({
-      ...validAddress,
-      country: 'Narnia',
-    });
-    expect(result.success).toBe(false);
+    expect(
+      addressSchema.safeParse({ ...validAddress, country: 'Narnia' }).success,
+    ).toBe(false);
   });
 
   test('rejects a city containing digits', () => {
@@ -97,9 +158,9 @@ describe('addressSchema', () => {
 
 describe('interestsSchema', () => {
   test('accepts known interests', () => {
-    expect(interestsSchema.safeParse(['Health', 'Arts+Culture']).success).toBe(
-      true,
-    );
+    expect(
+      interestsSchema.safeParse(['Health', 'Arts & Culture']).success,
+    ).toBe(true);
   });
 
   test('rejects an unknown interest', () => {
@@ -140,17 +201,36 @@ describe('individualSchema', () => {
     expect(result.error?.issues[0].path).toEqual(['confirmPassword']);
   });
 
-  test('rejects a phone number that is not E.164', () => {
+  test('rejects a phone number that is not 10 digits', () => {
     expect(
       individualSchema.safeParse({
         ...validIndividual,
-        phoneNumber: '6041234567',
+        phoneNumber: '604123456',
       }).success,
     ).toBe(false);
   });
 
-  test('treats the waiver fields as optional', () => {
+  test('accepts an application with no waiver request', () => {
     expect(individualSchema.safeParse(validIndividual).success).toBe(true);
+  });
+
+  test('accepts a waiver request that has a reason', () => {
+    expect(
+      individualSchema.safeParse({
+        ...validIndividual,
+        waiverRequest: true,
+        waiverReason: 'Low income this year.',
+      }).success,
+    ).toBe(true);
+  });
+
+  test('accepts a waiver request with no reason (the reason is optional)', () => {
+    expect(
+      individualSchema.safeParse({
+        ...validIndividual,
+        waiverRequest: true,
+      }).success,
+    ).toBe(true);
   });
 });
 
@@ -163,6 +243,11 @@ describe('organizationSchema', () => {
     const { organizationEmail, programsOrServices, ...required } =
       validOrganization;
     expect(organizationSchema.safeParse(required).success).toBe(true);
+  });
+
+  test('requires an organization name', () => {
+    const { organizationName, ...missing } = validOrganization;
+    expect(organizationSchema.safeParse(missing).success).toBe(false);
   });
 
   test('rejects a malformed organization email', () => {
