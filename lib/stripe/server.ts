@@ -99,6 +99,26 @@ export async function createStripeCheckoutSession(input: {
   return result;
 }
 
+/** Expires an open Checkout Session so it can no longer be paid. */
+export async function expireStripeCheckoutSession(sessionId: string) {
+  const response = await fetch(
+    `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}/expire`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${getSecretKey()}` },
+      cache: 'no-store',
+    },
+  );
+  const result = (await response.json()) as StripeCheckoutSession &
+    StripeErrorBody;
+  if (!response.ok || !result.id) {
+    throw new Error(
+      result.error?.message || 'Stripe could not expire the Checkout Session.',
+    );
+  }
+  return result;
+}
+
 export async function getStripeCheckoutSession(sessionId: string) {
   const response = await fetch(
     `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,

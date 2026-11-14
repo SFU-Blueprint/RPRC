@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   createStripeCheckoutSession,
+  expireStripeCheckoutSession,
   getMembershipFee,
   getStripeCheckoutSession,
   PAYMENT_CURRENCY,
@@ -16,14 +17,57 @@ type CheckoutResult =
   | { ok: true; url: string }
   | { ok: false; status: number; error: string };
 
-const FINAL_OR_IN_FLIGHT: PaymentTransactionStatus[] = [
-  PaymentTransactionStatus.SUCCEEDED,
-  PaymentTransactionStatus.PROCESSING,
-];
+type AdminClient = ReturnType<typeof createAdminClient>;
+
+type PaymentRow = {
+  id: string;
+  status: PaymentTransactionStatus;
+  stripe_session_id: string | null;
+  amount: number;
+  created_at: string;
+};
+
+type CheckoutContext = {
+  admin: AdminClient;
+  application: { id: string; type: ApplicationType };
+  fee: number;
+  userId: string;
+  email?: string | null;
+  requestOrigin?: string;
+};
+
+const PAYMENT_COLUMNS = 'id, status, stripe_session_id, amount, created_at';
+
+// Postgres unique_violation: payments_one_open_per_application allows one open payment
+// per application, so a second simultaneous insert fails with this code.
+const UNIQUE_VIOLATION = '23505';
+
+// How long a request that lost the insert race waits for the winner to store its
+// Checkout Session id before creating (the same, idempotent) session itself.
+const SESSION_WAIT_ATTEMPTS = 6;
+const SESSION_WAIT_MS = 500;
+
+const ALREADY_PAID: CheckoutResult = {
+  ok: false,
+  status: 409,
+  error:
+    'A payment for this membership has already been received or is still processing.',
+};
+
+const CHECKOUT_FAILED: CheckoutResult = {
+  ok: false,
+  status: 502,
+  error: 'Checkout could not be started. Please try again.',
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Creates (or reuses) a Stripe Checkout Session for the member's payment-pending application
  * and records it in `payments`. The amount is derived server-side from the application type.
+ *
+ * An application has at most one open payment (enforced by a unique index), so repeat or
+ * simultaneous clicks all end up on the same payments row and the same Checkout Session.
  */
 export async function startMembershipCheckout(input: {
   userId: string;
@@ -62,16 +106,11 @@ export async function startMembershipCheckout(input: {
     };
   }
 
-  // Applications are reused for renewals, so only payments since the latest approval count.
-  let paymentsQuery = admin
+  const { data: payments, error: paymentsError } = await admin
     .from('payments')
-    .select('id, status, stripe_session_id, amount, created_at')
+    .select(PAYMENT_COLUMNS)
     .eq('application_id', application.id)
     .order('created_at', { ascending: false });
-  if (application.finalized_at)
-    paymentsQuery = paymentsQuery.gte('created_at', application.finalized_at);
-
-  const { data: payments, error: paymentsError } = await paymentsQuery;
   if (paymentsError) {
     console.error('[payments] payment lookup failed:', paymentsError.message);
     return {
@@ -81,64 +120,91 @@ export async function startMembershipCheckout(input: {
     };
   }
 
+  // Applications are reused for renewals, so only payments since the latest approval
+  // count as paying for this round.
+  const approvedAt = application.finalized_at
+    ? new Date(application.finalized_at).getTime()
+    : null;
+  const isCurrentRound = (payment: PaymentRow) =>
+    approvedAt === null || new Date(payment.created_at).getTime() >= approvedAt;
+
+  const rows = (payments ?? []) as PaymentRow[];
   if (
-    payments?.some((payment) => FINAL_OR_IN_FLIGHT.includes(payment.status))
+    rows.some(
+      (payment) =>
+        payment.status === PaymentTransactionStatus.PROCESSING ||
+        (payment.status === PaymentTransactionStatus.SUCCEEDED &&
+          isCurrentRound(payment)),
+    )
   ) {
-    return {
-      ok: false,
-      status: 409,
-      error:
-        'A payment for this membership has already been received or is still processing.',
-    };
+    return ALREADY_PAID;
   }
 
-  const fee = getMembershipFee(application.type as ApplicationType);
+  const context: CheckoutContext = {
+    admin,
+    application: {
+      id: application.id,
+      type: application.type as ApplicationType,
+    },
+    fee: getMembershipFee(application.type as ApplicationType),
+    userId: input.userId,
+    email: input.email,
+    requestOrigin: input.requestOrigin,
+  };
 
-  // Reuse a still-open Checkout Session instead of creating duplicates on repeat clicks.
-  const pending = payments?.find(
+  const open = rows.find(
     (payment) =>
-      payment.status === PaymentTransactionStatus.REQUIRES_PAYMENT_METHOD &&
-      payment.stripe_session_id &&
-      Number(payment.amount) === fee,
+      payment.status === PaymentTransactionStatus.REQUIRES_PAYMENT_METHOD,
   );
-  if (pending?.stripe_session_id) {
-    try {
-      const existing = await getStripeCheckoutSession(
-        pending.stripe_session_id,
-      );
-      if (existing.status === 'open' && existing.url)
-        return { ok: true, url: existing.url };
-      if (existing.status === 'expired') {
-        await admin
-          .from('payments')
-          .update({
-            status: PaymentTransactionStatus.CANCELED,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', pending.id)
-          .eq('status', PaymentTransactionStatus.REQUIRES_PAYMENT_METHOD);
-      }
-    } catch (error) {
-      console.warn(
-        '[payments] could not reuse existing Checkout Session:',
-        error,
-      );
+  if (open) {
+    // An open payment from before the latest approval, or for a different fee, can't be
+    // reused. Retire it so it stops blocking a new one.
+    if (!isCurrentRound(open) || Number(open.amount) !== context.fee) {
+      await retireOpenPayment(admin, open);
+    } else {
+      const reused = await reuseOpenPayment(context, open);
+      if (reused) return reused;
     }
   }
 
-  const { data: payment, error: insertError } = await admin
+  const { data: inserted, error: insertError } = await admin
     .from('payments')
     .insert({
       user_id: input.userId,
       application_id: application.id,
-      amount: fee,
+      amount: context.fee,
       currency: PAYMENT_CURRENCY.toUpperCase(),
       status: PaymentTransactionStatus.REQUIRES_PAYMENT_METHOD,
     })
-    .select('id')
+    .select(PAYMENT_COLUMNS)
     .single();
 
-  if (insertError || !payment) {
+  if (insertError?.code === UNIQUE_VIOLATION) {
+    // Another request created the open payment first. Use that one.
+    const { data: winner, error: winnerError } = await admin
+      .from('payments')
+      .select(PAYMENT_COLUMNS)
+      .eq('application_id', application.id)
+      .in('status', [
+        PaymentTransactionStatus.REQUIRES_PAYMENT_METHOD,
+        PaymentTransactionStatus.PROCESSING,
+      ])
+      .maybeSingle();
+    if (winnerError || !winner) {
+      console.error(
+        '[payments] could not load the open payment after a conflict:',
+        winnerError?.message,
+      );
+      return CHECKOUT_FAILED;
+    }
+    if (winner.status === PaymentTransactionStatus.PROCESSING)
+      return ALREADY_PAID;
+    return (
+      (await reuseOpenPayment(context, winner as PaymentRow)) ?? CHECKOUT_FAILED
+    );
+  }
+
+  if (insertError || !inserted) {
     console.error(
       '[payments] could not create payment record:',
       insertError?.message,
@@ -150,24 +216,118 @@ export async function startMembershipCheckout(input: {
     };
   }
 
-  try {
-    const session = await createStripeCheckoutSession({
-      paymentId: payment.id,
-      applicationId: application.id,
-      userId: input.userId,
-      membershipType: application.type as ApplicationType,
-      amountMinor: Math.round(fee * 100),
-      customerEmail: input.email,
-      requestOrigin: input.requestOrigin,
+  return createSessionForPayment(context, inserted.id, { ownsPayment: true });
+}
+
+/**
+ * Returns the Checkout Session URL for an open payment of the current round, creating the
+ * session if it doesn't exist yet. Returns null if the payment turned out to be expired and
+ * was canceled, so the caller can create a new one.
+ */
+async function reuseOpenPayment(
+  context: CheckoutContext,
+  payment: PaymentRow,
+): Promise<CheckoutResult | null> {
+  let sessionId = payment.stripe_session_id;
+
+  // A payment without a session id is usually one another request is still setting up.
+  // Give it a moment, then fall back to creating the session ourselves: the Stripe call
+  // uses the payment id as its idempotency key, so both requests get the same session.
+  for (
+    let attempt = 0;
+    !sessionId && attempt < SESSION_WAIT_ATTEMPTS;
+    attempt++
+  ) {
+    await sleep(SESSION_WAIT_MS);
+    const { data } = await context.admin
+      .from('payments')
+      .select('status, stripe_session_id')
+      .eq('id', payment.id)
+      .maybeSingle();
+    if (!data) break;
+    if (data.status === PaymentTransactionStatus.PROCESSING)
+      return ALREADY_PAID;
+    if (data.status !== PaymentTransactionStatus.REQUIRES_PAYMENT_METHOD)
+      return null;
+    sessionId = data.stripe_session_id;
+  }
+
+  if (!sessionId)
+    return createSessionForPayment(context, payment.id, {
+      ownsPayment: false,
     });
 
-    const { error: sessionUpdateError } = await admin
+  try {
+    const session = await getStripeCheckoutSession(sessionId);
+    if (session.status === 'open' && session.url)
+      return { ok: true, url: session.url };
+    if (session.status === 'complete') {
+      // Paid (or settling) but not recorded yet: record it now instead of charging again.
+      await fulfillCheckoutSession(session);
+      return ALREADY_PAID;
+    }
+    await markCanceled(context.admin, payment.id);
+    return null;
+  } catch (error) {
+    // Don't fall through to a new payment: the open one may still be payable.
+    console.error(
+      '[payments] could not load the open Checkout Session:',
+      error,
+    );
+    return CHECKOUT_FAILED;
+  }
+}
+
+/** Expires an open payment's Checkout Session (if any) and marks the payment canceled. */
+async function retireOpenPayment(admin: AdminClient, payment: PaymentRow) {
+  if (payment.stripe_session_id) {
+    try {
+      await expireStripeCheckoutSession(payment.stripe_session_id);
+    } catch (error) {
+      // Usually means the session already expired or completed. If it was paid,
+      // fulfillment still records it, because canceled payments can move to succeeded.
+      console.warn('[payments] could not expire old Checkout Session:', error);
+    }
+  }
+  await markCanceled(admin, payment.id);
+}
+
+async function markCanceled(admin: AdminClient, paymentId: string) {
+  const { error } = await admin
+    .from('payments')
+    .update({
+      status: PaymentTransactionStatus.CANCELED,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', paymentId)
+    .eq('status', PaymentTransactionStatus.REQUIRES_PAYMENT_METHOD);
+  if (error)
+    console.error('[payments] could not cancel payment:', error.message);
+}
+
+async function createSessionForPayment(
+  context: CheckoutContext,
+  paymentId: string,
+  { ownsPayment }: { ownsPayment: boolean },
+): Promise<CheckoutResult> {
+  try {
+    const session = await createStripeCheckoutSession({
+      paymentId,
+      applicationId: context.application.id,
+      userId: context.userId,
+      membershipType: context.application.type,
+      amountMinor: Math.round(context.fee * 100),
+      customerEmail: context.email,
+      requestOrigin: context.requestOrigin,
+    });
+
+    const { error: sessionUpdateError } = await context.admin
       .from('payments')
       .update({
         stripe_session_id: session.id,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', payment.id);
+      .eq('id', paymentId);
     if (sessionUpdateError) {
       // Fulfillment matches on metadata.payment_id and backfills the session id, so this is recoverable.
       console.error(
@@ -179,19 +339,25 @@ export async function startMembershipCheckout(input: {
     return { ok: true, url: session.url! };
   } catch (error) {
     console.error('[payments] Stripe session creation failed:', error);
-    await admin
-      .from('payments')
-      .update({
-        status: PaymentTransactionStatus.FAILED,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', payment.id);
-    return {
-      ok: false,
-      status: 502,
-      error:
-        'Stripe could not start checkout. Check the Stripe server key and site URL.',
-    };
+    // Only the request that created the payment marks it failed. Another request's
+    // failure (for example Stripe refusing a simultaneous call with the same
+    // idempotency key) says nothing about whether the payment itself is usable.
+    if (ownsPayment) {
+      await context.admin
+        .from('payments')
+        .update({
+          status: PaymentTransactionStatus.FAILED,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', paymentId);
+      return {
+        ok: false,
+        status: 502,
+        error:
+          'Stripe could not start checkout. Check the Stripe server key and site URL.',
+      };
+    }
+    return CHECKOUT_FAILED;
   }
 }
 

@@ -7,7 +7,10 @@ type Call = {
   payload?: unknown;
   filters: [string, string, unknown][];
 };
-type Response = { data: unknown; error: { message: string } | null };
+type Response = {
+  data: unknown;
+  error: { message: string; code?: string } | null;
+};
 
 // Minimal stand-in for the supabase-js query builder: records every call and answers
 // each query from a per-table queue of responses.
@@ -33,6 +36,10 @@ function from(table: string) {
       call.filters.push([column, 'gte', value]),
       builder
     ),
+    in: (column: string, value: unknown) => (
+      call.filters.push([column, 'in', value]),
+      builder
+    ),
     order: () => builder,
     limit: () => builder,
     single: respond,
@@ -47,6 +54,16 @@ function from(table: string) {
 
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({ from }),
+}));
+
+const stripe = vi.hoisted(() => ({
+  createStripeCheckoutSession: vi.fn(),
+  getStripeCheckoutSession: vi.fn(),
+  expireStripeCheckoutSession: vi.fn(),
+}));
+vi.mock('@/lib/stripe/server', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/stripe/server')>()),
+  ...stripe,
 }));
 
 const {
@@ -79,6 +96,7 @@ const paidSession: StripeCheckoutSession = {
 beforeEach(() => {
   calls.length = 0;
   responses = {};
+  vi.clearAllMocks();
 });
 
 describe('getPaymentStatusForSession', () => {
@@ -219,30 +237,209 @@ describe('startMembershipCheckout', () => {
     expect(calls.some((c) => c.table === 'payments')).toBe(false);
   });
 
+  const pendingApplication = {
+    data: {
+      id: 'app_1',
+      type: 'individual',
+      status: 'payment_pending',
+      finalized_at: '2026-11-01T00:00:00Z',
+    },
+    error: null,
+  };
+  const openPayment = {
+    ...payment,
+    created_at: '2026-11-02T00:00:00Z',
+  };
+  const openSession = {
+    id: 'cs_1',
+    url: 'https://checkout.stripe.com/c/pay/cs_1',
+    status: 'open' as const,
+  };
+
   it('refuses a second payment after one succeeded since the latest approval', async () => {
-    responses.applications = [
+    responses.applications = [pendingApplication];
+    responses.payments = [
       {
-        data: {
-          id: 'app_1',
-          type: 'individual',
-          status: 'payment_pending',
-          finalized_at: '2026-11-01T00:00:00Z',
-        },
+        data: [{ ...openPayment, status: 'succeeded' }],
         error: null,
       },
-    ];
-    responses.payments = [
-      { data: [{ ...payment, status: 'succeeded' }], error: null },
     ];
 
     const result = await startMembershipCheckout({ userId: 'user_1' });
 
     expect(result).toMatchObject({ ok: false, status: 409 });
-    const lookup = calls.find((c) => c.table === 'payments');
-    expect(lookup?.filters).toContainEqual([
-      'created_at',
-      'gte',
-      '2026-11-01T00:00:00Z',
+    expect(calls.some((c) => c.op === 'insert')).toBe(false);
+  });
+
+  it('allows a renewal payment when the only succeeded payment is from before the latest approval', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [
+      {
+        data: [
+          {
+            ...openPayment,
+            status: 'succeeded',
+            created_at: '2025-11-02T00:00:00Z',
+          },
+        ],
+        error: null,
+      },
+      { data: { ...openPayment, id: 'pay_2' }, error: null },
+    ];
+    stripe.createStripeCheckoutSession.mockResolvedValue(openSession);
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toEqual({ ok: true, url: openSession.url });
+    expect(stripe.createStripeCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({ paymentId: 'pay_2', amountMinor: 500 }),
+    );
+  });
+
+  it('reuses the open Checkout Session on a repeat click', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [{ data: [openPayment], error: null }];
+    stripe.getStripeCheckoutSession.mockResolvedValue(openSession);
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toEqual({ ok: true, url: openSession.url });
+    expect(calls.some((c) => c.op === 'insert')).toBe(false);
+    expect(stripe.createStripeCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it('cancels an open payment from before the latest approval and starts a new one', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [
+      {
+        data: [{ ...openPayment, created_at: '2025-11-02T00:00:00Z' }],
+        error: null,
+      },
+      { data: null, error: null }, // cancel
+      { data: { ...openPayment, id: 'pay_2' }, error: null }, // insert
+    ];
+    stripe.createStripeCheckoutSession.mockResolvedValue(openSession);
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toMatchObject({ ok: true });
+    expect(stripe.expireStripeCheckoutSession).toHaveBeenCalledWith('cs_1');
+    const cancel = calls.find(
+      (c) => c.op === 'update' && c.filters.some(([, , v]) => v === 'pay_1'),
+    );
+    expect(cancel?.payload).toMatchObject({ status: 'canceled' });
+    expect(calls.some((c) => c.op === 'insert')).toBe(true);
+  });
+
+  it('cancels an open payment for a different fee instead of reusing it', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [
+      { data: [{ ...openPayment, amount: 4 }], error: null },
+      { data: null, error: null }, // cancel
+      { data: { ...openPayment, id: 'pay_2' }, error: null }, // insert
+    ];
+    stripe.createStripeCheckoutSession.mockResolvedValue(openSession);
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toMatchObject({ ok: true });
+    expect(stripe.getStripeCheckoutSession).not.toHaveBeenCalled();
+    expect(stripe.expireStripeCheckoutSession).toHaveBeenCalledWith('cs_1');
+    expect(stripe.createStripeCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({ paymentId: 'pay_2' }),
+    );
+  });
+
+  it('refuses while a payment is still processing, even from an earlier round', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [
+      {
+        data: [
+          {
+            ...openPayment,
+            status: 'processing',
+            created_at: '2025-11-02T00:00:00Z',
+          },
+        ],
+        error: null,
+      },
+    ];
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toMatchObject({ ok: false, status: 409 });
+  });
+
+  it('uses the payment created by a simultaneous request instead of making a second one', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [
+      { data: [], error: null },
+      {
+        data: null,
+        error: { message: 'duplicate key value', code: '23505' },
+      },
+      { data: openPayment, error: null },
+    ];
+    stripe.getStripeCheckoutSession.mockResolvedValue(openSession);
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toEqual({ ok: true, url: openSession.url });
+    expect(stripe.createStripeCheckoutSession).not.toHaveBeenCalled();
+    const winnerLookup = calls[calls.length - 1];
+    expect(winnerLookup.filters).toContainEqual([
+      'status',
+      'in',
+      ['requires_payment_method', 'processing'],
     ]);
+  });
+
+  it('waits for the winning request to store its session before reusing it', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [
+      { data: [], error: null },
+      { data: null, error: { message: 'duplicate', code: '23505' } },
+      { data: { ...openPayment, stripe_session_id: null }, error: null },
+      {
+        data: { status: 'requires_payment_method', stripe_session_id: 'cs_1' },
+        error: null,
+      },
+    ];
+    stripe.getStripeCheckoutSession.mockResolvedValue(openSession);
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toEqual({ ok: true, url: openSession.url });
+    expect(stripe.getStripeCheckoutSession).toHaveBeenCalledWith('cs_1');
+    expect(stripe.createStripeCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it('records a completed session it finds instead of charging again', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [
+      { data: [openPayment], error: null },
+      { data: payment, error: null }, // fulfillment lookup
+      { data: null, error: null }, // fulfillment update
+    ];
+    stripe.getStripeCheckoutSession.mockResolvedValue(paidSession);
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toMatchObject({ ok: false, status: 409 });
+    expect(
+      calls.some((c) => c.table === 'applications' && c.op === 'update'),
+    ).toBe(true);
+    expect(calls.some((c) => c.op === 'insert')).toBe(false);
+  });
+
+  it('does not start a second payment when the open session cannot be loaded', async () => {
+    responses.applications = [pendingApplication];
+    responses.payments = [{ data: [openPayment], error: null }];
+    stripe.getStripeCheckoutSession.mockRejectedValue(new Error('timeout'));
+
+    const result = await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(result).toMatchObject({ ok: false, status: 502 });
+    expect(calls.some((c) => c.op === 'insert')).toBe(false);
   });
 });
