@@ -19,6 +19,4 @@ export const PaymentErrorMessage = {
   PAYMENTS_LOAD_FAILED:
     'Your payment history could not be loaded. Please try again.',
   CHECKOUT_FAILED: 'Checkout could not be started. Please try again.',
-  STRIPE_NOT_CONFIGURED:
-    'Stripe could not start checkout. Check the Stripe server key and site URL.',
 } as const;

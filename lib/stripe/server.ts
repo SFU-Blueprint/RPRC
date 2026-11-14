@@ -3,6 +3,7 @@ import {
   PAYMENT_CURRENCY,
 } from '@/lib/constants/processing-fees';
 import { ApplicationType } from '@/lib/constants/enums';
+import { ROUTES } from '@/lib/constants/routes';
 import type { StripeCheckoutSession } from '@/types/payment.types';
 
 /** Membership fee in whole dollars (CAD). */
@@ -63,8 +64,8 @@ export async function createStripeCheckoutSession(input: {
     'metadata[application_id]': input.applicationId,
     'metadata[user_id]': input.userId,
     'payment_intent_data[metadata][payment_id]': input.paymentId,
-    success_url: `${siteUrl}/membership/payment/return?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/membership/dashboard`,
+    success_url: `${siteUrl}${ROUTES.MEMBERSHIP_PAYMENT_RETURN}?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${siteUrl}${ROUTES.MEMBERSHIP_DASHBOARD}`,
   });
   if (input.customerEmail) body.set('customer_email', input.customerEmail);
 
