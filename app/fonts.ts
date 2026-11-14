@@ -30,8 +30,7 @@ export const headerStyles = {
   // Desktop (responsive)
   xsResponsive:
     'text-[12px] md:text-[14px] font-medium leading-[1] md:leading-[1.1]',
-  sResponsive:
-    'text-sm md:text-md font-medium leading-[1] md:leading-[1.1]',
+  sResponsive: 'text-sm md:text-md font-medium leading-[1] md:leading-[1.1]',
   mResponsive:
     'text-md md:text-xl font-normal md:font-medium leading-[1] md:leading-[1.1]',
   lResponsive:
@@ -42,8 +41,8 @@ export const headerStyles = {
 
 // Subheaders - Inter (Desktop only)
 export const subheaderStyles = {
-  xs: 'text-[15px] font-semibold leading-[1.2]',
-  s: 'text-[18px] font-bold leading-[1.2]',
+  xs: 'text-[12px] font-semibold leading-[1.2]',
+  s: 'text-[16px] font-bold leading-[1.2]',
   m: 'text-[22px] font-medium leading-[1.3]',
 };
 
@@ -58,6 +57,7 @@ export const bodyStyles = {
 // Button - Inter
 export const buttonStyles = {
   text: 'text-[15px] font-medium leading-[1.6]',
+  textSmall: 'text-[12px] font-medium leading-[1.6]',
   large: 'text-[18px] font-medium leading-[1.2]',
   radio: 'text-[22px] font-normal leading-none',
 };
