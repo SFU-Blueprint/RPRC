@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { inter, robotoCondensed } from '@/app/fonts';
@@ -23,6 +23,9 @@ type SubmitReviewProps = {
   waiverRequested?: boolean;
 };
 
+// Today's date never needs re-reading while the form is open.
+const noSubscription = () => () => {};
+
 export default function SubmitReview({
   appId,
   reviewHistory,
@@ -31,7 +34,16 @@ export default function SubmitReview({
   const router = useRouter();
 
   const [boardMemberName, setBoardMemberName] = useState('');
-  const [reviewDate, setReviewDate] = useState(() => getLocalDateString());
+  // The server renders this component too, and its date (UTC) can differ from the browser's
+  // in the evening. So today's date only comes from the browser (empty on the server, which
+  // keeps the submit button disabled until it's known), and an edited date overrides it.
+  const today = useSyncExternalStore(
+    noSubscription,
+    getLocalDateString,
+    () => '',
+  );
+  const [editedDate, setEditedDate] = useState<string | null>(null);
+  const reviewDate = editedDate ?? today;
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
   const [waiverDecision, setWaiverDecision] = useState<ReviewDecision | ''>('');
@@ -72,7 +84,7 @@ export default function SubmitReview({
 
     // Reset form after successful submission
     setBoardMemberName('');
-    setReviewDate(getLocalDateString());
+    setEditedDate(null);
     setDecision('');
     setReason('');
     setSubmitError('');
@@ -117,7 +129,7 @@ export default function SubmitReview({
             id="reviewDate"
             type="date"
             value={reviewDate}
-            onChange={(e) => setReviewDate(e.target.value)}
+            onChange={(e) => setEditedDate(e.target.value)}
             className="mt-2 w-full"
           />
         </div>
