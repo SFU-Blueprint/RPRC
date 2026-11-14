@@ -111,4 +111,17 @@ describe('submitApplicationReview review_date', () => {
     expect(insert.review_date).toBe('2026-11-14');
     expect(insert).not.toHaveProperty('created_at');
   });
+
+  it('rejects a review date that is not a real YYYY-MM-DD date', async () => {
+    const result = await submitApplicationReview({
+      ...review,
+      reviewDate: 'today',
+    });
+
+    expect(result).toEqual({
+      success: false,
+      error: 'Review date must be a valid date',
+    });
+    expect(calls.some((c) => c.op === 'insert')).toBe(false);
+  });
 });

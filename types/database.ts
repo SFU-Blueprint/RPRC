@@ -61,7 +61,7 @@ export type Database = {
           decision: Database['public']['Enums']['review_decision'];
           id?: string;
           reason: string;
-          review_date?: string;
+          review_date: string;
           reviewer_name: string;
           waiver_decision?:
             | Database['public']['Enums']['review_decision']

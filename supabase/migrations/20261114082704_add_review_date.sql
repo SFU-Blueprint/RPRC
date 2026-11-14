@@ -8,8 +8,9 @@ alter table public.application_reviews add column review_date date;
 update public.application_reviews
 set review_date = (created_at at time zone 'UTC')::date;
 
+-- No default: every insert must say which date the reviewer chose. A default would quietly
+-- use the database's (UTC) date.
 alter table public.application_reviews
-  alter column review_date set default current_date,
   alter column review_date set not null;
 
 comment on column public.application_reviews.review_date is

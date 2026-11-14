@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 import { submitApplicationReview } from '@/app/actions/application';
 import { ReviewDecision } from '@/lib/constants/enums';
+import { getLocalDateString } from '@/lib/utils/time-utils';
 import type { ReviewHistoryItem } from '@/types/admin.types';
 
 import SubmitReviewModal from './SubmitReviewModal';
@@ -21,7 +22,10 @@ type ConflictResolutionProps = {
   reviewHistory: ReviewHistoryItem[];
 };
 
-export default function ConflictResolution({ appId, reviewHistory }: ConflictResolutionProps) {
+export default function ConflictResolution({
+  appId,
+  reviewHistory,
+}: ConflictResolutionProps) {
   const router = useRouter();
 
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
@@ -30,8 +34,12 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const approvalCount = reviewHistory.filter(r => r.decision === ReviewDecision.APPROVE).length;
-  const rejectionCount = reviewHistory.filter(r => r.decision === ReviewDecision.REJECT).length;
+  const approvalCount = reviewHistory.filter(
+    (r) => r.decision === ReviewDecision.APPROVE,
+  ).length;
+  const rejectionCount = reviewHistory.filter(
+    (r) => r.decision === ReviewDecision.REJECT,
+  ).length;
 
   const isFormValid = Boolean(decision && reason.trim());
 
@@ -44,7 +52,7 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
     const result = await submitApplicationReview({
       appId,
       reviewerName: 'Board Admin',
-      reviewDate: new Date().toISOString().slice(0, 10),
+      reviewDate: getLocalDateString(),
       decision: decision as ReviewDecision,
       reason,
     });
@@ -67,23 +75,31 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
 
   return (
     <BackdropContainer className="bg-application-conflict-background shadow-card p-5 rounded-xl flex flex-col gap-y-6 w-full">
-      <p className={`${robotoCondensed.className} text-3xl font-bold`}>Submit Review</p>
+      <p className={`${robotoCondensed.className} text-3xl font-bold`}>
+        Submit Review
+      </p>
 
       {/* Conflict warning banner */}
       <div className="bg-application-conflict-note border-l-4 border-application-conflict-border rounded-md px-4 py-3">
         <div className="flex items-center gap-2 mb-1">
-          <AlertTriangle size={18} className="text-application-conflict-border shrink-0" />
+          <AlertTriangle
+            size={18}
+            className="text-application-conflict-border shrink-0"
+          />
           <p className="font-semibold text-sm">Conflicting decisions</p>
         </div>
         <p className="text-sm text-application-detail-text-secondary">
-          This application has {approvalCount} approval{approvalCount !== 1 ? 's' : ''} and{' '}
-          {rejectionCount} rejection{rejectionCount !== 1 ? 's' : ''}. Please discuss with your
-          team and finalize the decision with a note.
+          This application has {approvalCount} approval
+          {approvalCount !== 1 ? 's' : ''} and {rejectionCount} rejection
+          {rejectionCount !== 1 ? 's' : ''}. Please discuss with your team and
+          finalize the decision with a note.
         </p>
       </div>
 
       <div>
-        <Label className="text-application-detail-text-secondary text-md">Final Decision</Label>
+        <Label className="text-application-detail-text-secondary text-md">
+          Final Decision
+        </Label>
 
         <div className="flex justify-center w-full mt-2">
           <RadioGroup
@@ -123,7 +139,10 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
       </div>
 
       <div>
-        <Label htmlFor="conflict-reason" className="text-application-detail-text-secondary text-md">
+        <Label
+          htmlFor="conflict-reason"
+          className="text-application-detail-text-secondary text-md"
+        >
           Resolution Note
         </Label>
         <textarea
@@ -136,7 +155,9 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
         />
       </div>
 
-      {submitError ? <p className="text-destructive text-sm">{submitError}</p> : null}
+      {submitError ? (
+        <p className="text-destructive text-sm">{submitError}</p>
+      ) : null}
 
       <div className="flex justify-center mt-2">
         <Button

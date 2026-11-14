@@ -72,7 +72,9 @@ export async function getAdminApplicationPageDataServer(
         'id, application_id, reason, reviewer_name, decision, created_at, review_date, waiver_decision',
       )
       .eq('application_id', appId)
-      .order('created_at', { ascending: true }),
+      .order('created_at', { ascending: true })
+      // Reviews from before review_date existed can share a created_at; keep their order stable.
+      .order('id', { ascending: true }),
   ]);
 
   const individualProfile = userData?.individual_profiles as

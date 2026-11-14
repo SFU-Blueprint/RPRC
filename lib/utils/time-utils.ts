@@ -23,6 +23,27 @@ export function formatDateWithOrdinal(date: string | Date) {
 }
 
 /**
+ * Today's date (YYYY-MM-DD) in the user's time zone. `toISOString()` would give the UTC date,
+ * which is already tomorrow in the evening west of UTC.
+ */
+export function getLocalDateString(date: Date = new Date()) {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+/** Whether a value is a real calendar date written as YYYY-MM-DD. */
+export function isCalendarDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+/**
  * Formats a calendar date (YYYY-MM-DD) without converting time zones. Parsing it with
  * `new Date()` would read it as midnight UTC and show the previous day west of UTC.
  */

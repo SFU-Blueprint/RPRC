@@ -15,6 +15,7 @@ import {
   SubmitApplication,
 } from '@/lib/constants/application-errors';
 import { isAdmin } from '@/lib/helpers/auth-helper';
+import { isCalendarDate } from '@/lib/utils/time-utils';
 import { phoneNumberSchema } from '@/lib/schema/shared.schema';
 import type { Database } from '@/types/database';
 
@@ -353,6 +354,10 @@ export async function submitApplicationReview(
     !input.reason.trim()
   ) {
     return { success: false, error: 'All review fields are required' };
+  }
+
+  if (!isCalendarDate(input.reviewDate)) {
+    return { success: false, error: 'Review date must be a valid date' };
   }
 
   const { data: application } = await supabase
