@@ -104,23 +104,21 @@ describe('submitApplicationReview finalized_at', () => {
     ).toBeGreaterThanOrEqual(before);
   });
 
-  it('clears finalized_at while the application is still being reviewed', async () => {
-    responses.applications = [
-      { data: { status: 'to_review' }, error: null },
-      statusUpdated,
-    ];
+  it('leaves the application untouched when a first review keeps it in to_review', async () => {
+    // Also means this review is never withdrawn because another admin's request, which
+    // already counted it, changed the status first.
+    responses.applications = [{ data: { status: 'to_review' }, error: null }];
     responses.application_reviews = [
       { data: [], error: null },
       inserted,
       recount(1),
     ];
 
-    await submitApplicationReview(review);
+    const result = await submitApplicationReview(review);
 
-    expect(applicationUpdate()?.payload).toEqual({
-      status: 'to_review',
-      finalized_at: null,
-    });
+    expect(result).toEqual({ success: true });
+    expect(applicationUpdate()).toBeUndefined();
+    expect(deletedReview()).toBeUndefined();
   });
 });
 
@@ -206,5 +204,20 @@ describe('submitApplicationReview guards', () => {
       'to_review',
     ]);
     expect(deletedReview()?.filters).toContainEqual(['id', 'rev_new']);
+  });
+
+  it('warns not to retry when the review could not be withdrawn', async () => {
+    responses.applications = [{ data: { status: 'to_review' }, error: null }];
+    responses.application_reviews = [
+      { data: [], error: null },
+      inserted,
+      recount(2),
+      { data: null, error: { message: 'connection reset' } }, // delete fails
+    ];
+
+    const result = await submitApplicationReview(review);
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('could not be withdrawn');
   });
 });

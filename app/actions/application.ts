@@ -419,10 +419,18 @@ export async function submitApplicationReview(
   // above. If another admin's review landed at the same time, that set is stale: withdraw
   // this review rather than record an outcome that ignores the other one.
   const withdrawReview = async () => {
-    await supabase
+    const { error: deleteError } = await supabase
       .from('application_reviews')
       .delete()
       .eq('id', insertedReview.id);
+    if (deleteError) {
+      // The review is still saved, so retrying would add a duplicate.
+      return {
+        success: false,
+        error:
+          'Another review was submitted at the same time, and yours could not be withdrawn. Reload the page before trying again.',
+      };
+    }
     return { success: false, error: CONCURRENT_REVIEW_ERROR };
   };
 
@@ -472,6 +480,20 @@ export async function submitApplicationReview(
     nextStatus === ApplicationStatus.PAYMENT_PENDING ||
     nextStatus === ApplicationStatus.ACTIVE ||
     nextStatus === ApplicationStatus.REJECTED;
+
+  // Nothing to write when the outcome doesn't change the status (typically a first review
+  // that leaves the application in to_review). Skipping it also means a review that another
+  // admin's request has already counted is never withdrawn because of this update.
+  //
+  // Known gap: if this is the second review and a third lands before this update, the third
+  // can update first, and this review is then withdrawn although the third counted it. A
+  // database-side lock (an RPC with select ... for update) would close that; it's rare with
+  // a handful of admins.
+  if (nextStatus === application.status && !isFinalized) {
+    revalidatePath(ROUTES.ADMIN_DASHBOARD);
+    revalidatePath(ROUTES.ADMIN_APPLICATION_DETAIL(input.appId));
+    return { success: true };
+  }
 
   // Only applies if the status hasn't changed since it was read.
   const { data: updatedApplication, error: updateError } = await supabase

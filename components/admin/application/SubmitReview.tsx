@@ -210,14 +210,14 @@ export default function SubmitReview({
               {earlierWaiverDecision === ReviewDecision.APPROVE
                 ? 'approved'
                 : 'rejected'}{' '}
-              the fee waiver. That decision stands; a conflict resolution can
-              change it.
+              the fee waiver. That decision stands unless the application goes
+              to conflict resolution.
             </p>
           ) : (
             <>
               <div className="mt-8">
                 <Label
-                  htmlFor="reason"
+                  htmlFor="waiverReason"
                   className="text-application-detail-text-secondary text-md"
                 >
                   Note
