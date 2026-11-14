@@ -65,6 +65,9 @@ const CHECKOUT_FAILED: CheckoutResult = {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const DOUBLE_PAYMENT_MESSAGE =
+  '[payments] two payments for the same application and approval round were paid. Refund one.';
+
 /**
  * A payment counts for the application's current approval round if it was created after
  * the latest approval. Applications are reused for renewals, so older payments paid for an
@@ -462,6 +465,7 @@ async function activateForPayment(
   admin: SupabaseAdminClient,
   applicationId: string,
   payment: { id: string; created_at: string },
+  { flagDuplicates = false }: { flagDuplicates?: boolean } = {},
 ) {
   const { data: application, error: lookupError } = await admin
     .from('applications')
@@ -470,10 +474,21 @@ async function activateForPayment(
     .maybeSingle();
   if (lookupError)
     throw new Error(`Application lookup failed: ${lookupError.message}`);
-  if (!application || application.status !== ApplicationStatus.PAYMENT_PENDING)
-    return;
+  if (!application) return;
 
-  if (!countsForCurrentRound(payment.created_at, application.finalized_at)) {
+  const countsThisRound = countsForCurrentRound(
+    payment.created_at,
+    application.finalized_at,
+  );
+
+  // Checked before the status test: a second payment usually arrives after the first one
+  // already activated the membership.
+  if (flagDuplicates && countsThisRound)
+    await flagIfAlreadyPaid(admin, applicationId, payment.id, application);
+
+  if (application.status !== ApplicationStatus.PAYMENT_PENDING) return;
+
+  if (!countsThisRound) {
     console.error(
       '[payments] a payment from an earlier approval round succeeded; not activating. Reconcile manually.',
       { paymentId: payment.id, applicationId },
@@ -488,6 +503,41 @@ async function activateForPayment(
     .eq('status', ApplicationStatus.PAYMENT_PENDING);
   if (activationError)
     throw new Error(`Membership activation failed: ${activationError.message}`);
+}
+
+/**
+ * Logs a refund flag when another payment for the same application already succeeded in the
+ * current approval round. Catches every way a member can end up paying twice. Only logs:
+ * a failed lookup here must not stop the payment being recorded.
+ */
+async function flagIfAlreadyPaid(
+  admin: SupabaseAdminClient,
+  applicationId: string,
+  paymentId: string,
+  application: { finalized_at: string | null },
+) {
+  let query = admin
+    .from('payments')
+    .select('id')
+    .eq('application_id', applicationId)
+    .eq('status', PaymentTransactionStatus.SUCCEEDED)
+    .neq('id', paymentId);
+  if (application.finalized_at)
+    query = query.gte('created_at', application.finalized_at);
+
+  const { data: others, error } = await query;
+  if (error) {
+    console.error(
+      '[payments] could not check for a duplicate payment:',
+      error.message,
+    );
+    return;
+  }
+  if (others?.length)
+    console.error(DOUBLE_PAYMENT_MESSAGE, {
+      paymentId,
+      otherPaymentIds: others.map((other) => other.id),
+    });
 }
 
 /**
@@ -628,15 +678,28 @@ export async function fulfillCheckoutSession(
           throw new Error(
             'Could not retire the newer open payment; Stripe will retry.',
           );
+        // The newer payment had already been paid (or is settling) too. Record both, since
+        // the money moved either way, and flag one for a refund.
+        if (
+          outcome.kind === 'recorded' &&
+          outcome.result.outcome !== 'ignored' &&
+          (outcome.result.status === PaymentTransactionStatus.SUCCEEDED ||
+            outcome.result.status === PaymentTransactionStatus.PROCESSING)
+        ) {
+          console.error(DOUBLE_PAYMENT_MESSAGE, {
+            paymentId: payment.id,
+            otherPaymentId: newer.id,
+          });
+        }
       }
       ({ error: updateError } = await update());
       if (updateError?.code === UNIQUE_VIOLATION) {
         // Both payments are paid or settling. Don't fail forever: leave this one as it is
         // (its later async_payment_succeeded event can still record it) and flag a refund.
-        console.error(
-          '[payments] two payments for the same application are being paid. Refund one.',
-          { paymentId: payment.id, otherPaymentId: newer?.id },
-        );
+        console.error(DOUBLE_PAYMENT_MESSAGE, {
+          paymentId: payment.id,
+          otherPaymentId: newer?.id,
+        });
         return {
           outcome: 'ignored',
           reason: 'Another payment for this application is already in flight.',
@@ -654,7 +717,11 @@ export async function fulfillCheckoutSession(
     payment.application_id
   ) {
     // Runs on every call (not only on change) so a retry can finish a half-applied fulfillment.
-    await activateForPayment(admin, payment.application_id, payment);
+    // Duplicate payments are only checked when this call recorded the success, so retries
+    // don't log the same refund twice.
+    await activateForPayment(admin, payment.application_id, payment, {
+      flagDuplicates: changed,
+    });
   }
 
   return {

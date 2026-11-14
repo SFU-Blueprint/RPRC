@@ -357,6 +357,93 @@ describe('fulfillCheckoutSession', () => {
     );
     errorSpy.mockRestore();
   });
+
+  it('records both and flags a refund when the newer session in a processing conflict was already paid', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    responses.payments = [
+      { data: { ...payment, status: 'canceled' }, error: null }, // pay_1 lookup
+      uniqueViolation, // pay_1 → processing conflicts with the open pay_2
+      { data: { id: 'pay_2', stripe_session_id: 'cs_2' }, error: null }, // newer
+      {
+        data: { ...payment, id: 'pay_2', stripe_session_id: 'cs_2' },
+        error: null,
+      }, // pay_2 lookup (nested fulfillment)
+      ok, // pay_2 → succeeded
+      { data: [], error: null }, // duplicate check while recording pay_2
+      ok, // retry pay_1 → processing
+    ];
+    responses.applications = [activationLookup, ok];
+    stripe.getStripeCheckoutSession.mockResolvedValue({
+      ...paidSession,
+      id: 'cs_2',
+      metadata: { ...metadata, payment_id: 'pay_2' },
+    });
+
+    const result = await fulfillCheckoutSession(
+      settlingSession,
+      'checkout.session.completed',
+    );
+
+    expect(result).toMatchObject({ outcome: 'updated', status: 'processing' });
+    expect(stripe.expireStripeCheckoutSession).not.toHaveBeenCalled();
+    const [, newerPaid, retry] = updates('payments');
+    expect(newerPaid.payload).toMatchObject({ status: 'succeeded' });
+    expect(retry.payload).toMatchObject({ status: 'processing' });
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Refund one'),
+      { paymentId: 'pay_1', otherPaymentId: 'pay_2' },
+    );
+    errorSpy.mockRestore();
+  });
+
+  it('flags a refund when a second payment for the round succeeds after the membership activated', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    responses.payments = [
+      { data: { ...payment, status: 'processing' }, error: null },
+      ok, // → succeeded
+      { data: [{ id: 'pay_2' }], error: null }, // pay_2 already succeeded this round
+    ];
+    responses.applications = [
+      { data: { status: 'active', finalized_at: APPROVED_AT }, error: null },
+    ];
+
+    const result = await fulfillCheckoutSession(
+      paidSession,
+      'checkout.session.async_payment_succeeded',
+    );
+
+    expect(result).toMatchObject({ outcome: 'updated', status: 'succeeded' });
+    expect(activated()).toBe(false);
+    const duplicateCheck = calls.filter((c) => c.table === 'payments')[2];
+    expect(duplicateCheck.filters).toEqual(
+      expect.arrayContaining([
+        ['status', 'eq', 'succeeded'],
+        ['id', 'neq', 'pay_1'],
+        ['created_at', 'gte', APPROVED_AT],
+      ]),
+    );
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Refund one'),
+      { paymentId: 'pay_1', otherPaymentIds: ['pay_2'] },
+    );
+    errorSpy.mockRestore();
+  });
+
+  it('does not repeat the refund flag when a retry finds the payment already recorded', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    responses.payments = [
+      { data: { ...payment, status: 'succeeded' }, error: null },
+    ];
+    responses.applications = [
+      { data: { status: 'active', finalized_at: APPROVED_AT }, error: null },
+    ];
+
+    await fulfillCheckoutSession(paidSession);
+
+    expect(calls.filter((c) => c.table === 'payments')).toHaveLength(1);
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
 });
 
 describe('startMembershipCheckout', () => {
