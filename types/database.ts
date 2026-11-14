@@ -388,6 +388,7 @@ export type Database = {
         Args: {
           p_city: string;
           p_country: string;
+          p_fee_waiver?: boolean;
           p_fee_waiver_reason: string;
           p_interests: string[];
           p_mailing_address: string;

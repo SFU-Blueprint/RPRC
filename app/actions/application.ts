@@ -12,9 +12,11 @@ import {
 import { ROUTES } from '@/lib/constants/routes';
 import {
   ApplicationErrorCode,
+  ReviewErrorMessage,
   SubmitApplication,
 } from '@/lib/constants/application-errors';
 import { isAdmin } from '@/lib/helpers/auth-helper';
+import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
 import { phoneNumberSchema } from '@/lib/schema/shared.schema';
 import type { Database } from '@/types/database';
 
@@ -121,6 +123,7 @@ export async function submitIndividualApplication(
         p_province: data.province,
         p_postal_code: data.postalCode,
         p_reason: data.whyrpcmember,
+        p_fee_waiver: data.membershipwaiver,
         p_fee_waiver_reason: data.waiverreason || null,
         p_interests: data.interests,
       },
@@ -361,19 +364,24 @@ export async function submitApplicationReview(
     .eq('id', input.appId)
     .single();
 
+  if (!application) {
+    return { success: false, error: ReviewErrorMessage.NOT_FOUND };
+  }
+  // Only applications under review can be reviewed. Anything else (finalized, active, or
+  // expiring/expired with last round's reviews still attached) would add a stray review.
   if (
-    application?.status === 'payment_pending' ||
-    application?.status === 'rejected'
+    application.status !== ApplicationStatus.TO_REVIEW &&
+    application.status !== ApplicationStatus.CONFLICT
   ) {
     return {
       success: false,
-      error: 'This application has already been finalized',
+      error: ReviewErrorMessage.ALREADY_FINALIZED,
     };
   }
 
   const { data: existingReviews, error: reviewsError } = await supabase
     .from('application_reviews')
-    .select('decision')
+    .select('decision, waiver_decision')
     .eq('application_id', input.appId);
 
   if (reviewsError) {
@@ -384,7 +392,7 @@ export async function submitApplicationReview(
     `${input.reviewDate}T00:00:00.000Z`,
   ).toISOString();
 
-  const { error: insertError } = await supabase
+  const { data: insertedReview, error: insertError } = await supabase
     .from('application_reviews')
     .insert({
       application_id: input.appId,
@@ -394,34 +402,112 @@ export async function submitApplicationReview(
       created_at: reviewCreatedAt,
       waiver_decision: input.waiverDecision ?? null,
       waiver_note: input.waiverReason ?? null,
-    });
+    })
+    .select('id')
+    .single();
 
-  if (insertError) {
-    return { success: false, error: insertError.message };
+  if (insertError || !insertedReview) {
+    return {
+      success: false,
+      error: insertError?.message ?? ReviewErrorMessage.SAVE_FAILED,
+    };
   }
 
-  const allReviews = [
+  // The outcome (and which review decides the waiver) is worked out from the reviews read
+  // above. If another admin's review landed at the same time, that set is stale: withdraw
+  // this review rather than record an outcome that ignores the other one.
+  const withdrawReview = async () => {
+    const { error: deleteError } = await supabase
+      .from('application_reviews')
+      .delete()
+      .eq('id', insertedReview.id);
+    if (deleteError) {
+      // The review is still saved, so retrying would add a duplicate.
+      return {
+        success: false,
+        error: ReviewErrorMessage.CONCURRENT_REVIEW_NOT_WITHDRAWN,
+      };
+    }
+    return { success: false, error: ReviewErrorMessage.CONCURRENT_REVIEW };
+  };
+
+  const { data: reviewsNow, error: recountError } = await supabase
+    .from('application_reviews')
+    .select('id')
+    .eq('application_id', input.appId);
+  if (recountError) {
+    return { success: false, error: recountError.message };
+  }
+  if ((reviewsNow?.length ?? 0) !== (existingReviews?.length ?? 0) + 1) {
+    return withdrawReview();
+  }
+
+  const currentReview = {
+    decision: input.decision as Database['public']['Enums']['review_decision'],
+    waiver_decision: input.waiverDecision ?? null,
+  };
+  let nextStatus = getNextApplicationStatus([
     ...(existingReviews ?? []),
-    {
-      decision:
-        input.decision as Database['public']['Enums']['review_decision'],
-    },
-  ];
-  const nextStatus = getNextApplicationStatus(allReviews);
+    currentReview,
+  ]);
+
+  // An approved application whose fee waiver is granted skips payment.
+  if (nextStatus === ApplicationStatus.PAYMENT_PENDING) {
+    const { data: details, error: detailsError } = await supabase
+      .from('individual_application_details')
+      .select('fee_waiver')
+      .eq('application_id', input.appId)
+      .maybeSingle();
+    if (detailsError) {
+      return { success: false, error: detailsError.message };
+    }
+    if (
+      isFeeWaiverGranted({
+        requested: details?.fee_waiver ?? false,
+        earlierReviews: existingReviews ?? [],
+        currentReview,
+        resolvesConflict: application.status === ApplicationStatus.CONFLICT,
+      })
+    ) {
+      nextStatus = ApplicationStatus.ACTIVE;
+    }
+  }
+
   const isFinalized =
     nextStatus === ApplicationStatus.PAYMENT_PENDING ||
+    nextStatus === ApplicationStatus.ACTIVE ||
     nextStatus === ApplicationStatus.REJECTED;
 
-  const { error: updateError } = await supabase
+  // Nothing to write when the outcome doesn't change the status (typically a first review
+  // that leaves the application in to_review). Skipping it also means a review that another
+  // admin's request has already counted is never withdrawn because of this update.
+  //
+  // Known gap: if this is the second review and a third lands before this update, the third
+  // can update first, and this review is then withdrawn although the third counted it. A
+  // database-side lock (an RPC with select ... for update) would close that; it's rare with
+  // a handful of admins.
+  if (nextStatus === application.status && !isFinalized) {
+    revalidatePath(ROUTES.ADMIN_DASHBOARD);
+    revalidatePath(ROUTES.ADMIN_APPLICATION_DETAIL(input.appId));
+    return { success: true };
+  }
+
+  // Only applies if the status hasn't changed since it was read.
+  const { data: updatedApplication, error: updateError } = await supabase
     .from('applications')
     .update({
       status: nextStatus,
       finalized_at: isFinalized ? new Date().toISOString() : null,
     })
-    .eq('id', input.appId);
+    .eq('id', input.appId)
+    .eq('status', application.status)
+    .select('id');
 
   if (updateError) {
     return { success: false, error: updateError.message };
+  }
+  if (!updatedApplication?.length) {
+    return withdrawReview();
   }
 
   revalidatePath(ROUTES.ADMIN_DASHBOARD);
