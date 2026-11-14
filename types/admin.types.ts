@@ -1,4 +1,4 @@
-import { ApplicationStatus, ReviewDecision } from "@/lib/constants";
+import { ApplicationStatus, ReviewDecision } from '@/lib/constants';
 import type { Database } from '@/types/database';
 
 /** Config for one status chip: color, label, and theme (ApplicationStatus or ReviewDecision). */
@@ -31,7 +31,7 @@ export type ReviewRow = {
   created_at: string;
 };
 
-/** First two reviewers per application (by created_at), used when mapping to ApplicationType */
+/** First two reviewers per application (by submission time, created_at), used when mapping to ApplicationType */
 export type ReviewerPair = { reviewer1: string; reviewer2: string };
 
 export type ColumnType = {
@@ -45,7 +45,13 @@ export type ApplicationType = {
   applicantName: string;
   type: 'individual' | 'organization';
   dateReceived: string | Date;
-  status: 'to_review' | 'rejected' | 'payment_pending' | 'active' | 'expired' | 'conflict';
+  status:
+    | 'to_review'
+    | 'rejected'
+    | 'payment_pending'
+    | 'active'
+    | 'expired'
+    | 'conflict';
   reviewer1: string;
   reviewer2: string;
 };
@@ -90,9 +96,10 @@ export type AdminDashboardMobileTablePropTypes = {
 };
 
 export type AdminReviewProps = {
-  createdAt: string;
+  /** The date the reviewer chose (YYYY-MM-DD). */
+  reviewDate: string;
   reviewerName: string;
-  decision: ReviewDecision
+  decision: ReviewDecision;
   reason: string;
   waiverDecision?: ReviewDecision;
   isFinalDecision: boolean;
@@ -112,7 +119,8 @@ export type AdminApplicationDetailsData = {
   dateReceived: string;
 };
 
-export type ReviewHistoryItem = Database['public']['Tables']['application_reviews']['Row'];
+export type ReviewHistoryItem =
+  Database['public']['Tables']['application_reviews']['Row'];
 
 export type AdminApplicationPageData = {
   headerName: string;

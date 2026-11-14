@@ -380,10 +380,6 @@ export async function submitApplicationReview(
     return { success: false, error: reviewsError.message };
   }
 
-  const reviewCreatedAt = new Date(
-    `${input.reviewDate}T00:00:00.000Z`,
-  ).toISOString();
-
   const { error: insertError } = await supabase
     .from('application_reviews')
     .insert({
@@ -391,7 +387,8 @@ export async function submitApplicationReview(
       reviewer_name: input.reviewerName.trim(),
       decision: input.decision,
       reason: input.reason.trim(),
-      created_at: reviewCreatedAt,
+      // created_at defaults to the submission time.
+      review_date: input.reviewDate,
       waiver_decision: input.waiverDecision ?? null,
       waiver_note: input.waiverReason ?? null,
     });

@@ -22,6 +22,16 @@ export function formatDateWithOrdinal(date: string | Date) {
   return `${month} ${day}${getOrdinal(day)}, ${year}`;
 }
 
+/**
+ * Formats a calendar date (YYYY-MM-DD) without converting time zones. Parsing it with
+ * `new Date()` would read it as midnight UTC and show the previous day west of UTC.
+ */
+export function formatCalendarDate(date: string) {
+  const [year, month, day] = date.split('-').map(Number);
+  if (!year || !month || !day) return date;
+  return formatDateWithOrdinal(new Date(year, month - 1, day));
+}
+
 export function formatDisplayDate(date: string) {
   if (!date) return '';
   const parsed = new Date(date);

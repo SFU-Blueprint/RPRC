@@ -68,7 +68,9 @@ export async function getAdminApplicationPageDataServer(
       .eq('application_id', appId),
     supabase
       .from('application_reviews')
-      .select('id, application_id, reason, reviewer_name, decision, created_at, waiver_decision')
+      .select(
+        'id, application_id, reason, reviewer_name, decision, created_at, review_date, waiver_decision',
+      )
       .eq('application_id', appId)
       .order('created_at', { ascending: true }),
   ]);
@@ -97,12 +99,14 @@ export async function getAdminApplicationPageDataServer(
       ? (organizationDetails?.reason ?? '')
       : (individualDetails?.reason ?? '');
 
-  const feeWaiverRequested = application.type === 'organization'
-    ? false
-    : (individualDetails?.fee_waiver ?? false);
-  const feeWaiverReason = application.type === 'organization'
-    ? null
-    : (individualDetails?.fee_waiver_reason ?? '');
+  const feeWaiverRequested =
+    application.type === 'organization'
+      ? false
+      : (individualDetails?.fee_waiver ?? false);
+  const feeWaiverReason =
+    application.type === 'organization'
+      ? null
+      : (individualDetails?.fee_waiver_reason ?? '');
   const interests = (interestRows ?? [])
     .map((row) => {
       const relation = row.membership_interests as
@@ -118,19 +122,20 @@ export async function getAdminApplicationPageDataServer(
 
   const address = userAddress
     ? [
-      userAddress.mailing_address,
-      userAddress.city,
-      userAddress.province,
-      userAddress.country,
-      userAddress.postal_code,
-    ]
-      .filter(Boolean)
-      .join(', ')
+        userAddress.mailing_address,
+        userAddress.city,
+        userAddress.province,
+        userAddress.country,
+        userAddress.postal_code,
+      ]
+        .filter(Boolean)
+        .join(', ')
     : '';
 
   return {
     headerName,
-    headerStatus: application.status as Database['public']['Enums']['application_status'],
+    headerStatus:
+      application.status as Database['public']['Enums']['application_status'],
     details: {
       type: application.type as Database['public']['Enums']['application_type'],
       interests,
@@ -145,7 +150,8 @@ export async function getAdminApplicationPageDataServer(
       dateReceived: application.created_at ?? '',
     },
     reviewHistory:
-      (reviewRows as Database['public']['Tables']['application_reviews']['Row'][] | null) ??
-      [],
+      (reviewRows as
+        | Database['public']['Tables']['application_reviews']['Row'][]
+        | null) ?? [],
   };
 }
