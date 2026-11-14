@@ -3,12 +3,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // Checkout and payment activation treat payments created after `finalized_at` as paying for
 // the current approval round, so every approval (including after a renewal) must move it.
 
-type Call = { table: string; op: string; payload?: unknown };
+type Call = {
+  table: string;
+  op: string;
+  payload?: unknown;
+  filters: [string, unknown][];
+};
 const calls: Call[] = [];
 let responses: Record<string, { data: unknown; error: unknown }[]> = {};
 
 function from(table: string) {
-  const call: Call = { table, op: 'select' };
+  const call: Call = { table, op: 'select', filters: [] };
   calls.push(call);
   const respond = () =>
     Promise.resolve(responses[table]?.shift() ?? { data: null, error: null });
@@ -18,7 +23,11 @@ function from(table: string) {
       Object.assign(call, { op: 'insert', payload }) && builder,
     update: (payload: unknown) =>
       Object.assign(call, { op: 'update', payload }) && builder,
-    eq: () => builder,
+    delete: () => Object.assign(call, { op: 'delete' }) && builder,
+    eq: (column: string, value: unknown) => (
+      call.filters.push([column, value]),
+      builder
+    ),
     single: respond,
     maybeSingle: respond,
     then: (
@@ -49,9 +58,21 @@ const review = {
   reason: 'Looks good',
 } as Parameters<typeof submitApplicationReview>[0];
 
+const ok = { data: null, error: null };
+const inserted = { data: { id: 'rev_new' }, error: null };
+const recount = (n: number) => ({
+  data: Array.from({ length: n }, (_, i) => ({ id: `rev_${i}` })),
+  error: null,
+});
+const statusUpdated = { data: [{ id: 'app_1' }], error: null };
+const statusNotUpdated = { data: [], error: null };
+
 const applicationUpdate = () =>
-  calls.find((c) => c.table === 'applications' && c.op === 'update')
-    ?.payload as { status: string; finalized_at: string | null };
+  calls.find((c) => c.table === 'applications' && c.op === 'update') as
+    | (Call & { payload: { status: string; finalized_at: string | null } })
+    | undefined;
+const deletedReview = () =>
+  calls.find((c) => c.table === 'application_reviews' && c.op === 'delete');
 
 beforeEach(() => {
   calls.length = 0;
@@ -62,35 +83,128 @@ describe('submitApplicationReview finalized_at', () => {
   it('sets finalized_at to now on the approval that moves the application to payment_pending', async () => {
     // A renewal: the application was approved last year, and its old reviews were
     // cleared when the member resubmitted, so this round has one approval so far.
-    responses.applications = [{ data: { status: 'to_review' }, error: null }];
+    responses.applications = [
+      { data: { status: 'to_review' }, error: null },
+      statusUpdated,
+    ];
     responses.application_reviews = [
-      { data: [{ decision: 'approve' }], error: null },
-      { data: null, error: null },
+      { data: [{ decision: 'approve', waiver_decision: null }], error: null },
+      inserted,
+      recount(2),
     ];
     const before = Date.now();
 
     const result = await submitApplicationReview(review);
 
     expect(result).toEqual({ success: true });
-    const update = applicationUpdate();
-    expect(update.status).toBe('payment_pending');
-    expect(new Date(update.finalized_at!).getTime()).toBeGreaterThanOrEqual(
-      before,
-    );
+    const update = applicationUpdate()!;
+    expect(update.payload.status).toBe('payment_pending');
+    expect(
+      new Date(update.payload.finalized_at!).getTime(),
+    ).toBeGreaterThanOrEqual(before);
   });
 
   it('clears finalized_at while the application is still being reviewed', async () => {
-    responses.applications = [{ data: { status: 'to_review' }, error: null }];
+    responses.applications = [
+      { data: { status: 'to_review' }, error: null },
+      statusUpdated,
+    ];
     responses.application_reviews = [
       { data: [], error: null },
-      { data: null, error: null },
+      inserted,
+      recount(1),
     ];
 
     await submitApplicationReview(review);
 
-    expect(applicationUpdate()).toEqual({
+    expect(applicationUpdate()?.payload).toEqual({
       status: 'to_review',
       finalized_at: null,
     });
+  });
+});
+
+describe('submitApplicationReview fee waiver', () => {
+  it('activates an approved application whose waiver the first reviewer granted', async () => {
+    responses.applications = [
+      { data: { status: 'to_review' }, error: null },
+      statusUpdated,
+    ];
+    responses.application_reviews = [
+      {
+        data: [{ decision: 'approve', waiver_decision: 'approve' }],
+        error: null,
+      },
+      inserted,
+      recount(2),
+    ];
+    responses.individual_application_details = [
+      { data: { fee_waiver: true }, error: null },
+    ];
+
+    const result = await submitApplicationReview(review);
+
+    expect(result).toEqual({ success: true });
+    expect(applicationUpdate()?.payload.status).toBe('active');
+  });
+});
+
+describe('submitApplicationReview guards', () => {
+  it.each(['payment_pending', 'rejected', 'active', 'expires_soon', 'expired'])(
+    'refuses to review an application that is %s',
+    async (status) => {
+      responses.applications = [{ data: { status }, error: null }];
+
+      const result = await submitApplicationReview(review);
+
+      expect(result).toEqual({
+        success: false,
+        error: 'This application has already been finalized',
+      });
+      expect(calls.some((c) => c.op === 'insert')).toBe(false);
+    },
+  );
+
+  it('withdraws the review when another review landed at the same time', async () => {
+    // Two first reviews at once: both read no reviews, but there are two after inserting.
+    responses.applications = [{ data: { status: 'to_review' }, error: null }];
+    responses.application_reviews = [
+      { data: [], error: null },
+      inserted,
+      recount(2),
+      ok, // delete
+    ];
+
+    const result = await submitApplicationReview(review);
+
+    expect(result).toEqual({
+      success: false,
+      error:
+        'Another review was submitted at the same time. Reload the page and try again.',
+    });
+    expect(deletedReview()?.filters).toContainEqual(['id', 'rev_new']);
+    expect(applicationUpdate()).toBeUndefined();
+  });
+
+  it('withdraws the review when the status changed before the update', async () => {
+    responses.applications = [
+      { data: { status: 'to_review' }, error: null },
+      statusNotUpdated,
+    ];
+    responses.application_reviews = [
+      { data: [{ decision: 'approve', waiver_decision: null }], error: null },
+      inserted,
+      recount(2),
+      ok, // delete
+    ];
+
+    const result = await submitApplicationReview(review);
+
+    expect(result.success).toBe(false);
+    expect(applicationUpdate()?.filters).toContainEqual([
+      'status',
+      'to_review',
+    ]);
+    expect(deletedReview()?.filters).toContainEqual(['id', 'rev_new']);
   });
 });

@@ -3,6 +3,9 @@
 -- shown the request. Add p_fee_waiver and store it.
 --
 -- The parameter list changes, so the old function is dropped rather than overloaded.
+-- p_fee_waiver comes last with a default, so the app version from before this change
+-- (which doesn't send it) keeps working between this migration and the app deploy.
+-- Apply this migration before deploying the app that sends p_fee_waiver.
 -- Existing rows are left as they are.
 
 drop function if exists public.create_individual_application(
@@ -20,13 +23,14 @@ create function public.create_individual_application(
   p_province text,
   p_postal_code text,
   p_reason text,
-  p_fee_waiver boolean,
   p_fee_waiver_reason text,
-  p_interests text[]
+  p_interests text[],
+  p_fee_waiver boolean default false
 )
  returns void
  language plpgsql
  security definer
+ set search_path = public
 as $function$
 DECLARE
   v_application_id uuid;

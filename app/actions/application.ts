@@ -298,6 +298,9 @@ type SubmitApplicationReviewInput = {
   waiverReason?: string;
 };
 
+const CONCURRENT_REVIEW_ERROR =
+  'Another review was submitted at the same time. Reload the page and try again.';
+
 type SubmitApplicationReviewResult = {
   success: boolean;
   error?: string;
@@ -363,10 +366,14 @@ export async function submitApplicationReview(
     .eq('id', input.appId)
     .single();
 
+  if (!application) {
+    return { success: false, error: 'Application not found' };
+  }
+  // Only applications under review can be reviewed. Anything else (finalized, active, or
+  // expiring/expired with last round's reviews still attached) would add a stray review.
   if (
-    application?.status === ApplicationStatus.PAYMENT_PENDING ||
-    application?.status === ApplicationStatus.REJECTED ||
-    application?.status === ApplicationStatus.ACTIVE
+    application.status !== ApplicationStatus.TO_REVIEW &&
+    application.status !== ApplicationStatus.CONFLICT
   ) {
     return {
       success: false,
@@ -387,7 +394,7 @@ export async function submitApplicationReview(
     `${input.reviewDate}T00:00:00.000Z`,
   ).toISOString();
 
-  const { error: insertError } = await supabase
+  const { data: insertedReview, error: insertError } = await supabase
     .from('application_reviews')
     .insert({
       application_id: input.appId,
@@ -397,10 +404,37 @@ export async function submitApplicationReview(
       created_at: reviewCreatedAt,
       waiver_decision: input.waiverDecision ?? null,
       waiver_note: input.waiverReason ?? null,
-    });
+    })
+    .select('id')
+    .single();
 
-  if (insertError) {
-    return { success: false, error: insertError.message };
+  if (insertError || !insertedReview) {
+    return {
+      success: false,
+      error: insertError?.message ?? 'Failed to save the review',
+    };
+  }
+
+  // The outcome (and which review decides the waiver) is worked out from the reviews read
+  // above. If another admin's review landed at the same time, that set is stale: withdraw
+  // this review rather than record an outcome that ignores the other one.
+  const withdrawReview = async () => {
+    await supabase
+      .from('application_reviews')
+      .delete()
+      .eq('id', insertedReview.id);
+    return { success: false, error: CONCURRENT_REVIEW_ERROR };
+  };
+
+  const { data: reviewsNow, error: recountError } = await supabase
+    .from('application_reviews')
+    .select('id')
+    .eq('application_id', input.appId);
+  if (recountError) {
+    return { success: false, error: recountError.message };
+  }
+  if ((reviewsNow?.length ?? 0) !== (existingReviews?.length ?? 0) + 1) {
+    return withdrawReview();
   }
 
   const currentReview = {
@@ -427,7 +461,7 @@ export async function submitApplicationReview(
         requested: details?.fee_waiver ?? false,
         earlierReviews: existingReviews ?? [],
         currentReview,
-        resolvesConflict: application?.status === ApplicationStatus.CONFLICT,
+        resolvesConflict: application.status === ApplicationStatus.CONFLICT,
       })
     ) {
       nextStatus = ApplicationStatus.ACTIVE;
@@ -439,16 +473,22 @@ export async function submitApplicationReview(
     nextStatus === ApplicationStatus.ACTIVE ||
     nextStatus === ApplicationStatus.REJECTED;
 
-  const { error: updateError } = await supabase
+  // Only applies if the status hasn't changed since it was read.
+  const { data: updatedApplication, error: updateError } = await supabase
     .from('applications')
     .update({
       status: nextStatus,
       finalized_at: isFinalized ? new Date().toISOString() : null,
     })
-    .eq('id', input.appId);
+    .eq('id', input.appId)
+    .eq('status', application.status)
+    .select('id');
 
   if (updateError) {
     return { success: false, error: updateError.message };
+  }
+  if (!updatedApplication?.length) {
+    return withdrawReview();
   }
 
   revalidatePath(ROUTES.ADMIN_DASHBOARD);

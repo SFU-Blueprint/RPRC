@@ -31,7 +31,11 @@ export default function ConflictResolution({
 
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
-  const [waiverDecision, setWaiverDecision] = useState<ReviewDecision | ''>('');
+  // 'keep' leaves the reviewers' waiver decision as it is.
+  const [waiverChoice, setWaiverChoice] = useState<ReviewDecision | 'keep'>(
+    'keep',
+  );
+  const [waiverNote, setWaiverNote] = useState('');
 
   // The reviewers' waiver decision stands unless the resolution overrides it.
   const showWaiverSection =
@@ -64,8 +68,12 @@ export default function ConflictResolution({
       reviewDate: new Date().toISOString().slice(0, 10),
       decision: decision as ReviewDecision,
       reason,
-      waiverDecision:
-        showWaiverSection && waiverDecision ? waiverDecision : undefined,
+      ...(showWaiverSection && waiverChoice !== 'keep'
+        ? {
+            waiverDecision: waiverChoice,
+            waiverReason: waiverNote.trim() || undefined,
+          }
+        : {}),
     });
 
     setIsSubmitting(false);
@@ -78,7 +86,8 @@ export default function ConflictResolution({
 
     setDecision('');
     setReason('');
-    setWaiverDecision('');
+    setWaiverChoice('keep');
+    setWaiverNote('');
     setSubmitError('');
     setIsModalOpen(false);
 
@@ -176,14 +185,29 @@ export default function ConflictResolution({
             {currentWaiverDecision
               ? `The reviewers' waiver decision is "${currentWaiverDecision === ReviewDecision.APPROVE ? 'approve' : 'reject'}".`
               : 'The reviewers did not decide the waiver.'}{' '}
-            Leave this blank to keep it, or choose to override it.
+            Keep it, or override it.
           </p>
           <div className="flex justify-center w-full mt-2">
             <RadioGroup
-              value={waiverDecision}
-              className="w-[75%] flex flex-row justify-between"
-              onValueChange={(val) => setWaiverDecision(val as ReviewDecision)}
+              value={waiverChoice}
+              className="w-full flex flex-row flex-wrap justify-between gap-y-3"
+              onValueChange={(val) =>
+                setWaiverChoice(val as ReviewDecision | 'keep')
+              }
             >
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  value="keep"
+                  id="conflict-waiver-keep"
+                  className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                />
+                <Label
+                  htmlFor="conflict-waiver-keep"
+                  className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                >
+                  Keep reviewers&apos; decision
+                </Label>
+              </div>
               <div className="flex items-center gap-3">
                 <RadioGroupItem
                   value={ReviewDecision.APPROVE}
@@ -212,6 +236,24 @@ export default function ConflictResolution({
               </div>
             </RadioGroup>
           </div>
+          {waiverChoice !== 'keep' ? (
+            <div className="mt-4">
+              <Label
+                htmlFor="conflict-waiver-note"
+                className="text-application-detail-text-secondary text-md"
+              >
+                Waiver Note
+              </Label>
+              <textarea
+                id="conflict-waiver-note"
+                name="waiverNote"
+                value={waiverNote}
+                onChange={(e) => setWaiverNote(e.target.value)}
+                className={`${inter.className} w-full h-15 bg-signup-neutral-50 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
+                placeholder="Why the waiver decision is being changed..."
+              />
+            </div>
+          ) : null}
         </div>
       ) : null}
 

@@ -22,11 +22,17 @@ type SubmitReviewProps = {
   waiverRequested?: boolean;
 };
 
-export default function SubmitReview({ appId, reviewHistory, waiverRequested }: SubmitReviewProps) {
+export default function SubmitReview({
+  appId,
+  reviewHistory,
+  waiverRequested,
+}: SubmitReviewProps) {
   const router = useRouter();
 
   const [boardMemberName, setBoardMemberName] = useState('');
-  const [reviewDate, setReviewDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [reviewDate, setReviewDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
   const [waiverDecision, setWaiverDecision] = useState<ReviewDecision | ''>('');
@@ -35,8 +41,18 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const isFormValid = Boolean(boardMemberName && reviewDate && decision && reason);
-  const showWaiverSection = (decision === ReviewDecision.APPROVE || decision === '') && waiverRequested;
+  const isFormValid = Boolean(
+    boardMemberName && reviewDate && decision && reason,
+  );
+  const showWaiverSection =
+    (decision === ReviewDecision.APPROVE || decision === '') && waiverRequested;
+  // The first approving review that decides the waiver sets it, so once an earlier approval
+  // has decided it, this review's waiver choice wouldn't count.
+  const earlierWaiverDecision = reviewHistory.find(
+    (review) =>
+      review.decision === ReviewDecision.APPROVE && review.waiver_decision,
+  )?.waiver_decision;
+  const canDecideWaiver = showWaiverSection && !earlierWaiverDecision;
 
   const handleConfirmSubmit = async () => {
     if (!isFormValid || isSubmitting) return;
@@ -50,8 +66,15 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
       reviewDate,
       decision: decision as ReviewDecision,
       reason,
-      waiverDecision: waiverDecision as ReviewDecision || undefined,
-      waiverReason
+      // Only an approving review that can still decide the waiver sends a waiver decision.
+      waiverDecision:
+        canDecideWaiver && decision === ReviewDecision.APPROVE && waiverDecision
+          ? waiverDecision
+          : undefined,
+      waiverReason:
+        canDecideWaiver && decision === ReviewDecision.APPROVE
+          ? waiverReason
+          : undefined,
     });
 
     setIsSubmitting(false);
@@ -75,11 +98,18 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
 
   return (
     <BackdropContainer className="bg-signup-neutral-50 shadow-card p-4 text w-full">
-      <p className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}>Submit Review</p>
+      <p
+        className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}
+      >
+        Submit Review
+      </p>
 
       <div className="flex flex-col gap-x-6 gap-y-4 mt-8">
         <div className="flex-2">
-          <Label htmlFor="boardMemberName" className="text-application-detail-text-secondary text-md">
+          <Label
+            htmlFor="boardMemberName"
+            className="text-application-detail-text-secondary text-md"
+          >
             Board Member Name
           </Label>
           <Input
@@ -92,7 +122,10 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
         </div>
 
         <div className="flex-1">
-          <Label htmlFor="reviewDate" className="text-application-detail-text-secondary text-md">
+          <Label
+            htmlFor="reviewDate"
+            className="text-application-detail-text-secondary text-md"
+          >
             Review Date
           </Label>
           <Input
@@ -106,7 +139,9 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
       </div>
 
       <div className="mt-4">
-        <Label className="text-application-detail-text-secondary text-md">Decision</Label>
+        <Label className="text-application-detail-text-secondary text-md">
+          Decision
+        </Label>
 
         <div className="flex justify-center w-full mt-2">
           <RadioGroup
@@ -146,7 +181,10 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
       </div>
 
       <div>
-        <Label htmlFor="reason" className="text-application-detail-text-secondary text-md">
+        <Label
+          htmlFor="reason"
+          className="text-application-detail-text-secondary text-md"
+        >
           Note
         </Label>
         <textarea
@@ -159,67 +197,91 @@ export default function SubmitReview({ appId, reviewHistory, waiverRequested }: 
         />
       </div>
 
-      {
-        showWaiverSection && (
-          <div className="mt-8">
-            <p className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}>Fee Waiver Request</p>
-            <div className="mt-8">
-              <Label htmlFor="reason" className="text-application-detail-text-secondary text-md">
-                Note
-              </Label>
-              <textarea
-                id="waiverReason"
-                name="waiverReason"
-                value={waiverReason}
-                onChange={(e) => setWaiverReason(e.target.value)}
-                className={`${inter.className} w-full h-15 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
-                placeholder="Enter your reasoning..."
-              />
-            </div>
-            <div className="mt-4">
-              <Label className="text-application-detail-text-secondary text-md">Decision</Label>
-
-              <div className="flex justify-center w-full mt-2">
-                <RadioGroup
-                  value={waiverDecision}
-                  className="w-[75%] flex flex-row justify-between"
-                  onValueChange={(val) => setWaiverDecision(val as ReviewDecision)}
+      {showWaiverSection && (
+        <div className="mt-8">
+          <p
+            className={`${robotoCondensed.className} text-3xl font-bold border-b pb-5`}
+          >
+            Fee Waiver Request
+          </p>
+          {earlierWaiverDecision ? (
+            <p className="mt-4 text-sm text-application-detail-text-secondary">
+              The first reviewer{' '}
+              {earlierWaiverDecision === ReviewDecision.APPROVE
+                ? 'approved'
+                : 'rejected'}{' '}
+              the fee waiver. That decision stands; a conflict resolution can
+              change it.
+            </p>
+          ) : (
+            <>
+              <div className="mt-8">
+                <Label
+                  htmlFor="reason"
+                  className="text-application-detail-text-secondary text-md"
                 >
-                  <div className="flex items-center gap-3">
-                    <RadioGroupItem
-                      value={ReviewDecision.APPROVE}
-                      id="approve"
-                      className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
-                    />
-                    <Label
-                      htmlFor="approve"
-                      className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
-                    >
-                      Approve
-                    </Label>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <RadioGroupItem
-                      value={ReviewDecision.REJECT}
-                      id="reject"
-                      className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
-                    />
-                    <Label
-                      htmlFor="reject"
-                      className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
-                    >
-                      Reject
-                    </Label>
-                  </div>
-                </RadioGroup>
+                  Note
+                </Label>
+                <textarea
+                  id="waiverReason"
+                  name="waiverReason"
+                  value={waiverReason}
+                  onChange={(e) => setWaiverReason(e.target.value)}
+                  className={`${inter.className} w-full h-15 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
+                  placeholder="Enter your reasoning..."
+                />
               </div>
-            </div>
-          </div>
-        )
-      }
+              <div className="mt-4">
+                <Label className="text-application-detail-text-secondary text-md">
+                  Decision
+                </Label>
 
-      {submitError ? <p className="text-destructive text-sm">{submitError}</p> : null}
+                <div className="flex justify-center w-full mt-2">
+                  <RadioGroup
+                    value={waiverDecision}
+                    className="w-[75%] flex flex-row justify-between"
+                    onValueChange={(val) =>
+                      setWaiverDecision(val as ReviewDecision)
+                    }
+                  >
+                    <div className="flex items-center gap-3">
+                      <RadioGroupItem
+                        value={ReviewDecision.APPROVE}
+                        id="approve"
+                        className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                      />
+                      <Label
+                        htmlFor="approve"
+                        className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                      >
+                        Approve
+                      </Label>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <RadioGroupItem
+                        value={ReviewDecision.REJECT}
+                        id="reject"
+                        className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                      />
+                      <Label
+                        htmlFor="reject"
+                        className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                      >
+                        Reject
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {submitError ? (
+        <p className="text-destructive text-sm">{submitError}</p>
+      ) : null}
 
       <div className="flex justify-center mt-8">
         <Button
