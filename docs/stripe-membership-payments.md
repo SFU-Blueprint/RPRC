@@ -23,7 +23,7 @@ All `payments` writes use the service-role client (`lib/supabase/admin.ts`), bec
 
 1. In `.env.local`, set the Supabase vars, `SUPABASE_SERVICE_ROLE_KEY`, and a Stripe **test-mode** `STRIPE_SECRET_KEY`.
 2. `make dev`, sign in as a member whose latest application is `payment_pending`, and open `/membership/dashboard`.
-3. To receive webhooks, run `stripe listen --events checkout.session.completed,checkout.session.async_payment_succeeded,checkout.session.async_payment_failed,checkout.session.expired --forward-to http://localhost:3000/api/stripe/webhook`. Set the printed `whsec_…` as `STRIPE_WEBHOOK_SECRET` and restart. Without the webhook, the return page still records card payments.
+3. To receive webhooks, run `npm run stripe:listen` (it forwards the four checkout events in the table above). Set the printed `whsec_…` as `STRIPE_WEBHOOK_SECRET` and restart. Without the webhook, the return page still records card payments.
 4. Click **Make Payment** and pay with `4242 4242 4242 4242` (any future expiry, any CVC).
 
 ## Deployment
