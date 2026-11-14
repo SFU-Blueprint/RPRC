@@ -17,18 +17,18 @@ When an application is approved (two approving reviews), its status becomes `pay
 | `checkout.session.async_payment_failed`                                 | `failed`                             |
 | `checkout.session.expired`                                              | `canceled`                           |
 
-All `payments` writes use the service-role client (`lib/supabase/admin.ts`), because webhooks have no user session. `SUPABASE_SERVICE_ROLE_KEY` must never be exposed to the browser.
+All `payments` writes use the admin client (`lib/supabase/admin.ts`) with the Supabase secret key (`sb_secret_...`, which replaces the legacy service_role key), because webhooks have no user session. `SUPABASE_SECRET_KEY` must never be exposed to the browser.
 
 ## Local testing
 
-1. In `.env.local`, set the Supabase vars, `SUPABASE_SERVICE_ROLE_KEY`, and a Stripe **test-mode** `STRIPE_SECRET_KEY`.
+1. In `.env.local`, set the Supabase vars, `SUPABASE_SECRET_KEY`, and a Stripe **test-mode** `STRIPE_SECRET_KEY`.
 2. `make dev`, sign in as a member whose latest application is `payment_pending`, and open `/membership/dashboard`.
 3. To receive webhooks, run `npm run stripe:listen` (it forwards the four checkout events in the table above). Set the printed `whsec_…` as `STRIPE_WEBHOOK_SECRET` and restart. Without the webhook, the return page still records card payments.
 4. Click **Make Payment** and pay with `4242 4242 4242 4242` (any future expiry, any CVC).
 
 ## Deployment
 
-Configure `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and `NEXT_PUBLIC_SITE_URL` (the deployment's HTTPS URL; it is also used for auth email links and Stripe's return URLs). Register the HTTPS endpoint `/api/stripe/webhook` in Stripe with the four events above. Use the matching key and webhook secret for each Stripe environment.
+Configure `SUPABASE_SECRET_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and `NEXT_PUBLIC_SITE_URL` (the deployment's HTTPS URL; it is also used for auth email links and Stripe's return URLs). Register the HTTPS endpoint `/api/stripe/webhook` in Stripe with the four events above. Use the matching key and webhook secret for each Stripe environment.
 
 ## Not yet handled
 
