@@ -68,8 +68,14 @@ export async function updateSession(request: NextRequest) {
 
   const isAdminUser = user.user_metadata?.role === 'admin'
   // TODO: Remove this bypass and re-enable stricter admin routing in production.
-  // Dev mode: allow authenticated admin users to access all routes.
+  // Dev mode: allow authenticated admin users to access all routes, but send them
+  // to the admin dashboard from the sign-in and sign-up pages.
   if (isAdminUser) {
+    if (isSigninOrSignupRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = ROUTES.ADMIN_DASHBOARD
+      return NextResponse.redirect(url)
+    }
     return supabaseResponse
   }
 
