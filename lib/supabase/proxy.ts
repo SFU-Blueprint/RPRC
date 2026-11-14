@@ -1,11 +1,11 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
-import { ROUTES, PROTECTED_ROUTES } from '@/lib/constants/routes'
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
+import { ROUTES, PROTECTED_ROUTES } from '@/lib/constants/routes';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
-  })
+  });
 
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
@@ -15,18 +15,22 @@ export async function updateSession(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
           supabaseResponse = NextResponse.next({
             request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options),
+          );
         },
       },
-    }
-  )
+    },
+  );
 
   // Do not run code between createServerClient and
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
@@ -35,42 +39,48 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: Refreshes the auth tokens and returns the user
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname
-  const isMembershipRoute = pathname.startsWith('/membership')
-  const isAdminRoute = pathname.startsWith('/admin')
-  const isSigninRoute = pathname === ROUTES.HOME
+  const pathname = request.nextUrl.pathname;
+  const isMembershipRoute = pathname.startsWith('/membership');
+  const isAdminRoute = pathname.startsWith('/admin');
+  const isSigninRoute = pathname === ROUTES.HOME;
   const isSignupRoute =
-    pathname.startsWith(ROUTES.MEMBERSHIP_SIGNUP) || pathname === '/membership'
-  const isSigninOrSignupRoute = isSigninRoute || isSignupRoute
+    pathname.startsWith(ROUTES.MEMBERSHIP_SIGNUP) || pathname === '/membership';
+  const isSigninOrSignupRoute = isSigninRoute || isSignupRoute;
 
   // Check if accessing protected membership routes
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  )
+    pathname.startsWith(route),
+  );
 
   if (!user) {
     if (isProtectedRoute) {
-      const url = request.nextUrl.clone()
-      url.pathname = ROUTES.MEMBERSHIP_SIGNUP
-      return NextResponse.redirect(url)
+      const url = request.nextUrl.clone();
+      url.pathname = ROUTES.MEMBERSHIP_SIGNUP;
+      return NextResponse.redirect(url);
     }
 
     if (isAdminRoute) {
-      const url = request.nextUrl.clone()
-      url.pathname = ROUTES.HOME
-      return NextResponse.redirect(url)
+      const url = request.nextUrl.clone();
+      url.pathname = ROUTES.HOME;
+      return NextResponse.redirect(url);
     }
 
-    return supabaseResponse
+    return supabaseResponse;
   }
 
-  const isAdminUser = user.user_metadata?.role === 'admin'
+  const isAdminUser = user.user_metadata?.role === 'admin';
   // TODO: Remove this bypass and re-enable stricter admin routing in production.
-  // Dev mode: allow authenticated admin users to access all routes.
+  // Dev mode: allow authenticated admin users to access all routes, but send them
+  // to the admin dashboard from the sign-in and sign-up pages.
   if (isAdminUser) {
-    return supabaseResponse
+    if (isSigninOrSignupRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = ROUTES.ADMIN_DASHBOARD;
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
   }
 
   // if user has an application, redirect to membership dashboard, otherwise redirect to membership form
@@ -79,34 +89,34 @@ export async function updateSession(request: NextRequest) {
       .from('applications')
       .select('id')
       .eq('user_id', user.id)
-      .limit(1)
+      .limit(1);
 
     return applications && applications.length > 0
       ? ROUTES.MEMBERSHIP_DASHBOARD
-      : ROUTES.MEMBERSHIP_FORM
-  }
+      : ROUTES.MEMBERSHIP_FORM;
+  };
 
   // Logged-in users should not return to sign-in/sign-up entry points.
   if (isSigninOrSignupRoute) {
-    const url = request.nextUrl.clone()
+    const url = request.nextUrl.clone();
     url.pathname = isAdminUser
       ? ROUTES.ADMIN_DASHBOARD
-      : await getMembershipLandingPath()
-    return NextResponse.redirect(url)
+      : await getMembershipLandingPath();
+    return NextResponse.redirect(url);
   }
 
   // Admins are restricted to admin portal.
   if (isAdminUser && isMembershipRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = ROUTES.ADMIN_DASHBOARD
-    return NextResponse.redirect(url)
+    const url = request.nextUrl.clone();
+    url.pathname = ROUTES.ADMIN_DASHBOARD;
+    return NextResponse.redirect(url);
   }
 
   // Non-admin users are restricted to membership area.
   if (!isAdminUser && isAdminRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = await getMembershipLandingPath()
-    return NextResponse.redirect(url)
+    const url = request.nextUrl.clone();
+    url.pathname = await getMembershipLandingPath();
+    return NextResponse.redirect(url);
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
@@ -122,5 +132,5 @@ export async function updateSession(request: NextRequest) {
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely!
 
-  return supabaseResponse
+  return supabaseResponse;
 }
