@@ -1,12 +1,7 @@
 import { ReviewDecision } from '@/lib/constants/enums';
-import type { Database } from '@/types/database';
+import type { ReviewHistoryItem } from '@/types/admin.types';
 
-type Decision = Database['public']['Enums']['review_decision'];
-
-type ReviewWaiver = {
-  decision: Decision;
-  waiver_decision: Decision | null;
-};
+type ReviewWaiver = Pick<ReviewHistoryItem, 'decision' | 'waiver_decision'>;
 
 /**
  * Whether an approved application's fee waiver is granted.

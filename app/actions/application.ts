@@ -12,6 +12,7 @@ import {
 import { ROUTES } from '@/lib/constants/routes';
 import {
   ApplicationErrorCode,
+  ReviewErrorMessage,
   SubmitApplication,
 } from '@/lib/constants/application-errors';
 import { isAdmin } from '@/lib/helpers/auth-helper';
@@ -298,9 +299,6 @@ type SubmitApplicationReviewInput = {
   waiverReason?: string;
 };
 
-const CONCURRENT_REVIEW_ERROR =
-  'Another review was submitted at the same time. Reload the page and try again.';
-
 type SubmitApplicationReviewResult = {
   success: boolean;
   error?: string;
@@ -367,7 +365,7 @@ export async function submitApplicationReview(
     .single();
 
   if (!application) {
-    return { success: false, error: 'Application not found' };
+    return { success: false, error: ReviewErrorMessage.NOT_FOUND };
   }
   // Only applications under review can be reviewed. Anything else (finalized, active, or
   // expiring/expired with last round's reviews still attached) would add a stray review.
@@ -377,7 +375,7 @@ export async function submitApplicationReview(
   ) {
     return {
       success: false,
-      error: 'This application has already been finalized',
+      error: ReviewErrorMessage.ALREADY_FINALIZED,
     };
   }
 
@@ -411,7 +409,7 @@ export async function submitApplicationReview(
   if (insertError || !insertedReview) {
     return {
       success: false,
-      error: insertError?.message ?? 'Failed to save the review',
+      error: insertError?.message ?? ReviewErrorMessage.SAVE_FAILED,
     };
   }
 
@@ -427,11 +425,10 @@ export async function submitApplicationReview(
       // The review is still saved, so retrying would add a duplicate.
       return {
         success: false,
-        error:
-          'Another review was submitted at the same time, and yours could not be withdrawn. Reload the page before trying again.',
+        error: ReviewErrorMessage.CONCURRENT_REVIEW_NOT_WITHDRAWN,
       };
     }
-    return { success: false, error: CONCURRENT_REVIEW_ERROR };
+    return { success: false, error: ReviewErrorMessage.CONCURRENT_REVIEW };
   };
 
   const { data: reviewsNow, error: recountError } = await supabase

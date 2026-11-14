@@ -49,6 +49,8 @@ vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
 
 const { submitApplicationReview } = await import('@/app/actions/application');
+const { ReviewErrorMessage } =
+  await import('@/lib/constants/application-errors');
 
 const review = {
   appId: 'app_1',
@@ -157,7 +159,7 @@ describe('submitApplicationReview guards', () => {
 
       expect(result).toEqual({
         success: false,
-        error: 'This application has already been finalized',
+        error: ReviewErrorMessage.ALREADY_FINALIZED,
       });
       expect(calls.some((c) => c.op === 'insert')).toBe(false);
     },
@@ -177,8 +179,7 @@ describe('submitApplicationReview guards', () => {
 
     expect(result).toEqual({
       success: false,
-      error:
-        'Another review was submitted at the same time. Reload the page and try again.',
+      error: ReviewErrorMessage.CONCURRENT_REVIEW,
     });
     expect(deletedReview()?.filters).toContainEqual(['id', 'rev_new']);
     expect(applicationUpdate()).toBeUndefined();
@@ -218,6 +219,8 @@ describe('submitApplicationReview guards', () => {
     const result = await submitApplicationReview(review);
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain('could not be withdrawn');
+    expect(result.error).toBe(
+      ReviewErrorMessage.CONCURRENT_REVIEW_NOT_WITHDRAWN,
+    );
   });
 });
