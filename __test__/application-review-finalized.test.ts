@@ -224,3 +224,34 @@ describe('submitApplicationReview guards', () => {
     );
   });
 });
+
+describe('submitApplicationReview review_date', () => {
+  it('stores the chosen date in review_date and leaves created_at to the database', async () => {
+    responses.applications = [{ data: { status: 'to_review' }, error: null }];
+    responses.application_reviews = [
+      { data: [], error: null },
+      { data: null, error: null },
+    ];
+
+    await submitApplicationReview(review);
+
+    const insert = calls.find(
+      (c) => c.table === 'application_reviews' && c.op === 'insert',
+    )?.payload as Record<string, unknown>;
+    expect(insert.review_date).toBe('2026-11-14');
+    expect(insert).not.toHaveProperty('created_at');
+  });
+
+  it('rejects a review date that is not a real YYYY-MM-DD date', async () => {
+    const result = await submitApplicationReview({
+      ...review,
+      reviewDate: 'today',
+    });
+
+    expect(result).toEqual({
+      success: false,
+      error: ReviewErrorMessage.INVALID_REVIEW_DATE,
+    });
+    expect(calls.some((c) => c.op === 'insert')).toBe(false);
+  });
+});

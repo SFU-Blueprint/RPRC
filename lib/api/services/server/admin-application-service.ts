@@ -9,7 +9,9 @@ import type {
   UserWithProfilesRow,
 } from '@/types/admin.types';
 
-const VALID_STATUSES = Object.values(ApplicationStatus) as readonly ApplicationType['status'][];
+const VALID_STATUSES = Object.values(
+  ApplicationStatus,
+) as readonly ApplicationType['status'][];
 
 function mapApplicationStatus(dbStatus: string): ApplicationType['status'] {
   if (VALID_STATUSES.includes(dbStatus as ApplicationType['status'])) {
@@ -34,7 +36,9 @@ function mapRowToApplicationType(
   };
 }
 
-function buildApplicantNameMap(users: UserWithProfilesRow[]): Map<string, string> {
+function buildApplicantNameMap(
+  users: UserWithProfilesRow[],
+): Map<string, string> {
   const map = new Map<string, string>();
   for (const u of users) {
     const ip = u.individual_profiles;
@@ -62,7 +66,8 @@ function buildReviewerMap(reviews: ReviewRow[]): Map<string, ReviewerPair> {
   const result = new Map<string, ReviewerPair>();
   for (const [appId, list] of byApp) {
     const sorted = [...list].sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
     );
     result.set(appId, {
       reviewer1: sorted[0]?.reviewer_name ?? '',
@@ -81,7 +86,10 @@ export async function getAdminApplicationList(): Promise<ApplicationType[]> {
     .order('created_at', { ascending: false });
 
   if (appError) {
-    console.error('[getAdminApplicationList] applications query failed:', appError);
+    console.error(
+      '[getAdminApplicationList] applications query failed:',
+      appError,
+    );
     throw new Error('Failed to load applications. Please try again.');
   }
 
@@ -110,7 +118,9 @@ export async function getAdminApplicationList(): Promise<ApplicationType[]> {
       .from('application_reviews')
       .select('application_id, reviewer_name, created_at')
       .in('application_id', appIds)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      // Reviews from before review_date existed can share a created_at; keep their order stable.
+      .order('id', { ascending: true });
 
     const reviews = (reviewsData ?? []) as ReviewRow[];
     reviewerMap = buildReviewerMap(reviews);
@@ -126,7 +136,8 @@ export async function getAdminApplicationList(): Promise<ApplicationType[]> {
 }
 
 function countApplicationsToReview(applications: ApplicationType[]): number {
-  return applications.filter((a) => a.status === ApplicationStatus.TO_REVIEW).length;
+  return applications.filter((a) => a.status === ApplicationStatus.TO_REVIEW)
+    .length;
 }
 
 export async function getAdminDashboardStats(): Promise<AdminDashboardStats> {

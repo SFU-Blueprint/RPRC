@@ -92,11 +92,12 @@ from (values
 ) as v(application_id, interest_name)
 join public.membership_interests mi on mi.name = v.interest_name;
 
-insert into public.application_reviews (application_id, reason, reviewer_name, decision) values
-  ('00000000-0000-4000-b000-000000000004', 'Meets the membership criteria.', 'Seed Admin', 'approve'),
-  ('00000000-0000-4000-b000-000000000004', 'Agreed.', 'Second Reviewer', 'approve'),
-  ('00000000-0000-4000-b000-000000000005', 'Meets the membership criteria.', 'Seed Admin', 'approve'),
-  ('00000000-0000-4000-b000-000000000005', 'Agreed.', 'Second Reviewer', 'approve');
+-- Explicit times so reviewer 1 and reviewer 2 have a fixed order.
+insert into public.application_reviews (application_id, reason, reviewer_name, decision, review_date, created_at) values
+  ('00000000-0000-4000-b000-000000000004', 'Meets the membership criteria.', 'Seed Admin', 'approve', current_date - 8, now() - interval '8 days'),
+  ('00000000-0000-4000-b000-000000000004', 'Agreed.', 'Second Reviewer', 'approve', current_date - 8, now() - interval '8 days' + interval '1 hour'),
+  ('00000000-0000-4000-b000-000000000005', 'Meets the membership criteria.', 'Seed Admin', 'approve', current_date - 60, now() - interval '60 days'),
+  ('00000000-0000-4000-b000-000000000005', 'Agreed.', 'Second Reviewer', 'approve', current_date - 60, now() - interval '60 days' + interval '1 hour');
 
 insert into public.payments (user_id, application_id, amount, currency, status, stripe_session_id) values
   ('00000000-0000-4000-a000-000000000005', '00000000-0000-4000-b000-000000000005', 5, 'CAD', 'succeeded', 'cs_test_seeded_member');

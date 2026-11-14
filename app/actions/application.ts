@@ -16,6 +16,7 @@ import {
   SubmitApplication,
 } from '@/lib/constants/application-errors';
 import { isAdmin } from '@/lib/helpers/auth-helper';
+import { isCalendarDate } from '@/lib/utils/time-utils';
 import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
 import { phoneNumberSchema } from '@/lib/schema/shared.schema';
 import type { Database } from '@/types/database';
@@ -358,6 +359,10 @@ export async function submitApplicationReview(
     return { success: false, error: 'All review fields are required' };
   }
 
+  if (!isCalendarDate(input.reviewDate)) {
+    return { success: false, error: ReviewErrorMessage.INVALID_REVIEW_DATE };
+  }
+
   const { data: application } = await supabase
     .from('applications')
     .select('status')
@@ -388,10 +393,6 @@ export async function submitApplicationReview(
     return { success: false, error: reviewsError.message };
   }
 
-  const reviewCreatedAt = new Date(
-    `${input.reviewDate}T00:00:00.000Z`,
-  ).toISOString();
-
   const { data: insertedReview, error: insertError } = await supabase
     .from('application_reviews')
     .insert({
@@ -399,7 +400,8 @@ export async function submitApplicationReview(
       reviewer_name: input.reviewerName.trim(),
       decision: input.decision,
       reason: input.reason.trim(),
-      created_at: reviewCreatedAt,
+      // created_at defaults to the submission time.
+      review_date: input.reviewDate,
       waiver_decision: input.waiverDecision ?? null,
       waiver_note: input.waiverReason ?? null,
     })

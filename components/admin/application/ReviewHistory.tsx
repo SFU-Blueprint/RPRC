@@ -39,7 +39,7 @@ export default function ReviewHistory({
         return (
           <AdminReview
             key={review.id}
-            createdAt={review.created_at}
+            reviewDate={review.review_date}
             reviewerName={review.reviewer_name}
             decision={review.decision}
             reason={review.reason}

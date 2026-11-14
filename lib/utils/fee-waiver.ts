@@ -10,8 +10,8 @@ type ReviewWaiver = Pick<ReviewHistoryItem, 'decision' | 'waiver_decision'>;
  * the approval comes from resolving a conflict, the resolution's waiver decision (if it gave
  * one) overrides that. Rejecting reviews can't carry a waiver decision.
  *
- * Review timestamps can't order reviews (they hold the reviewer's chosen date at midnight),
- * so the order comes from how an application reaches approval: either two approvals in a row
+ * created_at can't order reviews: reviews saved before review_date existed hold the
+ * reviewer's chosen date at midnight there. So the order comes from how an application reaches approval: either two approvals in a row
  * (the saved review came first) or one approval and one rejection followed by the resolution.
  * Either way at most one earlier review is an approval.
  */
