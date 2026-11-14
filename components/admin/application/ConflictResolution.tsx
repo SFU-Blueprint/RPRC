@@ -20,16 +20,30 @@ import SubmitReviewModal from './SubmitReviewModal';
 type ConflictResolutionProps = {
   appId: string;
   reviewHistory: ReviewHistoryItem[];
+  waiverRequested?: boolean;
 };
 
 export default function ConflictResolution({
   appId,
   reviewHistory,
+  waiverRequested = false,
 }: ConflictResolutionProps) {
   const router = useRouter();
 
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
+  // 'keep' leaves the reviewers' waiver decision as it is.
+  const [waiverChoice, setWaiverChoice] = useState<ReviewDecision | 'keep'>(
+    'keep',
+  );
+  const [waiverNote, setWaiverNote] = useState('');
+
+  // The reviewers' waiver decision stands unless the resolution overrides it.
+  const showWaiverSection =
+    waiverRequested && decision === ReviewDecision.APPROVE;
+  const currentWaiverDecision = reviewHistory.find(
+    (r) => r.decision === ReviewDecision.APPROVE && r.waiver_decision,
+  )?.waiver_decision;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -55,6 +69,12 @@ export default function ConflictResolution({
       reviewDate: getLocalDateString(),
       decision: decision as ReviewDecision,
       reason,
+      ...(showWaiverSection && waiverChoice !== 'keep'
+        ? {
+            waiverDecision: waiverChoice,
+            waiverReason: waiverNote.trim() || undefined,
+          }
+        : {}),
     });
 
     setIsSubmitting(false);
@@ -67,6 +87,8 @@ export default function ConflictResolution({
 
     setDecision('');
     setReason('');
+    setWaiverChoice('keep');
+    setWaiverNote('');
     setSubmitError('');
     setIsModalOpen(false);
 
@@ -154,6 +176,87 @@ export default function ConflictResolution({
           placeholder="Enter your reasoning..."
         />
       </div>
+
+      {showWaiverSection ? (
+        <div>
+          <Label className="text-application-detail-text-secondary text-md">
+            Fee Waiver
+          </Label>
+          <p className="text-sm text-application-detail-text-secondary mt-1">
+            {currentWaiverDecision
+              ? `The reviewers' waiver decision is "${currentWaiverDecision === ReviewDecision.APPROVE ? 'approve' : 'reject'}".`
+              : 'The reviewers did not decide the waiver.'}{' '}
+            Keep it, or override it.
+          </p>
+          <div className="flex justify-center w-full mt-2">
+            <RadioGroup
+              value={waiverChoice}
+              className="w-full flex flex-row flex-wrap justify-between gap-y-3"
+              onValueChange={(val) =>
+                setWaiverChoice(val as ReviewDecision | 'keep')
+              }
+            >
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  value="keep"
+                  id="conflict-waiver-keep"
+                  className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                />
+                <Label
+                  htmlFor="conflict-waiver-keep"
+                  className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                >
+                  Keep reviewers&apos; decision
+                </Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  value={ReviewDecision.APPROVE}
+                  id="conflict-waiver-approve"
+                  className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                />
+                <Label
+                  htmlFor="conflict-waiver-approve"
+                  className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                >
+                  Approve waiver
+                </Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  value={ReviewDecision.REJECT}
+                  id="conflict-waiver-reject"
+                  className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                />
+                <Label
+                  htmlFor="conflict-waiver-reject"
+                  className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                >
+                  Reject waiver
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+          {waiverChoice !== 'keep' ? (
+            <div className="mt-4">
+              <Label
+                htmlFor="conflict-waiver-note"
+                className="text-application-detail-text-secondary text-md"
+              >
+                Waiver Note
+              </Label>
+              <textarea
+                id="conflict-waiver-note"
+                name="waiverNote"
+                value={waiverNote}
+                onChange={(e) => setWaiverNote(e.target.value)}
+                className={`${inter.className} w-full h-15 bg-signup-neutral-50 border-2 border-[#D4D0C5] rounded-xl p-3.5 mt-2 focus:outline-none focus:border-ring focus:ring-ring/50 focus:ring-[3px]`}
+                placeholder="Why the waiver decision is being changed..."
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {submitError ? (
         <p className="text-destructive text-sm">{submitError}</p>

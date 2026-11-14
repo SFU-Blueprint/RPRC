@@ -89,7 +89,9 @@ accounts use the password `password123`.
 - **Application submission:** log in as the new account and complete the membership form.
 - **Admin review:** log in as `admin@rprc.test` and open `/admin`. An application needs two
   reviews: two approvals move it to `payment_pending`, two rejections to `rejected`, and a split
-  to `conflict`. You can submit both reviews from the same admin account.
+  to `conflict`. If the applicant requested a fee waiver (`review@rprc.test` does), the first
+  approving review that decides the waiver sets it, and a conflict resolution can override it. A
+  granted waiver sends the approved application straight to `active`. Renewals reuse the application, so a member's waiver request (and reason) carries over and is decided again each renewal. You can submit both reviews from the same admin account.
 - **Payments (optional):** needs Stripe test-mode keys and the local Supabase secret key.
   1. Put `STRIPE_SECRET_KEY=sk_test_...` in `.env.local`, and `SUPABASE_SECRET_KEY` (the
      `sb_secret_...` "Secret" key from `npx supabase status`).

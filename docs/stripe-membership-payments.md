@@ -1,6 +1,6 @@
 # Membership Stripe Checkout
 
-When an application is approved (two approving reviews), its status becomes `payment_pending` and the member dashboard shows **Make Payment**. Paying moves the application to `active`.
+When an application is approved (two approving reviews), its status becomes `payment_pending` and the member dashboard shows **Make Payment**. Paying moves the application to `active`. If the applicant's fee waiver was granted, approval moves it straight to `active` and no payment is created.
 
 ## Flow
 
@@ -32,5 +32,4 @@ Configure `SUPABASE_SECRET_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` an
 
 ## Not yet handled
 
-- Fee waivers: an approved waiver still leaves the application `payment_pending`. Nothing activates waived memberships without payment yet.
 - Payment/approval emails and refunds.
