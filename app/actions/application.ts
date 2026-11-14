@@ -15,6 +15,7 @@ import {
   SubmitApplication,
 } from '@/lib/constants/application-errors';
 import { isAdmin } from '@/lib/helpers/auth-helper';
+import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
 import { phoneNumberSchema } from '@/lib/schema/shared.schema';
 import type { Database } from '@/types/database';
 
@@ -121,6 +122,7 @@ export async function submitIndividualApplication(
         p_province: data.province,
         p_postal_code: data.postalCode,
         p_reason: data.whyrpcmember,
+        p_fee_waiver: data.membershipwaiver,
         p_fee_waiver_reason: data.waiverreason || null,
         p_interests: data.interests,
       },
@@ -362,8 +364,9 @@ export async function submitApplicationReview(
     .single();
 
   if (
-    application?.status === 'payment_pending' ||
-    application?.status === 'rejected'
+    application?.status === ApplicationStatus.PAYMENT_PENDING ||
+    application?.status === ApplicationStatus.REJECTED ||
+    application?.status === ApplicationStatus.ACTIVE
   ) {
     return {
       success: false,
@@ -373,7 +376,7 @@ export async function submitApplicationReview(
 
   const { data: existingReviews, error: reviewsError } = await supabase
     .from('application_reviews')
-    .select('decision')
+    .select('decision, waiver_decision')
     .eq('application_id', input.appId);
 
   if (reviewsError) {
@@ -400,16 +403,40 @@ export async function submitApplicationReview(
     return { success: false, error: insertError.message };
   }
 
-  const allReviews = [
+  const currentReview = {
+    decision: input.decision as Database['public']['Enums']['review_decision'],
+    waiver_decision: input.waiverDecision ?? null,
+  };
+  let nextStatus = getNextApplicationStatus([
     ...(existingReviews ?? []),
-    {
-      decision:
-        input.decision as Database['public']['Enums']['review_decision'],
-    },
-  ];
-  const nextStatus = getNextApplicationStatus(allReviews);
+    currentReview,
+  ]);
+
+  // An approved application whose fee waiver is granted skips payment.
+  if (nextStatus === ApplicationStatus.PAYMENT_PENDING) {
+    const { data: details, error: detailsError } = await supabase
+      .from('individual_application_details')
+      .select('fee_waiver')
+      .eq('application_id', input.appId)
+      .maybeSingle();
+    if (detailsError) {
+      return { success: false, error: detailsError.message };
+    }
+    if (
+      isFeeWaiverGranted({
+        requested: details?.fee_waiver ?? false,
+        earlierReviews: existingReviews ?? [],
+        currentReview,
+        resolvesConflict: application?.status === ApplicationStatus.CONFLICT,
+      })
+    ) {
+      nextStatus = ApplicationStatus.ACTIVE;
+    }
+  }
+
   const isFinalized =
     nextStatus === ApplicationStatus.PAYMENT_PENDING ||
+    nextStatus === ApplicationStatus.ACTIVE ||
     nextStatus === ApplicationStatus.REJECTED;
 
   const { error: updateError } = await supabase

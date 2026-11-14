@@ -60,7 +60,7 @@ export default function ApplicationResult({
           {isPaymentDue
             ? 'The application is approved and awaiting payment.'
             : result === ApplicationStatus.ACTIVE
-              ? 'The member’s payment is confirmed and the membership is active.'
+              ? 'The membership is active (paid, or the fee was waived).'
               : 'The application was rejected.'}
         </p>
       </div>

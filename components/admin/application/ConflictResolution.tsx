@@ -19,19 +19,36 @@ import SubmitReviewModal from './SubmitReviewModal';
 type ConflictResolutionProps = {
   appId: string;
   reviewHistory: ReviewHistoryItem[];
+  waiverRequested?: boolean;
 };
 
-export default function ConflictResolution({ appId, reviewHistory }: ConflictResolutionProps) {
+export default function ConflictResolution({
+  appId,
+  reviewHistory,
+  waiverRequested = false,
+}: ConflictResolutionProps) {
   const router = useRouter();
 
   const [decision, setDecision] = useState<ReviewDecision | ''>('');
   const [reason, setReason] = useState('');
+  const [waiverDecision, setWaiverDecision] = useState<ReviewDecision | ''>('');
+
+  // The reviewers' waiver decision stands unless the resolution overrides it.
+  const showWaiverSection =
+    waiverRequested && decision === ReviewDecision.APPROVE;
+  const currentWaiverDecision = reviewHistory.find(
+    (r) => r.decision === ReviewDecision.APPROVE && r.waiver_decision,
+  )?.waiver_decision;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const approvalCount = reviewHistory.filter(r => r.decision === ReviewDecision.APPROVE).length;
-  const rejectionCount = reviewHistory.filter(r => r.decision === ReviewDecision.REJECT).length;
+  const approvalCount = reviewHistory.filter(
+    (r) => r.decision === ReviewDecision.APPROVE,
+  ).length;
+  const rejectionCount = reviewHistory.filter(
+    (r) => r.decision === ReviewDecision.REJECT,
+  ).length;
 
   const isFormValid = Boolean(decision && reason.trim());
 
@@ -47,6 +64,8 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
       reviewDate: new Date().toISOString().slice(0, 10),
       decision: decision as ReviewDecision,
       reason,
+      waiverDecision:
+        showWaiverSection && waiverDecision ? waiverDecision : undefined,
     });
 
     setIsSubmitting(false);
@@ -59,6 +78,7 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
 
     setDecision('');
     setReason('');
+    setWaiverDecision('');
     setSubmitError('');
     setIsModalOpen(false);
 
@@ -67,23 +87,31 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
 
   return (
     <BackdropContainer className="bg-application-conflict-background shadow-card p-5 rounded-xl flex flex-col gap-y-6 w-full">
-      <p className={`${robotoCondensed.className} text-3xl font-bold`}>Submit Review</p>
+      <p className={`${robotoCondensed.className} text-3xl font-bold`}>
+        Submit Review
+      </p>
 
       {/* Conflict warning banner */}
       <div className="bg-application-conflict-note border-l-4 border-application-conflict-border rounded-md px-4 py-3">
         <div className="flex items-center gap-2 mb-1">
-          <AlertTriangle size={18} className="text-application-conflict-border shrink-0" />
+          <AlertTriangle
+            size={18}
+            className="text-application-conflict-border shrink-0"
+          />
           <p className="font-semibold text-sm">Conflicting decisions</p>
         </div>
         <p className="text-sm text-application-detail-text-secondary">
-          This application has {approvalCount} approval{approvalCount !== 1 ? 's' : ''} and{' '}
-          {rejectionCount} rejection{rejectionCount !== 1 ? 's' : ''}. Please discuss with your
-          team and finalize the decision with a note.
+          This application has {approvalCount} approval
+          {approvalCount !== 1 ? 's' : ''} and {rejectionCount} rejection
+          {rejectionCount !== 1 ? 's' : ''}. Please discuss with your team and
+          finalize the decision with a note.
         </p>
       </div>
 
       <div>
-        <Label className="text-application-detail-text-secondary text-md">Final Decision</Label>
+        <Label className="text-application-detail-text-secondary text-md">
+          Final Decision
+        </Label>
 
         <div className="flex justify-center w-full mt-2">
           <RadioGroup
@@ -123,7 +151,10 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
       </div>
 
       <div>
-        <Label htmlFor="conflict-reason" className="text-application-detail-text-secondary text-md">
+        <Label
+          htmlFor="conflict-reason"
+          className="text-application-detail-text-secondary text-md"
+        >
           Resolution Note
         </Label>
         <textarea
@@ -136,7 +167,57 @@ export default function ConflictResolution({ appId, reviewHistory }: ConflictRes
         />
       </div>
 
-      {submitError ? <p className="text-destructive text-sm">{submitError}</p> : null}
+      {showWaiverSection ? (
+        <div>
+          <Label className="text-application-detail-text-secondary text-md">
+            Fee Waiver
+          </Label>
+          <p className="text-sm text-application-detail-text-secondary mt-1">
+            {currentWaiverDecision
+              ? `The reviewers' waiver decision is "${currentWaiverDecision === ReviewDecision.APPROVE ? 'approve' : 'reject'}".`
+              : 'The reviewers did not decide the waiver.'}{' '}
+            Leave this blank to keep it, or choose to override it.
+          </p>
+          <div className="flex justify-center w-full mt-2">
+            <RadioGroup
+              value={waiverDecision}
+              className="w-[75%] flex flex-row justify-between"
+              onValueChange={(val) => setWaiverDecision(val as ReviewDecision)}
+            >
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  value={ReviewDecision.APPROVE}
+                  id="conflict-waiver-approve"
+                  className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                />
+                <Label
+                  htmlFor="conflict-waiver-approve"
+                  className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                >
+                  Approve waiver
+                </Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  value={ReviewDecision.REJECT}
+                  id="conflict-waiver-reject"
+                  className="w-10 h-10 border-2 border-application-detail-border-100 cursor-pointer"
+                />
+                <Label
+                  htmlFor="conflict-waiver-reject"
+                  className="text-application-detail-text-primary text-md sm:text-sm cursor-pointer"
+                >
+                  Reject waiver
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+      ) : null}
+
+      {submitError ? (
+        <p className="text-destructive text-sm">{submitError}</p>
+      ) : null}
 
       <div className="flex justify-center mt-2">
         <Button
