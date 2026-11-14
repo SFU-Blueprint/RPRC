@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 import { submitApplicationReview } from '@/app/actions/application';
 import { ReviewDecision } from '@/lib/constants/enums';
+import { getLocalDateString } from '@/lib/utils/time-utils';
 import type { ReviewHistoryItem } from '@/types/admin.types';
 
 import SubmitReviewModal from './SubmitReviewModal';
@@ -65,7 +66,7 @@ export default function ConflictResolution({
     const result = await submitApplicationReview({
       appId,
       reviewerName: 'Board Admin',
-      reviewDate: new Date().toISOString().slice(0, 10),
+      reviewDate: getLocalDateString(),
       decision: decision as ReviewDecision,
       reason,
       ...(showWaiverSection && waiverChoice !== 'keep'

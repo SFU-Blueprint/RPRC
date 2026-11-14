@@ -17,6 +17,7 @@ export const ReviewErrorMessage = {
   NOT_FOUND: 'Application not found',
   ALREADY_FINALIZED: 'This application has already been finalized',
   SAVE_FAILED: 'Failed to save the review',
+  INVALID_REVIEW_DATE: 'Review date must be a valid date',
   CONCURRENT_REVIEW:
     'Another review was submitted at the same time. Reload the page and try again.',
   CONCURRENT_REVIEW_NOT_WITHDRAWN:
