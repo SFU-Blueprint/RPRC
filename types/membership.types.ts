@@ -43,7 +43,8 @@ export type MemberDashboardData =
   | IndividualMemberDashboardData
   | OrganizationMemberDashboardData;
 
-export type MembershipProfileUpdateResult = {
+/** Result of a member dashboard action (profile update, renewal, re-application). */
+export type MembershipActionResult = {
   success: boolean;
   error?: string;
   code?: ApplicationErrorCodeType;

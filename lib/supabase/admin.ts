@@ -24,3 +24,5 @@ export function createAdminClient() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }
+
+export type SupabaseAdminClient = ReturnType<typeof createAdminClient>;

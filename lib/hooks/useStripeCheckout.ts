@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { PaymentErrorMessage } from '@/lib/constants/payments';
 
 /** Starts Stripe Checkout for the signed-in member's payment-pending membership. */
 export function useStripeCheckout() {
@@ -17,16 +18,14 @@ export function useStripeCheckout() {
         error?: string;
       };
       if (!response.ok || !result.url) {
-        throw new Error(
-          result.error || 'Checkout could not be started. Please try again.',
-        );
+        throw new Error(result.error || PaymentErrorMessage.CHECKOUT_FAILED);
       }
       window.location.assign(result.url);
     } catch (checkoutError) {
       setError(
         checkoutError instanceof Error
           ? checkoutError.message
-          : 'Checkout could not be started. Please try again.',
+          : PaymentErrorMessage.CHECKOUT_FAILED,
       );
       setIsStarting(false);
     }

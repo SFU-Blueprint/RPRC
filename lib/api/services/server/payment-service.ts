@@ -1,34 +1,29 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import {
+  createAdminClient,
+  type SupabaseAdminClient,
+} from '@/lib/supabase/admin';
 import {
   createStripeCheckoutSession,
   expireStripeCheckoutSession,
   getMembershipFee,
   getStripeCheckoutSession,
-  PAYMENT_CURRENCY,
-  type StripeCheckoutSession,
 } from '@/lib/stripe/server';
 import {
   ApplicationStatus,
   PaymentTransactionStatus,
   type ApplicationType,
 } from '@/lib/constants/enums';
-
-type CheckoutResult =
-  | { ok: true; url: string }
-  | { ok: false; status: number; error: string };
-
-type AdminClient = ReturnType<typeof createAdminClient>;
-
-type PaymentRow = {
-  id: string;
-  status: PaymentTransactionStatus;
-  stripe_session_id: string | null;
-  amount: number;
-  created_at: string;
-};
+import { PaymentErrorMessage } from '@/lib/constants/payments';
+import { PAYMENT_CURRENCY } from '@/lib/constants/processing-fees';
+import type {
+  CheckoutResult,
+  FulfillmentResult,
+  PaymentRow,
+  StripeCheckoutSession,
+} from '@/types/payment.types';
 
 type CheckoutContext = {
-  admin: AdminClient;
+  admin: SupabaseAdminClient;
   application: { id: string; type: ApplicationType };
   fee: number;
   userId: string;
@@ -50,14 +45,13 @@ const SESSION_WAIT_MS = 500;
 const ALREADY_PAID: CheckoutResult = {
   ok: false,
   status: 409,
-  error:
-    'A payment for this membership has already been received or is still processing.',
+  error: PaymentErrorMessage.ALREADY_PAID,
 };
 
 const CHECKOUT_FAILED: CheckoutResult = {
   ok: false,
   status: 502,
-  error: 'Checkout could not be started. Please try again.',
+  error: PaymentErrorMessage.CHECKOUT_FAILED,
 };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -92,7 +86,7 @@ export async function startMembershipCheckout(input: {
     return {
       ok: false,
       status: 500,
-      error: 'Your membership could not be loaded. Please try again.',
+      error: PaymentErrorMessage.MEMBERSHIP_LOAD_FAILED,
     };
   }
   if (
@@ -102,7 +96,7 @@ export async function startMembershipCheckout(input: {
     return {
       ok: false,
       status: 409,
-      error: 'There is no membership payment due on your account.',
+      error: PaymentErrorMessage.NO_PAYMENT_DUE,
     };
   }
 
@@ -116,7 +110,7 @@ export async function startMembershipCheckout(input: {
     return {
       ok: false,
       status: 500,
-      error: 'Your payment history could not be loaded. Please try again.',
+      error: PaymentErrorMessage.PAYMENTS_LOAD_FAILED,
     };
   }
 
@@ -212,7 +206,7 @@ export async function startMembershipCheckout(input: {
     return {
       ok: false,
       status: 500,
-      error: 'Checkout could not be started. Please try again.',
+      error: PaymentErrorMessage.CHECKOUT_FAILED,
     };
   }
 
@@ -279,7 +273,10 @@ async function reuseOpenPayment(
 }
 
 /** Expires an open payment's Checkout Session (if any) and marks the payment canceled. */
-async function retireOpenPayment(admin: AdminClient, payment: PaymentRow) {
+async function retireOpenPayment(
+  admin: SupabaseAdminClient,
+  payment: PaymentRow,
+) {
   if (payment.stripe_session_id) {
     try {
       await expireStripeCheckoutSession(payment.stripe_session_id);
@@ -292,7 +289,7 @@ async function retireOpenPayment(admin: AdminClient, payment: PaymentRow) {
   await markCanceled(admin, payment.id);
 }
 
-async function markCanceled(admin: AdminClient, paymentId: string) {
+async function markCanceled(admin: SupabaseAdminClient, paymentId: string) {
   const { error } = await admin
     .from('payments')
     .update({
@@ -353,8 +350,7 @@ async function createSessionForPayment(
       return {
         ok: false,
         status: 502,
-        error:
-          'Stripe could not start checkout. Check the Stripe server key and site URL.',
+        error: PaymentErrorMessage.STRIPE_NOT_CONFIGURED,
       };
     }
     return CHECKOUT_FAILED;
@@ -387,14 +383,6 @@ export function getPaymentStatusForSession(
   if (session.status === 'complete') return PaymentTransactionStatus.PROCESSING;
   return null;
 }
-
-export type FulfillmentResult =
-  | {
-      outcome: 'updated' | 'unchanged';
-      status: PaymentTransactionStatus;
-      userId: string;
-    }
-  | { outcome: 'ignored'; reason: string };
 
 /**
  * Records a Checkout Session's outcome on its `payments` row and, once paid, activates the

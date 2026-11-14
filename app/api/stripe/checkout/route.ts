@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { startMembershipCheckout } from '@/lib/api/services/server/payment-service';
+import { PaymentErrorMessage } from '@/lib/constants/payments';
 
 export const runtime = 'nodejs';
 
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json(
-      { error: 'Please sign in to pay for your membership.' },
+      { error: PaymentErrorMessage.SIGN_IN_REQUIRED },
       { status: 401 },
     );
   }
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('[stripe checkout] unexpected error:', error);
     return NextResponse.json(
-      { error: 'Checkout could not be started. Please try again.' },
+      { error: PaymentErrorMessage.CHECKOUT_FAILED },
       { status: 500 },
     );
   }

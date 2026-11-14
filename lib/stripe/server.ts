@@ -1,7 +1,9 @@
-import { APPLICATION_FEES } from '@/lib/constants/processing-fees';
+import {
+  APPLICATION_FEES,
+  PAYMENT_CURRENCY,
+} from '@/lib/constants/processing-fees';
 import { ApplicationType } from '@/lib/constants/enums';
-
-export const PAYMENT_CURRENCY = 'cad';
+import type { StripeCheckoutSession } from '@/types/payment.types';
 
 /** Membership fee in whole dollars (CAD). */
 export function getMembershipFee(type: ApplicationType): number {
@@ -31,18 +33,6 @@ function getSecretKey() {
   if (!secretKey) throw new Error('STRIPE_SECRET_KEY is not configured.');
   return secretKey;
 }
-
-export type StripeCheckoutSession = {
-  id: string;
-  url: string | null;
-  status?: 'open' | 'complete' | 'expired' | null;
-  payment_status?: 'paid' | 'unpaid' | 'no_payment_required';
-  amount_total?: number | null;
-  currency?: string | null;
-  client_reference_id?: string | null;
-  payment_intent?: string | { id: string } | null;
-  metadata?: Record<string, string> | null;
-};
 
 type StripeErrorBody = { error?: { message?: string } };
 

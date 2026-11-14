@@ -1,9 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import {
-  getStripeCheckoutSession,
-  type StripeCheckoutSession,
-} from '@/lib/stripe/server';
+import { getStripeCheckoutSession } from '@/lib/stripe/server';
+import type { StripeCheckoutSession } from '@/types/payment.types';
 import { fulfillCheckoutSession } from '@/lib/api/services/server/payment-service';
 import { PaymentTransactionStatus } from '@/lib/constants/enums';
 import { ROUTES } from '@/lib/constants/routes';

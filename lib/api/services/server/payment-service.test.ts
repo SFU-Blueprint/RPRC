@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { StripeCheckoutSession } from '@/lib/stripe/server';
+import type { StripeCheckoutSession } from '@/types/payment.types';
 
 type Call = {
   table: string;

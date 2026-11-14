@@ -1,22 +1,12 @@
 import { NextResponse } from 'next/server';
 import { verifyStripeWebhookSignature } from '@/lib/stripe/webhook-signature';
 import { fulfillCheckoutSession } from '@/lib/api/services/server/payment-service';
-import type { StripeCheckoutSession } from '@/lib/stripe/server';
+import { STRIPE_CHECKOUT_EVENTS } from '@/lib/constants/payments';
+import type { StripeEvent } from '@/types/payment.types';
 
 export const runtime = 'nodejs';
 
-type StripeEvent = {
-  id: string;
-  type: string;
-  data?: { object?: StripeCheckoutSession };
-};
-
-const CHECKOUT_EVENTS = new Set([
-  'checkout.session.completed',
-  'checkout.session.async_payment_succeeded',
-  'checkout.session.async_payment_failed',
-  'checkout.session.expired',
-]);
+const CHECKOUT_EVENTS = new Set<string>(STRIPE_CHECKOUT_EVENTS);
 
 export async function POST(request: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
