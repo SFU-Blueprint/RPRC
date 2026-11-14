@@ -7,9 +7,8 @@ import {
 } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import MembershipProfileEditForm, {
-  type MembershipProfileEditValues,
-} from '@/components/membership/MembershipProfileEditForm';
+import MembershipProfileEditForm from '@/components/membership/MembershipProfileEditForm';
+import type { MemberProfileEditValues } from '@/lib/schema/member-profile-edit.schema';
 import { ApplicationStatus, ApplicationType } from '@/lib/constants/enums';
 import type { MemberDashboardData } from '@/types/membership.types';
 
@@ -53,7 +52,7 @@ describe('MembershipProfileEditForm', () => {
     render(
       <MembershipProfileEditForm
         data={MEMBER_DASHBOARD}
-        onSave={vi.fn(async (_values: MembershipProfileEditValues) => {})}
+        onSave={vi.fn(async (_values: MemberProfileEditValues) => {})}
         isSaving={false}
         onDirtyChange={onDirtyChange}
       />,
@@ -68,7 +67,7 @@ describe('MembershipProfileEditForm', () => {
   });
 
   test('submits schema-normalized phone values to the save callback', async () => {
-    const onSave = vi.fn(async (_values: MembershipProfileEditValues) => {});
+    const onSave = vi.fn(async (_values: MemberProfileEditValues) => {});
     const onDirtyChange = vi.fn();
 
     render(

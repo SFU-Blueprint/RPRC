@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getMemberDashboardData } from '@/lib/api/services/server/member-dashboard-service';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, type SupabaseServerClient } from '@/lib/supabase/server';
 import { ApplicationStatus } from '@/lib/constants/enums';
 import { ApplicationErrorCode } from '@/lib/constants/application-errors';
 import {
@@ -13,10 +13,8 @@ import { ROUTES } from '@/lib/constants/routes';
 import { memberProfileEditSchema } from '@/lib/schema/member-profile-edit.schema';
 import type {
   MemberDashboardData,
-  MembershipProfileUpdateResult,
+  MembershipActionResult,
 } from '@/types/membership.types';
-
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
 /** The user's latest application, which is the one the dashboard shows. */
 async function getLatestApplication(
@@ -51,7 +49,7 @@ export async function fetchMemberDashboardData(): Promise<MemberDashboardData | 
  */
 export async function submitMembershipProfileUpdate(
   input: unknown,
-): Promise<MembershipProfileUpdateResult> {
+): Promise<MembershipActionResult> {
   const parsed = memberProfileEditSchema.safeParse(input);
   if (!parsed.success) {
     return {
@@ -136,10 +134,7 @@ export async function submitMembershipProfileUpdate(
  * has expired or expires soon, or a re-application after a rejection (once the
  * member has edited their profile).
  */
-export async function submitMembershipRenewal(): Promise<{
-  success: boolean;
-  error?: string;
-}> {
+export async function submitMembershipRenewal(): Promise<MembershipActionResult> {
   try {
     const supabase = await createClient();
     const {

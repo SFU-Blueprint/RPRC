@@ -16,9 +16,8 @@ import MembershipProfileBanner from '@/components/membership/MembershipProfileBa
 import MembershipActionModal from '@/components/membership/modals/MembershipActionModal';
 import IndividualProfile from '@/components/membership/profiles/IndividualProfile';
 import OrganizationProfile from '@/components/membership/profiles/OrganizationProfile';
-import MembershipProfileEditForm, {
-  type MembershipProfileEditValues,
-} from '@/components/membership/MembershipProfileEditForm';
+import MembershipProfileEditForm from '@/components/membership/MembershipProfileEditForm';
+import type { MemberProfileEditValues } from '@/lib/schema/member-profile-edit.schema';
 import DiscardChangesModal from '@/components/membership/modals/DiscardChangesModal';
 import { ApplicationStatus, UserRole } from '@/lib/constants/enums';
 import {
@@ -87,7 +86,7 @@ export default function MembershipDashboard() {
     setIsEditingProfile(false);
   };
 
-  const handleSaveProfile = async (values: MembershipProfileEditValues) => {
+  const handleSaveProfile = async (values: MemberProfileEditValues) => {
     if (!dashboardData?.type) return;
     if (!hasProfileChanges) return;
 

@@ -29,11 +29,9 @@ import type {
   OrganizationMemberDashboardData,
 } from '@/types/membership.types';
 
-export type MembershipProfileEditValues = MemberProfileEditValues;
-
 type Props = {
   data: MemberDashboardData;
-  onSave: (values: MembershipProfileEditValues) => Promise<void>;
+  onSave: (values: MemberProfileEditValues) => Promise<void>;
   isSaving: boolean;
   formId?: string;
   onDirtyChange?: (isDirty: boolean) => void;
