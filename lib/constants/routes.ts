@@ -18,10 +18,7 @@ export const ROUTES = {
   MEMBERSHIP: '/membership',
   // points to new signup flow for consistency.
   MEMBERSHIP_SIGNUP: '/sign-up',
-  MEMBERSHIP_FORM: '/membership/form',
-  MEMBERSHIP_CONFIRMATION: '/membership/confirmation',
   MEMBERSHIP_DASHBOARD: '/membership/dashboard',
-  MEMBERSHIP_RENEW: '/membership/renew',
   MEMBERSHIP_PAYMENT_RETURN: '/membership/payment/return',
 
   // Sign-up forms (one page each: account + application)
@@ -38,19 +35,12 @@ export const ROUTES = {
   ADMIN_APPLICATION_DETAIL: (id: string) => `/admin/dashboard/${id}`,
 
   // API
-  API_APPLICATION: '/api/application',
-  API_APPLICATION_BY_ID: (id: string) => `/api/application/${id}`,
   API_AUTH_LOGIN: '/api/auth/log-in',
   API_STRIPE_CHECKOUT: '/api/stripe/checkout',
 } as const;
 
 // Protected routes that require authentication
-export const PROTECTED_ROUTES = [
-  ROUTES.MEMBERSHIP_FORM,
-  ROUTES.MEMBERSHIP_CONFIRMATION,
-  ROUTES.MEMBERSHIP_DASHBOARD,
-  ROUTES.MEMBERSHIP_RENEW,
-] as const;
+export const PROTECTED_ROUTES = [ROUTES.MEMBERSHIP_DASHBOARD] as const;
 
 // Admin routes that require admin role
 export const ADMIN_ROUTES = [ROUTES.ADMIN_DASHBOARD] as const;

@@ -16,7 +16,7 @@ import { FormRadioButton } from '@/components/signup/inputs/FormRadioButton';
 import { FormSelect } from '@/components/signup/inputs/FormSelect';
 import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
 import { PhoneInput } from '@/components/signup/inputs/PhoneInput';
-import { COUNTRIES } from '@/app/membership/signup/const';
+import { ALLOWED_COUNTRIES } from '@/lib/constants/sign-up';
 import { bodyStyles, headerStyles, inter, robotoCondensed } from '@/app/fonts';
 import { MEMBERSHIP_INTERESTS } from '@/lib/constants/membership-interests';
 import {
@@ -442,7 +442,7 @@ export default function MembershipProfileEditForm({
               <FormSelect
                 name="address.country"
                 label="Country"
-                options={COUNTRIES}
+                options={[...ALLOWED_COUNTRIES]}
                 value={field.value}
                 onChange={(nextCountry) => {
                   field.onChange(nextCountry);

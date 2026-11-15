@@ -1,5 +1,5 @@
 /** placeholder page until design is finalized
- * a copy of the membership/signup without the email and pass fields.
+ * Based on the old multi-step sign-up's first step, without the email and password fields.
  */
 import type { Metadata } from 'next';
 
