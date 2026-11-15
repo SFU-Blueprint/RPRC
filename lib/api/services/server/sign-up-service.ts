@@ -1,20 +1,13 @@
 import { headers } from 'next/headers';
-import type { z } from 'zod';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { nullableArg } from '@/lib/utils/rpc-utils';
 import type {
-  individualApplicationSchema,
-  organizationApplicationSchema,
-} from '@/lib/schema';
-import type { SubmitResult } from '@/types/sign-up-form.types';
-
-type IndividualApplicationValues = z.output<typeof individualApplicationSchema>;
-type OrganizationApplicationValues = z.output<
-  typeof organizationApplicationSchema
->;
-
-type ApplicationFailure = Extract<SubmitResult, { stage: 'application' }>;
+  ApplicationFailure,
+  IndividualApplicationValues,
+  OrganizationApplicationValues,
+  SubmitResult,
+} from '@/types/sign-up-form.types';
 
 const applicationFailure = (
   reason: ApplicationFailure['reason'],

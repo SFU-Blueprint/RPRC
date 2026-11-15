@@ -6,6 +6,10 @@ import {
 } from '@/lib/schema';
 import type { DefaultValues } from 'react-hook-form';
 
+import { CONTACT_EMAILS } from '@/lib/constants/contact';
+import { APPLICATION_FEES } from '@/lib/constants/processing-fees';
+import { ROUTES } from '@/lib/constants/routes';
+
 import type { FieldOption } from '@/types/sign-up-fields.types';
 import type {
   AllowedCountry,
@@ -30,7 +34,7 @@ export const SIGN_UP_FORM_COPY = {
   SIGNED_IN_NOTE: "You're signed in. Complete the application below.",
 } as const;
 
-const CONTACT_EMAIL = 'info@richmondprc.org';
+const CONTACT_EMAIL = CONTACT_EMAILS.GENERAL;
 
 type SubmitResultCopy = {
   title: string;
@@ -38,15 +42,12 @@ type SubmitResultCopy = {
   link?: { label: string; href: string };
 };
 
-/**
- * Banners for a failed submission (docs/signup-integration-plan.md, 3.3).
- * `href`s are plain paths so this file stays free of route imports.
- */
+/** Banners for a failed submission (docs/signup-integration-plan.md, 3.3). */
 export const SUBMIT_RESULT_COPY = {
   EMAIL_EXISTS: {
     title: 'This email already has an account',
     description: 'Log in to continue your application.',
-    link: { label: 'Log in', href: '/' },
+    link: { label: 'Log in', href: ROUTES.HOME },
   },
   DUPLICATE_ORG_PHONE: {
     title: 'This phone number is already registered',
@@ -66,18 +67,39 @@ export const SUBMIT_RESULT_COPY = {
   },
   ALREADY_APPLIED: {
     title: "You've already applied",
-    link: { label: 'Go to your dashboard', href: '/membership/dashboard' },
+    link: {
+      label: 'Go to your dashboard',
+      href: ROUTES.MEMBERSHIP_DASHBOARD,
+    },
   },
   NOT_SIGNED_IN: {
     title: "You've been signed out",
     description: 'Log in to continue your application.',
-    link: { label: 'Log in', href: '/' },
+    link: { label: 'Log in', href: ROUTES.HOME },
   },
   INVALID: {
     title: 'Some answers need fixing',
     description: 'Check your answers and try again.',
   },
 } as const satisfies Record<string, SubmitResultCopy>;
+
+/** The `/sign-up` landing, where the membership type is chosen. */
+export const MEMBERSHIP_TYPE_CHOOSER_COPY = {
+  HEADING: 'Choose Membership Type',
+  INDIVIDUAL: {
+    TITLE: 'Individual',
+    PRICE: `$${APPLICATION_FEES.INDIVIDUAL}/yr`,
+    DESCRIPTION: `This is the option for individuals who want to join the RPRC. the Membership fee may be waived in special cases. The $${APPLICATION_FEES.INDIVIDUAL} fee is due after application is approved.`,
+  },
+  ORGANIZATION: {
+    TITLE: 'Organization',
+    PRICE: `$${APPLICATION_FEES.ORGANIZATION}/yr`,
+    DESCRIPTION: `This option is for organizations that want to join or work with the RPRC. The $${APPLICATION_FEES.ORGANIZATION} organization fee is due after application is accepted.`,
+  },
+  CONTINUE: 'Continue',
+  HAVE_ACCOUNT: 'Already have an account?',
+  SIGN_IN: 'Sign in here',
+} as const;
 
 /** Section headings, rendered as the `<legend>` of each section. */
 export const SIGN_UP_SECTION_TITLES = {

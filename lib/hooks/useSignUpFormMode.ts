@@ -11,7 +11,7 @@ import {
 import type { FieldValues, Resolver } from 'react-hook-form';
 import type { z } from 'zod';
 
-import type { SignUpFormMode, SubmitResult } from '@/types/sign-up-form.types';
+import type { SignUpFormMode, SubmitFailure } from '@/types/sign-up-form.types';
 
 /**
  * The form's mode. It starts from what the page found (signed in without an
@@ -32,10 +32,7 @@ export function useSignUpFormMode(initialMode: SignUpFormMode) {
   }, [mode]);
 
   const onFailure = useCallback(
-    (
-      result: Exclude<SubmitResult, { ok: true }>,
-      submittedIn: SignUpFormMode,
-    ) => {
+    (result: SubmitFailure, submittedIn: SignUpFormMode) => {
       if (result.stage === 'application' && submittedIn === 'sign-up')
         setAccountCreated(true);
     },

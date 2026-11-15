@@ -6,13 +6,11 @@ import { forwardRef } from 'react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { SUBMIT_RESULT_COPY } from '@/lib/constants/sign-up';
-import type { SignUpFormMode, SubmitResult } from '@/types/sign-up-form.types';
-
-type Failure = Exclude<SubmitResult, { ok: true }>;
+import type { SignUpFormMode, SubmitFailure } from '@/types/sign-up-form.types';
 
 /** Which banner a failed submission shows. */
 export function getSubmitResultCopy(
-  result: Failure,
+  result: SubmitFailure,
   submittedIn: SignUpFormMode,
 ) {
   switch (result.reason) {
@@ -35,7 +33,7 @@ export function getSubmitResultCopy(
 }
 
 type SubmitResultBannerProps = {
-  result: Failure;
+  result: SubmitFailure;
   /** The mode the form was in when it was submitted. */
   submittedIn: SignUpFormMode;
 };

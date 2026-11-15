@@ -14,14 +14,16 @@ import { Button } from '@/components/ui/button';
 import { InfoBox } from '@/components/ui/infobox';
 import { SIGN_UP_FORM_COPY } from '@/lib/constants/sign-up';
 import { cn } from '@/lib/utils';
-import type { SignUpFormMode, SubmitResult } from '@/types/sign-up-form.types';
+import type {
+  SignUpFormMode,
+  SubmitFailure,
+  SubmitResult,
+} from '@/types/sign-up-form.types';
 
 import { SubmitResultBanner } from './SubmitResultBanner';
 
 /** Form and success section share one width: full on mobile, 4/5 on large. */
 const FORM_WIDTH = 'mx-auto w-full lg:w-4/5';
-
-type Failure = Exclude<SubmitResult, { ok: true }>;
 
 type SignUpFormInterfaceProps<TInput extends FieldValues, TValues> = {
   form: UseFormReturn<TInput, unknown, TValues>;
@@ -30,7 +32,7 @@ type SignUpFormInterfaceProps<TInput extends FieldValues, TValues> = {
   /** Called with schema-parsed values. Throwing means an unexpected failure. */
   onSubmit: (values: TValues) => Promise<SubmitResult>;
   /** Called after a failed submission, e.g. to switch to application-only mode. */
-  onFailure?: (result: Failure, submittedIn: SignUpFormMode) => void;
+  onFailure?: (result: SubmitFailure, submittedIn: SignUpFormMode) => void;
   /** The form's sections. */
   children: ReactNode;
 };
@@ -52,7 +54,7 @@ export function SignUpFormInterface<TInput extends FieldValues, TValues>({
 }: SignUpFormInterfaceProps<TInput, TValues>) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [failure, setFailure] = useState<{
-    result: Failure;
+    result: SubmitFailure;
     submittedIn: SignUpFormMode;
   } | null>(null);
   const bannerRef = useRef<HTMLDivElement>(null);

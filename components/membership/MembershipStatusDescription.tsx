@@ -1,5 +1,6 @@
 import React from 'react';
 import { ApplicationStatus, UserRole } from '@/lib/constants/enums';
+import { CONTACT_EMAILS } from '@/lib/constants/contact';
 import { APPLICATION_FEES } from '@/lib/constants/processing-fees';
 
 export function MembershipStatusDescription({
@@ -83,10 +84,10 @@ export function MembershipStatusDescription({
         <small>
           For more information, contact{' '}
           <a
-            href="mailto:rprc@gmail.com"
+            href={`mailto:${CONTACT_EMAILS.MEMBERSHIP}`}
             className="underline hover:opacity-75"
           >
-            rprc@gmail.com
+            {CONTACT_EMAILS.MEMBERSHIP}
           </a>
         </small>
       </>
@@ -100,8 +101,11 @@ export function MembershipStatusDescription({
         <br />
         <br />
         For more information, please contact us at{' '}
-        <a href="mailto:rprc@gmail.com" className="underline hover:opacity-75">
-          rprc@gmail.com
+        <a
+          href={`mailto:${CONTACT_EMAILS.MEMBERSHIP}`}
+          className="underline hover:opacity-75"
+        >
+          {CONTACT_EMAILS.MEMBERSHIP}
         </a>
         .
       </>

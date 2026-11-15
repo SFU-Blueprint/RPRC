@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { UserRole } from '@/lib/constants/enums';
 import { ROUTES, PROTECTED_ROUTES } from '@/lib/constants/routes';
 
 export async function updateSession(request: NextRequest) {
@@ -49,7 +50,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith(`${ROUTES.MEMBERSHIP_SIGNUP}/`);
   // Where logged-in users shouldn't stay: sign-in, sign-up and their entry points.
   const isEntryRoute =
-    pathname === ROUTES.HOME || pathname === '/membership' || isSignUpRoute;
+    pathname === ROUTES.HOME || pathname === ROUTES.MEMBERSHIP || isSignUpRoute;
 
   // Check if accessing protected membership routes
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
@@ -86,9 +87,9 @@ export async function updateSession(request: NextRequest) {
     .maybeSingle();
   const hasApplication = (profile?.applications?.length ?? 0) > 0;
   const signUpForm =
-    profile?.role === 'individual'
+    profile?.role === UserRole.INDIVIDUAL
       ? ROUTES.SIGN_UP_INDIVIDUAL
-      : profile?.role === 'organization'
+      : profile?.role === UserRole.ORGANIZATION
         ? ROUTES.SIGN_UP_ORGANIZATION
         : null;
 
@@ -100,7 +101,7 @@ export async function updateSession(request: NextRequest) {
     if (pathname === signUpForm) return supabaseResponse;
     const redirectsToForm =
       isEntryRoute ||
-      (pathname.startsWith('/membership/') &&
+      (pathname.startsWith(`${ROUTES.MEMBERSHIP}/`) &&
         pathname !== ROUTES.MEMBERSHIP_PAYMENT_RETURN);
     if (redirectsToForm || isAdminRoute) return redirectTo(signUpForm);
     return supabaseResponse;

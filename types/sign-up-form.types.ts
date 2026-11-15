@@ -1,7 +1,12 @@
 import type { z } from 'zod';
 
 import type { ALLOWED_COUNTRIES } from '@/lib/constants/sign-up';
-import type { individualSchema, organizationSchema } from '@/lib/schema';
+import type {
+  individualApplicationSchema,
+  individualSchema,
+  organizationApplicationSchema,
+  organizationSchema,
+} from '@/lib/schema';
 
 /**
  * Form value types derived from the zod schemas, which are the single source
@@ -13,6 +18,14 @@ export type IndividualSignUpValues = z.output<typeof individualSchema>;
 
 export type OrganizationSignUpInput = z.input<typeof organizationSchema>;
 export type OrganizationSignUpValues = z.output<typeof organizationSchema>;
+
+/** The application fields only (no account fields). */
+export type IndividualApplicationValues = z.output<
+  typeof individualApplicationSchema
+>;
+export type OrganizationApplicationValues = z.output<
+  typeof organizationApplicationSchema
+>;
 
 type SharedSignUpKey = Extract<
   keyof IndividualSignUpInput,
@@ -48,6 +61,13 @@ export type SubmitResult =
         | 'duplicate_org_phone'
         | 'failed';
     };
+
+export type SubmitFailure = Exclude<SubmitResult, { ok: true }>;
+export type AccountFailure = Extract<SubmitResult, { stage: 'account' }>;
+export type ApplicationFailure = Extract<
+  SubmitResult,
+  { stage: 'application' }
+>;
 
 /** Countries the address section offers (see `ALLOWED_COUNTRIES`). */
 export type AllowedCountry = (typeof ALLOWED_COUNTRIES)[number];

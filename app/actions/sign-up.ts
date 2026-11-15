@@ -15,9 +15,11 @@ import {
 } from '@/lib/schema';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
-import type { SubmitResult } from '@/types/sign-up-form.types';
-
-type AccountFailure = Extract<SubmitResult, { stage: 'account' }>;
+import type {
+  AccountFailure,
+  ApplicationFailure,
+  SubmitResult,
+} from '@/types/sign-up-form.types';
 
 const accountFailure = (reason: AccountFailure['reason']): AccountFailure => ({
   ok: false,
@@ -123,9 +125,7 @@ export async function signUpOrganization(
   return createOrganizationApplication(account.userId, application);
 }
 
-type ApplicationOnlyUser =
-  | { ok: true; userId: string }
-  | Extract<SubmitResult, { stage: 'application' }>;
+type ApplicationOnlyUser = { ok: true; userId: string } | ApplicationFailure;
 
 /** The signed-in user, if their role matches the form they submitted. */
 async function getApplicationOnlyUser(

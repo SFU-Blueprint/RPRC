@@ -19,6 +19,7 @@ import OrganizationProfile from '@/components/membership/profiles/OrganizationPr
 import MembershipProfileEditForm from '@/components/membership/MembershipProfileEditForm';
 import type { MemberProfileEditValues } from '@/lib/schema/member-profile-edit.schema';
 import DiscardChangesModal from '@/components/membership/modals/DiscardChangesModal';
+import { CONTACT_EMAILS } from '@/lib/constants/contact';
 import { ApplicationStatus, UserRole } from '@/lib/constants/enums';
 import {
   PROFILE_EDITABLE_STATUSES,
@@ -150,10 +151,10 @@ export default function MembershipDashboard() {
             <p className={`${bodyStyles.m}`}>
               For assistance, email -{' '}
               <a
-                href="mailto:info@richmondprc.org"
+                href={`mailto:${CONTACT_EMAILS.GENERAL}`}
                 className="underline hover:opacity-75"
               >
-                info@richmondprc.org
+                {CONTACT_EMAILS.GENERAL}
               </a>
             </p>
           </div>
