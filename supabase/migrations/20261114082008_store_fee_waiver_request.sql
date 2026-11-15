@@ -1,7 +1,18 @@
--- =========================
--- RPC Function: Create Individual Application
--- =========================
-CREATE OR REPLACE FUNCTION public.create_individual_application(
+-- create_individual_application stored the waiver reason but never the waiver request
+-- itself, so individual_application_details.fee_waiver stayed false and admins were never
+-- shown the request. Add p_fee_waiver and store it.
+--
+-- The parameter list changes, so the old function is dropped rather than overloaded.
+-- p_fee_waiver comes last with a default, so the app version from before this change
+-- (which doesn't send it) keeps working between this migration and the app deploy.
+-- Apply this migration before deploying the app that sends p_fee_waiver.
+-- Existing rows are left as they are.
+
+drop function if exists public.create_individual_application(
+  uuid, text, text, phone_type, text, text, text, text, text, text, text, text[]
+);
+
+create function public.create_individual_application(
   p_user_id uuid,
   p_name text,
   p_phone_num text,
@@ -13,12 +24,14 @@ CREATE OR REPLACE FUNCTION public.create_individual_application(
   p_postal_code text,
   p_reason text,
   p_fee_waiver_reason text,
-  p_interests text[]
+  p_interests text[],
+  p_fee_waiver boolean default false
 )
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
+ returns void
+ language plpgsql
+ security definer
+ set search_path = public
+as $function$
 DECLARE
   v_application_id uuid;
   v_interest_name text;
@@ -37,7 +50,7 @@ BEGIN
     p_phone_num,
     p_phone_type
   )
-  ON CONFLICT (user_id) 
+  ON CONFLICT (user_id)
   DO UPDATE SET
     name = EXCLUDED.name,
     phone_num = EXCLUDED.phone_num,
@@ -85,11 +98,13 @@ BEGIN
   INSERT INTO public.individual_application_details (
     application_id,
     reason,
+    fee_waiver,
     fee_waiver_reason
   )
   VALUES (
     v_application_id,
     p_reason,
+    coalesce(p_fee_waiver, false),
     p_fee_waiver_reason
   );
 
@@ -102,7 +117,7 @@ BEGIN
       VALUES (v_interest_name)
       ON CONFLICT (name) DO NOTHING
       RETURNING id INTO v_interest_id;
-      
+
       -- If no ID was returned (conflict), fetch it
       IF v_interest_id IS NULL THEN
         SELECT id INTO v_interest_id
@@ -121,4 +136,4 @@ EXCEPTION
   WHEN OTHERS THEN
     RAISE EXCEPTION 'Error creating individual application: %', SQLERRM;
 END;
-$$;
+$function$;

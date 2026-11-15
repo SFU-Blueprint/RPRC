@@ -4,7 +4,7 @@ export const MEMBERSHIP_INTERESTS = [
   'Health',
   'Education',
   'Environment',
-  'Arts+Culture',
+  'Arts & Culture',
   'Housing',
   'Other',
 ] as const;

@@ -21,6 +21,7 @@ export const ROUTES = {
   MEMBERSHIP_CONFIRMATION: '/membership/confirmation',
   MEMBERSHIP_DASHBOARD: '/membership/dashboard',
   MEMBERSHIP_RENEW: '/membership/renew',
+  MEMBERSHIP_PAYMENT_RETURN: '/membership/payment/return',
 
   // Sign-up forms (one page each: account + application)
   SIGN_UP_INDIVIDUAL: '/sign-up/individual',
@@ -39,6 +40,7 @@ export const ROUTES = {
   API_APPLICATION: '/api/application',
   API_APPLICATION_BY_ID: (id: string) => `/api/application/${id}`,
   API_AUTH_LOGIN: '/api/auth/log-in',
+  API_STRIPE_CHECKOUT: '/api/stripe/checkout',
 } as const;
 
 // Protected routes that require authentication

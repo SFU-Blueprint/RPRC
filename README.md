@@ -62,8 +62,9 @@ The project uses:
 
 | Command               | Description                               |
 | --------------------- | ----------------------------------------- |
-| `make dev`            | Start local Supabase + Next.js dev server |
-| `npm run dev`         | Start Next.js dev server only             |
+| `make dev`            | `npm install`, then `npm run dev`         |
+| `npm run dev`         | Start local Supabase + Next.js dev server |
+| `npm run types`       | Regenerate `types/database.ts` (local DB) |
 | `npm run build`       | Build for production                      |
 | `npm run lint`        | Run ESLint                                |
 | `npm run format`      | Format code with Prettier                 |

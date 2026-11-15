@@ -12,16 +12,24 @@ import {
 import { ROUTES } from '@/lib/constants/routes';
 import {
   ApplicationErrorCode,
+  ReviewErrorMessage,
   SubmitApplication,
 } from '@/lib/constants/application-errors';
 import { isAdmin } from '@/lib/helpers/auth-helper';
+import { isCalendarDate } from '@/lib/utils/time-utils';
+import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
+import { phoneNumberSchema } from '@/lib/schema/shared.schema';
 import type { Database } from '@/types/database';
 
-function formatPhoneWithAreaCode(phoneNumber: string): string {
-  const normalized = phoneNumber.trim();
-  if (!normalized) return normalized;
-  if (normalized.startsWith('+1')) return normalized;
-  return `+1 ${normalized}`;
+const INVALID_PHONE_RESPONSE = {
+  success: false,
+  error: 'Phone number must be 10 digits',
+  code: ApplicationErrorCode.VALIDATION_ERROR,
+} as const;
+
+/** The stored format (`+1 (604)-123-4567`), or null if it isn't 10 digits. */
+function toStoredPhone(phoneNumber: string | null): string | null {
+  return phoneNumberSchema.safeParse(phoneNumber ?? '').data ?? null;
 }
 
 /**
@@ -48,7 +56,6 @@ export async function submitIndividualApplication(
     membershipwaiver: formData.get('membershipwaiver') === 'true',
     waiverreason: formData.get('waiverreason') as string | undefined,
   };
-  const phoneNumberWithAreaCode = formatPhoneWithAreaCode(data.phoneNumber);
 
   // Validate required fields
   const requiredFields = [
@@ -71,6 +78,9 @@ export async function submitIndividualApplication(
       code: ApplicationErrorCode.VALIDATION_ERROR,
     };
   }
+
+  const storedPhone = toStoredPhone(data.phoneNumber);
+  if (!storedPhone) return INVALID_PHONE_RESPONSE;
 
   const {
     data: { user },
@@ -106,7 +116,7 @@ export async function submitIndividualApplication(
       {
         p_user_id: user.id,
         p_name: data.fullName,
-        p_phone_num: phoneNumberWithAreaCode,
+        p_phone_num: storedPhone,
         p_phone_type: data.phoneType,
         p_mailing_address: data.mailingAddress,
         p_city: data.city,
@@ -114,6 +124,7 @@ export async function submitIndividualApplication(
         p_province: data.province,
         p_postal_code: data.postalCode,
         p_reason: data.whyrpcmember,
+        p_fee_waiver: data.membershipwaiver,
         p_fee_waiver_reason: data.waiverreason || null,
         p_interests: data.interests,
       },
@@ -127,9 +138,7 @@ export async function submitIndividualApplication(
     return {
       success: false,
       error:
-        error instanceof Error
-          ? error.message
-          : 'Failed to create application',
+        error instanceof Error ? error.message : 'Failed to create application',
       code: ApplicationErrorCode.SERVER_ERROR,
     };
   }
@@ -161,10 +170,13 @@ export async function submitOrganizationApplication(
     interests: JSON.parse(formData.get('interests') as string) as string[],
     whyrpcmember: formData.get('whyrpcmember') as string,
     organisationservices: formData.get('organisationservices') as string,
-    representativeName: formData.get('representativeName') as string | undefined,
-    representativeEmail: formData.get('representativeEmail') as string | undefined,
+    representativeName: formData.get('representativeName') as
+      | string
+      | undefined,
+    representativeEmail: formData.get('representativeEmail') as
+      | string
+      | undefined,
   };
-  const phoneNumberWithAreaCode = formatPhoneWithAreaCode(data.phoneNumber);
 
   // Validate required fields
   const requiredFields = [
@@ -189,6 +201,10 @@ export async function submitOrganizationApplication(
     };
   }
 
+  // Validated, so it only contains digits, spaces, "+", "(", ")" and "-".
+  const storedPhone = toStoredPhone(data.phoneNumber);
+  if (!storedPhone) return INVALID_PHONE_RESPONSE;
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -201,23 +217,29 @@ export async function submitOrganizationApplication(
     };
   }
 
-  // Check if organization already exists by phone or if user has already submitted an application
-  const { data: existing } = await supabase
+  // Check if organization already exists by phone or if user has already submitted an application.
+  // The phone must be double-quoted: PostgREST reserves "(" and ")" inside or(), and an unquoted
+  // "+1 (604)-..." silently matches nothing.
+  const { data: matches, error: existingError } = await supabase
     .from('organization_profiles')
-    .select('*')
-    .or(
-      `phone_num.eq.${phoneNumberWithAreaCode},phone_num.eq.${data.phoneNumber},user_id.eq.${user.id}`,
-    )
-    .maybeSingle();
+    .select('user_id, phone_num')
+    .or(`phone_num.eq."${storedPhone}",user_id.eq.${user.id}`)
+    .limit(2);
 
-  if (existing) {
+  if (existingError) {
+    console.error('Organization duplicate check error:', existingError);
+    return {
+      success: false,
+      error: 'Failed to submit application',
+      code: ApplicationErrorCode.SERVER_ERROR,
+    };
+  }
+
+  if (matches && matches.length > 0) {
     let errorMessage = 'Organization already exists';
-    if (existing.user_id === user.id) {
+    if (matches.some((row) => row.user_id === user.id)) {
       errorMessage = 'You have already submitted an application';
-    } else if (
-      existing.phone_num === phoneNumberWithAreaCode ||
-      existing.phone_num === data.phoneNumber
-    ) {
+    } else if (matches.some((row) => row.phone_num === storedPhone)) {
       errorMessage = 'An organization with this phone number already exists';
     }
 
@@ -237,7 +259,7 @@ export async function submitOrganizationApplication(
         p_org_name: data.fullName,
         p_org_rep_name: data.representativeName || null,
         p_org_rep_email: data.representativeEmail || null,
-        p_phone_num: phoneNumberWithAreaCode,
+        p_phone_num: storedPhone,
         p_phone_type: data.phoneType,
         p_mailing_address: data.mailingAddress,
         p_city: data.city,
@@ -258,9 +280,7 @@ export async function submitOrganizationApplication(
     return {
       success: false,
       error:
-        error instanceof Error
-          ? error.message
-          : 'Failed to create application',
+        error instanceof Error ? error.message : 'Failed to create application',
       code: ApplicationErrorCode.SERVER_ERROR,
     };
   }
@@ -286,7 +306,9 @@ type SubmitApplicationReviewResult = {
 };
 
 function getNextApplicationStatus(
-  reviews: Array<Pick<Database['public']['Tables']['application_reviews']['Row'], 'decision'>>,
+  reviews: Array<
+    Pick<Database['public']['Tables']['application_reviews']['Row'], 'decision'>
+  >,
 ): Database['public']['Enums']['application_status'] {
   const approveCount = reviews.filter(
     (review) => review.decision === ReviewDecision.APPROVE,
@@ -337,60 +359,157 @@ export async function submitApplicationReview(
     return { success: false, error: 'All review fields are required' };
   }
 
+  if (!isCalendarDate(input.reviewDate)) {
+    return { success: false, error: ReviewErrorMessage.INVALID_REVIEW_DATE };
+  }
+
   const { data: application } = await supabase
     .from('applications')
     .select('status')
     .eq('id', input.appId)
     .single();
 
-  if (application?.status === 'payment_pending' || application?.status === 'rejected') {
-    return { success: false, error: 'This application has already been finalized' };
+  if (!application) {
+    return { success: false, error: ReviewErrorMessage.NOT_FOUND };
+  }
+  // Only applications under review can be reviewed. Anything else (finalized, active, or
+  // expiring/expired with last round's reviews still attached) would add a stray review.
+  if (
+    application.status !== ApplicationStatus.TO_REVIEW &&
+    application.status !== ApplicationStatus.CONFLICT
+  ) {
+    return {
+      success: false,
+      error: ReviewErrorMessage.ALREADY_FINALIZED,
+    };
   }
 
   const { data: existingReviews, error: reviewsError } = await supabase
     .from('application_reviews')
-    .select('decision')
+    .select('decision, waiver_decision')
     .eq('application_id', input.appId);
 
   if (reviewsError) {
     return { success: false, error: reviewsError.message };
   }
 
-  const reviewCreatedAt = new Date(`${input.reviewDate}T00:00:00.000Z`).toISOString();
+  const { data: insertedReview, error: insertError } = await supabase
+    .from('application_reviews')
+    .insert({
+      application_id: input.appId,
+      reviewer_name: input.reviewerName.trim(),
+      decision: input.decision,
+      reason: input.reason.trim(),
+      // created_at defaults to the submission time.
+      review_date: input.reviewDate,
+      waiver_decision: input.waiverDecision ?? null,
+      waiver_note: input.waiverReason ?? null,
+    })
+    .select('id')
+    .single();
 
-  const { error: insertError } = await supabase.from('application_reviews').insert({
-    application_id: input.appId,
-    reviewer_name: input.reviewerName.trim(),
-    decision: input.decision,
-    reason: input.reason.trim(),
-    created_at: reviewCreatedAt,
-    waiver_decision: input.waiverDecision ?? null,
-    waiver_note: input.waiverReason ?? null
-  });
-
-  if (insertError) {
-    return { success: false, error: insertError.message };
+  if (insertError || !insertedReview) {
+    return {
+      success: false,
+      error: insertError?.message ?? ReviewErrorMessage.SAVE_FAILED,
+    };
   }
 
-  const allReviews = [
+  // The outcome (and which review decides the waiver) is worked out from the reviews read
+  // above. If another admin's review landed at the same time, that set is stale: withdraw
+  // this review rather than record an outcome that ignores the other one.
+  const withdrawReview = async () => {
+    const { error: deleteError } = await supabase
+      .from('application_reviews')
+      .delete()
+      .eq('id', insertedReview.id);
+    if (deleteError) {
+      // The review is still saved, so retrying would add a duplicate.
+      return {
+        success: false,
+        error: ReviewErrorMessage.CONCURRENT_REVIEW_NOT_WITHDRAWN,
+      };
+    }
+    return { success: false, error: ReviewErrorMessage.CONCURRENT_REVIEW };
+  };
+
+  const { data: reviewsNow, error: recountError } = await supabase
+    .from('application_reviews')
+    .select('id')
+    .eq('application_id', input.appId);
+  if (recountError) {
+    return { success: false, error: recountError.message };
+  }
+  if ((reviewsNow?.length ?? 0) !== (existingReviews?.length ?? 0) + 1) {
+    return withdrawReview();
+  }
+
+  const currentReview = {
+    decision: input.decision as Database['public']['Enums']['review_decision'],
+    waiver_decision: input.waiverDecision ?? null,
+  };
+  let nextStatus = getNextApplicationStatus([
     ...(existingReviews ?? []),
-    { decision: input.decision as Database['public']['Enums']['review_decision'] },
-  ];
-  const nextStatus = getNextApplicationStatus(allReviews);
+    currentReview,
+  ]);
+
+  // An approved application whose fee waiver is granted skips payment.
+  if (nextStatus === ApplicationStatus.PAYMENT_PENDING) {
+    const { data: details, error: detailsError } = await supabase
+      .from('individual_application_details')
+      .select('fee_waiver')
+      .eq('application_id', input.appId)
+      .maybeSingle();
+    if (detailsError) {
+      return { success: false, error: detailsError.message };
+    }
+    if (
+      isFeeWaiverGranted({
+        requested: details?.fee_waiver ?? false,
+        earlierReviews: existingReviews ?? [],
+        currentReview,
+        resolvesConflict: application.status === ApplicationStatus.CONFLICT,
+      })
+    ) {
+      nextStatus = ApplicationStatus.ACTIVE;
+    }
+  }
+
   const isFinalized =
     nextStatus === ApplicationStatus.PAYMENT_PENDING ||
+    nextStatus === ApplicationStatus.ACTIVE ||
     nextStatus === ApplicationStatus.REJECTED;
 
-  const { error: updateError } = await supabase
+  // Nothing to write when the outcome doesn't change the status (typically a first review
+  // that leaves the application in to_review). Skipping it also means a review that another
+  // admin's request has already counted is never withdrawn because of this update.
+  //
+  // Known gap: if this is the second review and a third lands before this update, the third
+  // can update first, and this review is then withdrawn although the third counted it. A
+  // database-side lock (an RPC with select ... for update) would close that; it's rare with
+  // a handful of admins.
+  if (nextStatus === application.status && !isFinalized) {
+    revalidatePath(ROUTES.ADMIN_DASHBOARD);
+    revalidatePath(ROUTES.ADMIN_APPLICATION_DETAIL(input.appId));
+    return { success: true };
+  }
+
+  // Only applies if the status hasn't changed since it was read.
+  const { data: updatedApplication, error: updateError } = await supabase
     .from('applications')
     .update({
       status: nextStatus,
       finalized_at: isFinalized ? new Date().toISOString() : null,
     })
-    .eq('id', input.appId);
+    .eq('id', input.appId)
+    .eq('status', application.status)
+    .select('id');
 
   if (updateError) {
     return { success: false, error: updateError.message };
+  }
+  if (!updatedApplication?.length) {
+    return withdrawReview();
   }
 
   revalidatePath(ROUTES.ADMIN_DASHBOARD);

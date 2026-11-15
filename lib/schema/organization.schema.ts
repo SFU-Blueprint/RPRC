@@ -7,6 +7,7 @@ import { passwordSchema } from './password.schema';
 import {
   emailSchema,
   nameSchema,
+  organizationNameSchema,
   phoneNumberSchema,
   phoneTypeSchema,
 } from './shared.schema';
@@ -14,7 +15,9 @@ import {
 export const organizationSchema = z
   .object({
     email: emailSchema,
-    /** The organization representative's name. */
+    /** Maps to `p_org_name`. Required, since `org_name` is NOT NULL. */
+    organizationName: organizationNameSchema,
+    /** The organization representative's name. Maps to `p_org_rep_name`. */
     name: nameSchema,
     organizationEmail: emailSchema.optional(),
     password: passwordSchema,
