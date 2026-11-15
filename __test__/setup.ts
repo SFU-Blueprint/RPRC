@@ -29,9 +29,12 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 };
 
-Element.prototype.hasPointerCapture ??= () => false;
-Element.prototype.releasePointerCapture ??= () => {};
-Element.prototype.scrollIntoView ??= () => {};
-window.scrollTo = () => {};
+// Tests that opt into the node environment (e.g. the proxy tests) have no DOM.
+if (typeof Element !== 'undefined') {
+  Element.prototype.hasPointerCapture ??= () => false;
+  Element.prototype.releasePointerCapture ??= () => {};
+  Element.prototype.scrollIntoView ??= () => {};
+  window.scrollTo = () => {};
+}
 
 afterEach(cleanup);

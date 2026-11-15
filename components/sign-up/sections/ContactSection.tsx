@@ -17,16 +17,23 @@ import { SignUpSection } from './SignUpSection';
 type ContactSectionProps = {
   /** "Name" for individuals, the representative's name for organizations. */
   nameLabel: string;
-  /** Form-specific fields placed after the name, e.g. `organizationEmail`. */
+  /** Form-specific fields placed before the name, e.g. `organizationName`. */
+  leadingFields?: ReactNode;
+  /** Form-specific fields placed after the name, e.g. `representativeEmail`. */
   children?: ReactNode;
 };
 
 /** `name`, `phoneNumber`, `phoneType`, plus any form-specific contact fields. */
-export function ContactSection({ nameLabel, children }: ContactSectionProps) {
+export function ContactSection({
+  nameLabel,
+  leadingFields,
+  children,
+}: ContactSectionProps) {
   const { control } = useSharedSignUpForm();
 
   return (
     <SignUpSection title={SIGN_UP_SECTION_TITLES.CONTACT}>
+      {leadingFields}
       <TextField
         control={control}
         name="name"

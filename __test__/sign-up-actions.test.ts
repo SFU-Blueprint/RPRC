@@ -19,7 +19,7 @@ const shared = {
   password: 'Abcdefghijklm1!',
   confirmPassword: 'Abcdefghijklm1!',
   phoneNumber: '+16041234567',
-  phoneType: 'Cell',
+  phoneType: 'cell',
   address: {
     mailingAddress: '1234 No. 3 Rd',
     city: 'Richmond',
@@ -38,7 +38,8 @@ const individual = {
 
 const organization = {
   ...shared,
-  organizationEmail: 'info@foodbank.org',
+  organizationName: 'Richmond Food Bank Society',
+  representativeEmail: 'rep@foodbank.org',
 } as unknown as OrganizationSignUpValues;
 
 beforeEach(() => {

@@ -52,8 +52,11 @@ function type(label: string, value: string) {
   fireEvent.change(byLabel(label), { target: { value } });
 }
 
-function fillShared(nameLabel: string) {
-  type(SIGN_UP_FIELD_LABELS.EMAIL, 'jane@example.com');
+function fillShared(
+  nameLabel: string,
+  emailLabel: string = SIGN_UP_FIELD_LABELS.EMAIL,
+) {
+  type(emailLabel, 'jane@example.com');
   type(SIGN_UP_FIELD_LABELS.PASSWORD, PASSWORD);
   type(SIGN_UP_FIELD_LABELS.CONFIRM_PASSWORD, PASSWORD);
   type(nameLabel, 'Jane Doe');
@@ -68,6 +71,15 @@ function fillShared(nameLabel: string) {
   fireEvent.keyDown(screen.getByRole('option', { name: 'British Columbia' }), {
     key: 'Enter',
   });
+}
+
+/** The organization form labels its account email as the organization's. */
+function fillOrganization() {
+  fillShared(
+    SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME,
+    SIGN_UP_FIELD_LABELS.ORGANIZATION_ACCOUNT_EMAIL,
+  );
+  type(SIGN_UP_FIELD_LABELS.ORGANIZATION_NAME, 'Richmond Food Bank Society');
 }
 
 async function submit() {
@@ -160,8 +172,8 @@ describe('individual sign-up form', () => {
     expect(vi.mocked(signUpIndividual).mock.calls[0][0]).toMatchObject({
       email: 'jane@example.com',
       name: 'Jane Doe',
-      phoneNumber: '+16041234567',
-      phoneType: 'Cell',
+      phoneNumber: '+1 (604)-123-4567',
+      phoneType: 'cell',
       address: {
         mailingAddress: '1234 No. 3 Rd',
         city: 'Richmond',
@@ -199,7 +211,7 @@ describe('individual sign-up form', () => {
 });
 
 describe('organization sign-up form', () => {
-  test('submits organization values, including the optional org email', async () => {
+  test('submits organization values, including the optional representative email', async () => {
     vi.mocked(signUpOrganization).mockResolvedValue();
     render(<OrganizationSignUpForm />);
 
@@ -210,13 +222,15 @@ describe('organization sign-up form', () => {
       }),
     ).toBeDefined();
 
-    fillShared(SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME);
-    type(SIGN_UP_FIELD_LABELS.ORGANIZATION_EMAIL, 'info@foodbank.org');
+    fillOrganization();
+    type(SIGN_UP_FIELD_LABELS.REPRESENTATIVE_EMAIL, 'jane.rep@example.com');
     await submit();
 
     expect(vi.mocked(signUpOrganization).mock.calls[0][0]).toMatchObject({
+      email: 'jane@example.com',
+      organizationName: 'Richmond Food Bank Society',
       name: 'Jane Doe',
-      organizationEmail: 'info@foodbank.org',
+      representativeEmail: 'jane.rep@example.com',
     });
     expect(screen.getByText(SUCCESS_HEADING)).toBeDefined();
   });
@@ -328,7 +342,7 @@ describe('submit behaviour edge cases', () => {
   test('organization failure shows the same toast and keeps the form', async () => {
     vi.mocked(signUpOrganization).mockRejectedValue(new Error('network'));
     render(<OrganizationSignUpForm />);
-    fillShared(SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME);
+    fillOrganization();
 
     await submit();
 

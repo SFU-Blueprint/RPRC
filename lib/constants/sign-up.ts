@@ -44,8 +44,12 @@ export const SIGN_UP_FIELD_LABELS = {
   PASSWORD: 'Password',
   CONFIRM_PASSWORD: 'Confirm Password',
   NAME: 'Name',
+  ORGANIZATION_NAME: 'Organization Name',
+  /** The account email on the organization form, as in the old form. */
+  ORGANIZATION_ACCOUNT_EMAIL: 'Organization Email Address',
   REPRESENTATIVE_NAME: 'Organization Representative Name',
-  ORGANIZATION_EMAIL: 'Organization Email Address',
+  REPRESENTATIVE_EMAIL:
+    'Representative Email Address (if different from the one given above)',
   PHONE_NUMBER: 'Phone Number',
   PHONE_TYPE: 'Phone Type',
   MAILING_ADDRESS: 'Mailing Address',
@@ -59,25 +63,25 @@ export const SIGN_UP_FIELD_LABELS = {
 } as const;
 
 export const SIGN_UP_FIELD_DESCRIPTIONS = {
-  ORGANIZATION_EMAIL: "Only if it's different from the email address above.",
   INTERESTS: 'Select all that apply.',
   WAIVER:
     'We are committed to making membership accessible to everyone. Applicants who are unable to afford the membership fee may request a waiver. Requests are reviewed confidentially, and approval is subject to availability and organizational policy.',
 } as const;
 
-/** Display labels for schema values that are not human friendly as is. */
-const INTEREST_LABELS: Partial<Record<Interest, string>> = {
-  'Arts+Culture': 'Arts + Culture',
-};
-
 export const INTEREST_OPTIONS: FieldOption<Interest>[] =
   MEMBERSHIP_INTERESTS.map((interest) => ({
     value: interest,
-    label: INTEREST_LABELS[interest] ?? interest,
+    label: interest,
   }));
 
+/** Schema values are lowercase to match the `phone_type` enum in the database. */
+const PHONE_TYPE_LABELS: Record<PhoneType, string> = {
+  home: 'Home',
+  cell: 'Cell',
+};
+
 export const PHONE_TYPE_OPTIONS: FieldOption<PhoneType>[] = PHONE_TYPES.map(
-  (phoneType) => ({ value: phoneType, label: phoneType }),
+  (phoneType) => ({ value: phoneType, label: PHONE_TYPE_LABELS[phoneType] }),
 );
 
 /**
@@ -109,7 +113,7 @@ export const ADDRESS_LABELS: Record<
 
 /** Starting values: phone type and country preselected, as in the old form. */
 const SHARED_SIGN_UP_DEFAULTS = {
-  phoneType: 'Cell',
+  phoneType: 'cell',
   address: { country: DEFAULT_COUNTRY },
   membershipInterests: [],
 } satisfies DefaultValues<IndividualSignUpInput & OrganizationSignUpInput>;

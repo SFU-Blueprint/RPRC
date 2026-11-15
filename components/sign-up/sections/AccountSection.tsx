@@ -10,8 +10,15 @@ import { useSharedSignUpForm } from '@/lib/hooks/useSignUpFormContext';
 
 import { SignUpSection } from './SignUpSection';
 
+type AccountSectionProps = {
+  /** "Email Address" for individuals, the organization's email for organizations. */
+  emailLabel?: string;
+};
+
 /** `email`, `password`, `confirmPassword` from the application schemas. */
-export function AccountSection() {
+export function AccountSection({
+  emailLabel = SIGN_UP_FIELD_LABELS.EMAIL,
+}: AccountSectionProps) {
   const { control } = useSharedSignUpForm();
 
   return (
@@ -20,7 +27,7 @@ export function AccountSection() {
         control={control}
         name="email"
         type="email"
-        label={SIGN_UP_FIELD_LABELS.EMAIL}
+        label={emailLabel}
         required
         className="md:col-span-2"
         inputProps={{ autoComplete: 'email' }}

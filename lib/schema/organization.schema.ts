@@ -4,6 +4,7 @@ import { addressSchema } from './address.schema';
 import { interestsSchema } from './interests.schema';
 import { motivationSchema, wordLimitedStringSchema } from './motivation.schema';
 import { passwordSchema } from './password.schema';
+import { optionalProfileEmailSchema } from './profile-edit.shared.schema';
 import {
   emailSchema,
   nameSchema,
@@ -14,12 +15,17 @@ import {
 
 export const organizationSchema = z
   .object({
+    /** The account email, which is also the organization's email (`users.email`). */
     email: emailSchema,
     /** Maps to `p_org_name`. Required, since `org_name` is NOT NULL. */
     organizationName: organizationNameSchema,
     /** The organization representative's name. Maps to `p_org_rep_name`. */
     name: nameSchema,
-    organizationEmail: emailSchema.optional(),
+    /**
+     * Only if different from the organization email. Maps to `p_org_rep_email`.
+     * A blank input becomes undefined, as in profile edit.
+     */
+    representativeEmail: optionalProfileEmailSchema,
     password: passwordSchema,
     confirmPassword: z.string({ error: 'Please confirm your password' }),
     phoneNumber: phoneNumberSchema,

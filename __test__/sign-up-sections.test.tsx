@@ -65,14 +65,26 @@ function IndividualSections({
   );
 }
 
-function OrganizationEmailField() {
+function OrganizationNameField() {
   const { control } = useOrganizationSignUpForm();
   return (
     <TextField
       control={control}
-      name="organizationEmail"
+      name="organizationName"
+      label={SIGN_UP_FIELD_LABELS.ORGANIZATION_NAME}
+      required
+    />
+  );
+}
+
+function RepresentativeEmailField() {
+  const { control } = useOrganizationSignUpForm();
+  return (
+    <TextField
+      control={control}
+      name="representativeEmail"
       type="email"
-      label={SIGN_UP_FIELD_LABELS.ORGANIZATION_EMAIL}
+      label={SIGN_UP_FIELD_LABELS.REPRESENTATIVE_EMAIL}
     />
   );
 }
@@ -94,9 +106,14 @@ function OrganizationSections({
   return (
     <FormProvider {...form}>
       <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
-        <AccountSection />
-        <ContactSection nameLabel={SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME}>
-          <OrganizationEmailField />
+        <AccountSection
+          emailLabel={SIGN_UP_FIELD_LABELS.ORGANIZATION_ACCOUNT_EMAIL}
+        />
+        <ContactSection
+          nameLabel={SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME}
+          leadingFields={<OrganizationNameField />}
+        >
+          <RepresentativeEmailField />
         </ContactSection>
         <AddressSection />
         <InterestsSection />
@@ -174,11 +191,11 @@ describe('individual sections', () => {
     expect(screen.queryByText(SIGN_UP_SECTION_TITLES.PROGRAMS)).toBeNull();
   });
 
-  test('interests show friendly labels but keep schema values', () => {
+  test('interests show their schema values as labels', () => {
     render(<IndividualSections />);
 
-    const artsCulture = screen.getByLabelText('Arts + Culture');
-    expect(artsCulture.getAttribute('value')).toBe('Arts+Culture');
+    const artsCulture = screen.getByLabelText('Arts & Culture');
+    expect(artsCulture.getAttribute('value')).toBe('Arts & Culture');
   });
 
   test('waiver reason appears only when requested and is cleared when unticked', () => {
@@ -276,7 +293,12 @@ describe('organization sections', () => {
     render(<OrganizationSections />);
 
     const names = renderedFieldNames();
-    for (const name of ['organizationEmail', 'programsOrServices', 'name']) {
+    for (const name of [
+      'organizationName',
+      'representativeEmail',
+      'programsOrServices',
+      'name',
+    ]) {
       expect(names, name).toContain(name);
     }
     expect(names).not.toContain('waiverRequest');
@@ -301,9 +323,21 @@ function type(label: string, value: string) {
   fireEvent.change(byLabel(label), { target: { value } });
 }
 
+/** The organization form's required fields, including the organization name. */
+function fillOrganizationRequired() {
+  fillRequired(
+    SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME,
+    SIGN_UP_FIELD_LABELS.ORGANIZATION_ACCOUNT_EMAIL,
+  );
+  type(SIGN_UP_FIELD_LABELS.ORGANIZATION_NAME, 'Richmond Food Bank Society');
+}
+
 /** Valid values for every required shared field. */
-function fillRequired(nameLabel: string) {
-  type(SIGN_UP_FIELD_LABELS.EMAIL, 'jane@example.com');
+function fillRequired(
+  nameLabel: string,
+  emailLabel: string = SIGN_UP_FIELD_LABELS.EMAIL,
+) {
+  type(emailLabel, 'jane@example.com');
   type(SIGN_UP_FIELD_LABELS.PASSWORD, PASSWORD);
   type(SIGN_UP_FIELD_LABELS.CONFIRM_PASSWORD, PASSWORD);
   type(nameLabel, 'Jane Doe');
@@ -421,7 +455,7 @@ describe('section edge cases', () => {
   test('Programs: empty is valid and left out', async () => {
     const onSubmit = vi.fn();
     render(<OrganizationSections onSubmit={onSubmit} />);
-    fillRequired(SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME);
+    fillOrganizationRequired();
 
     await submitSections();
 
@@ -431,7 +465,7 @@ describe('section edge cases', () => {
   test('Programs: over the word limit is rejected', async () => {
     const onSubmit = vi.fn();
     render(<OrganizationSections onSubmit={onSubmit} />);
-    fillRequired(SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME);
+    fillOrganizationRequired();
     type(SIGN_UP_FIELD_LABELS.PROGRAMS, TOO_MANY_WORDS);
 
     await submitSections();
@@ -481,14 +515,26 @@ describe('section edge cases', () => {
     });
   });
 
-  test('Contact (organization): org email sits between the name and the phone', () => {
+  test('Contact (organization): old form order, org name, rep name, rep email, phone', () => {
     render(<OrganizationSections />);
     const names = [...document.querySelectorAll('[name]')].map((element) =>
       element.getAttribute('name'),
     );
     const position = (name: string) => names.indexOf(name);
 
-    expect(position('name')).toBeLessThan(position('organizationEmail'));
-    expect(position('organizationEmail')).toBeLessThan(position('phoneNumber'));
+    expect(position('organizationName')).toBeLessThan(position('name'));
+    expect(position('name')).toBeLessThan(position('representativeEmail'));
+    expect(position('representativeEmail')).toBeLessThan(
+      position('phoneNumber'),
+    );
+  });
+
+  test('Account (organization): the account email is the organization email', () => {
+    render(<OrganizationSections />);
+    expect(
+      byLabel(SIGN_UP_FIELD_LABELS.ORGANIZATION_ACCOUNT_EMAIL).getAttribute(
+        'name',
+      ),
+    ).toBe('email');
   });
 });

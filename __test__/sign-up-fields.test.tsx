@@ -23,8 +23,8 @@ import {
   MEMBERSHIP_INTERESTS,
   MOTIVATION_MAX_WORDS,
   organizationSchema,
-  PHONE_TYPES,
 } from '@/lib/schema';
+import { PHONE_TYPE_OPTIONS } from '@/lib/constants/sign-up';
 
 const toOptions = (values: readonly string[]) =>
   values.map((value) => ({ value, label: value }));
@@ -52,6 +52,12 @@ function OrganizationHarness({
   return (
     <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
       <fieldset disabled={disabled}>
+        <TextField
+          control={control}
+          name="organizationName"
+          label="Organization name"
+          required
+        />
         <TextField control={control} name="name" label="Name" required />
         <TextField
           control={control}
@@ -62,8 +68,8 @@ function OrganizationHarness({
         />
         <TextField
           control={control}
-          name="organizationEmail"
-          label="Organization email"
+          name="representativeEmail"
+          label="Representative email"
           type="email"
         />
         <PasswordField
@@ -89,7 +95,7 @@ function OrganizationHarness({
           control={control}
           name="phoneType"
           label="Phone type"
-          options={toOptions(PHONE_TYPES)}
+          options={PHONE_TYPE_OPTIONS}
           required
         />
         <TextField
@@ -161,6 +167,7 @@ function change(label: string, value: string) {
 }
 
 function fillValidOrganization() {
+  change('Organization name', 'Richmond Food Bank Society');
   change('Name', 'Jane Doe');
   change('Email', 'jane@example.com');
   change('Password', PASSWORD);
@@ -182,8 +189,8 @@ describe('schema-driven sign-up fields', () => {
 
     fillValidOrganization();
     // Typed then cleared: must not fail the optional email check.
-    change('Organization email', 'x');
-    change('Organization email', '');
+    change('Representative email', 'x');
+    change('Representative email', '');
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -191,9 +198,11 @@ describe('schema-driven sign-up fields', () => {
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     const values = onSubmit.mock.calls[0][0] as OrgOutput;
-    expect(values.phoneNumber).toBe('+16041234567');
-    expect(values.phoneType).toBe('Cell');
-    expect(values.organizationEmail).toBeUndefined();
+    expect(values.organizationName).toBe('Richmond Food Bank Society');
+    // The schema outputs the stored phone format.
+    expect(values.phoneNumber).toBe('+1 (604)-123-4567');
+    expect(values.phoneType).toBe('cell');
+    expect(values.representativeEmail).toBeUndefined();
     expect(values.programsOrServices).toBeUndefined();
     // Stored in option order, not click order.
     expect(values.membershipInterests).toEqual(['Health', 'Housing']);
@@ -351,20 +360,16 @@ describe('field edge cases', () => {
     change('Phone number', '6041234567');
     change('Phone number', '');
     await submitHarness();
-    expect(
-      screen.getByText(
-        'Enter a valid phone number in international format (+16041234567)',
-      ),
-    ).toBeDefined();
+    expect(screen.getByText('Phone number is required')).toBeDefined();
   });
 
-  test('RadioGroupField: choosing Home submits Home', async () => {
+  test('RadioGroupField: choosing Home submits home', async () => {
     const onSubmit = vi.fn();
     render(<OrganizationHarness onSubmit={onSubmit} />);
     fillValidOrganization();
     fireEvent.click(screen.getByLabelText('Home'));
     await submitHarness();
-    expect(onSubmit.mock.calls[0][0].phoneType).toBe('Home');
+    expect(onSubmit.mock.calls[0][0].phoneType).toBe('home');
   });
 
   test('TextareaField: over the word limit turns the counter red and fails the schema', async () => {

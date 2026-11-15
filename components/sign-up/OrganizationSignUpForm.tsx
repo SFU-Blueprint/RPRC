@@ -13,7 +13,6 @@ import { MotivationSection } from '@/components/sign-up/sections/MotivationSecti
 import { ProgramsSection } from '@/components/sign-up/sections/ProgramsSection';
 import {
   ORGANIZATION_SIGN_UP_DEFAULTS,
-  SIGN_UP_FIELD_DESCRIPTIONS,
   SIGN_UP_FIELD_LABELS,
   SIGN_UP_FORM_COPY,
 } from '@/lib/constants/sign-up';
@@ -42,14 +41,27 @@ export function OrganizationSignUpForm() {
       heading={SIGN_UP_FORM_COPY.ORGANIZATION_HEADING}
       onSubmit={signUpOrganization}
     >
-      <AccountSection />
-      <ContactSection nameLabel={SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME}>
+      <AccountSection
+        emailLabel={SIGN_UP_FIELD_LABELS.ORGANIZATION_ACCOUNT_EMAIL}
+      />
+      {/* Same fields, labels and order as the old organization form. */}
+      <ContactSection
+        nameLabel={SIGN_UP_FIELD_LABELS.REPRESENTATIVE_NAME}
+        leadingFields={
+          <TextField
+            control={form.control}
+            name="organizationName"
+            label={SIGN_UP_FIELD_LABELS.ORGANIZATION_NAME}
+            required
+            inputProps={{ autoComplete: 'organization' }}
+          />
+        }
+      >
         <TextField
           control={form.control}
-          name="organizationEmail"
+          name="representativeEmail"
           type="email"
-          label={SIGN_UP_FIELD_LABELS.ORGANIZATION_EMAIL}
-          description={SIGN_UP_FIELD_DESCRIPTIONS.ORGANIZATION_EMAIL}
+          label={SIGN_UP_FIELD_LABELS.REPRESENTATIVE_EMAIL}
           inputProps={{ autoComplete: 'email' }}
         />
       </ContactSection>

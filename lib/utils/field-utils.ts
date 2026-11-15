@@ -35,7 +35,7 @@ export function getDescribedBy(
 /**
  * An empty (or whitespace only) input means "not provided". Storing
  * `undefined` instead of `''` lets optional schema fields such as
- * `organizationEmail` pass, while required fields still get their
+ * `representativeEmail` and `programsOrServices` pass, while required fields still get their
  * "is required" message from the schema.
  */
 export function toOptionalString(value: string): string | undefined {
