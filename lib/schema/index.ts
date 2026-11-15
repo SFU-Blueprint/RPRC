@@ -1,3 +1,4 @@
+export * from './account.schema';
 export * from './address.schema';
 export * from './individual.schema';
 export * from './interests.schema';

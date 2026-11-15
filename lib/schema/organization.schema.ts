@@ -1,45 +1,44 @@
 import { z } from 'zod';
 
+import { accountObject, withPasswordsMatch } from './account.schema';
 import { addressSchema } from './address.schema';
 import { interestsSchema } from './interests.schema';
 import { motivationSchema, wordLimitedStringSchema } from './motivation.schema';
-import { passwordSchema } from './password.schema';
 import { optionalProfileEmailSchema } from './profile-edit.shared.schema';
 import {
-  emailSchema,
   nameSchema,
   organizationNameSchema,
   phoneNumberSchema,
   phoneTypeSchema,
 } from './shared.schema';
 
-export const organizationSchema = z
-  .object({
-    /** The account email, which is also the organization's email (`users.email`). */
-    email: emailSchema,
-    /** Maps to `p_org_name`. Required, since `org_name` is NOT NULL. */
-    organizationName: organizationNameSchema,
-    /** The organization representative's name. Maps to `p_org_rep_name`. */
-    name: nameSchema,
-    /**
-     * Only if different from the organization email. Maps to `p_org_rep_email`.
-     * A blank input becomes undefined, as in profile edit.
-     */
-    representativeEmail: optionalProfileEmailSchema,
-    password: passwordSchema,
-    confirmPassword: z.string({ error: 'Please confirm your password' }),
-    phoneNumber: phoneNumberSchema,
-    phoneType: phoneTypeSchema,
-    address: addressSchema,
-    membershipInterests: interestsSchema,
-    motivation: motivationSchema,
-    programsOrServices: wordLimitedStringSchema(
-      'Programs or services',
-    ).optional(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    error: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
+/**
+ * The organization application without account fields (application-only
+ * mode). The account email is the organization's email (`users.email`).
+ */
+export const organizationApplicationSchema = z.object({
+  /** Maps to `p_org_name`. Required, since `org_name` is NOT NULL. */
+  organizationName: organizationNameSchema,
+  /** The organization representative's name. Maps to `p_org_rep_name`. */
+  name: nameSchema,
+  /**
+   * Only if different from the organization email. Maps to `p_org_rep_email`.
+   * A blank input becomes undefined, as in profile edit.
+   */
+  representativeEmail: optionalProfileEmailSchema,
+  phoneNumber: phoneNumberSchema,
+  phoneType: phoneTypeSchema,
+  address: addressSchema,
+  membershipInterests: interestsSchema,
+  motivation: motivationSchema,
+  programsOrServices: wordLimitedStringSchema(
+    'Programs or services',
+  ).optional(),
+});
+
+/** Sign-up: account + organization application. */
+export const organizationSchema = withPasswordsMatch(
+  organizationApplicationSchema.extend(accountObject.shape),
+);
 
 export type OrganizationApplication = z.infer<typeof organizationSchema>;
