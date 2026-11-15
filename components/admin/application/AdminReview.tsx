@@ -60,7 +60,8 @@ export default function AdminReview({
           </p>
         </div>
         <div className="pl-8">
-          {waiverDecision !== null && (
+          {/* No waiver decision (null or undefined): the review didn't decide one. */}
+          {waiverDecision != null && (
             <div>
               <p className="text-application-detail-text-secondary text-sm">
                 Fee Waived?
