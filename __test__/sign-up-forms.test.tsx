@@ -342,14 +342,10 @@ describe('submit behaviour edge cases', () => {
 
     await submit();
 
-    // React Hook Form moves focus after validation settles; under a loaded
-    // test run that can land a tick later.
-    await waitFor(
-      () =>
-        expect(document.activeElement).toBe(
-          byLabel(SIGN_UP_FIELD_LABELS.EMAIL),
-        ),
-      { timeout: 5000 },
+    // Focus moves once the submission has settled and the fieldset is
+    // enabled again (SignUpFormInterface).
+    await waitFor(() =>
+      expect(document.activeElement).toBe(byLabel(SIGN_UP_FIELD_LABELS.EMAIL)),
     );
   });
 

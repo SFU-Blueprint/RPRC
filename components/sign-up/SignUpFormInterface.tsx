@@ -56,7 +56,20 @@ export function SignUpFormInterface<TInput extends FieldValues, TValues>({
     submittedIn: SignUpFormMode;
   } | null>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [invalidSubmits, setInvalidSubmits] = useState(0);
   const { isSubmitting } = form.formState;
+
+  // After an invalid submit, focus the first invalid field in page order.
+  // React Hook Form's own focus runs while `isSubmitting` is still true, when
+  // the <fieldset disabled> may already have disabled every input, so it can
+  // miss. This runs once the fieldset is enabled again.
+  useEffect(() => {
+    if (invalidSubmits === 0 || isSubmitting) return;
+    formRef.current
+      ?.querySelector<HTMLElement>('[aria-invalid="true"]')
+      ?.focus();
+  }, [invalidSubmits, isSubmitting]);
 
   useEffect(() => {
     if (!failure) return;
@@ -125,9 +138,12 @@ export function SignUpFormInterface<TInput extends FieldValues, TValues>({
 
       <FormProvider {...form}>
         <form
+          ref={formRef}
           noValidate
           aria-busy={isSubmitting}
-          onSubmit={form.handleSubmit(handleValidSubmit)}
+          onSubmit={form.handleSubmit(handleValidSubmit, () =>
+            setInvalidSubmits((count) => count + 1),
+          )}
         >
           <fieldset
             disabled={isSubmitting}
