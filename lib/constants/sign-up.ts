@@ -26,7 +26,58 @@ export const SIGN_UP_FORM_COPY = {
     'To vote at the Annual General Meeting, members must be registered at least 30 days in advance.',
   NOTE_SECONDARY:
     'All memberships require renewal in January. Members who join after October 1 do not need to renew until January of the next calendar year',
+  /** Application-only mode: shown under the read-only account email. */
+  SIGNED_IN_NOTE: "You're signed in. Complete the application below.",
 } as const;
+
+const CONTACT_EMAIL = 'info@richmondprc.org';
+
+type SubmitResultCopy = {
+  title: string;
+  description?: string;
+  link?: { label: string; href: string };
+};
+
+/**
+ * Banners for a failed submission (docs/signup-integration-plan.md, 3.3).
+ * `href`s are plain paths so this file stays free of route imports.
+ */
+export const SUBMIT_RESULT_COPY = {
+  EMAIL_EXISTS: {
+    title: 'This email already has an account',
+    description: 'Log in to continue your application.',
+    link: { label: 'Log in', href: '/' },
+  },
+  DUPLICATE_ORG_PHONE: {
+    title: 'This phone number is already registered',
+    description: `An organization with this phone number has already applied. Check the number, or contact ${CONTACT_EMAIL}.`,
+  },
+  ACCOUNT_FAILED: {
+    title: "We couldn't create your account",
+    description: 'Nothing was saved, so please try again.',
+  },
+  APPLICATION_FAILED_AFTER_SIGN_UP: {
+    title: "Your account was created, but your application wasn't submitted",
+    description: `Your answers are still below. Please submit again. If it keeps failing, contact ${CONTACT_EMAIL}.`,
+  },
+  APPLICATION_FAILED: {
+    title: "Your application wasn't submitted",
+    description: `Please try again. If it keeps failing, contact ${CONTACT_EMAIL}.`,
+  },
+  ALREADY_APPLIED: {
+    title: "You've already applied",
+    link: { label: 'Go to your dashboard', href: '/membership/dashboard' },
+  },
+  NOT_SIGNED_IN: {
+    title: "You've been signed out",
+    description: 'Log in to continue your application.',
+    link: { label: 'Log in', href: '/' },
+  },
+  INVALID: {
+    title: 'Some answers need fixing',
+    description: 'Check your answers and try again.',
+  },
+} as const satisfies Record<string, SubmitResultCopy>;
 
 /** Section headings, rendered as the `<legend>` of each section. */
 export const SIGN_UP_SECTION_TITLES = {

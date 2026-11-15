@@ -7,8 +7,9 @@ export const INFO_CARDS = [
     ID: 1,
     ICON: User,
     HEADING: 'Check Your Email',
+    // Sign-up no longer sends a confirmation email (it was removed).
     DESCRIPTION:
-      'A confirmation email has been sent to your registered email address, further about your application status will be sent here.',
+      'Updates about your application status will be sent to your registered email address.',
   },
   {
     ID: 2,

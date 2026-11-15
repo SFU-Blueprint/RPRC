@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   FormProvider,
   type FieldValues,
@@ -14,15 +14,23 @@ import { Button } from '@/components/ui/button';
 import { InfoBox } from '@/components/ui/infobox';
 import { SIGN_UP_FORM_COPY } from '@/lib/constants/sign-up';
 import { cn } from '@/lib/utils';
+import type { SignUpFormMode, SubmitResult } from '@/types/sign-up-form.types';
+
+import { SubmitResultBanner } from './SubmitResultBanner';
 
 /** Form and success section share one width: full on mobile, 4/5 on large. */
 const FORM_WIDTH = 'mx-auto w-full lg:w-4/5';
 
+type Failure = Exclude<SubmitResult, { ok: true }>;
+
 type SignUpFormInterfaceProps<TInput extends FieldValues, TValues> = {
   form: UseFormReturn<TInput, unknown, TValues>;
   heading: string;
-  /** Called with schema-parsed values. Throwing means the submission failed. */
-  onSubmit: (values: TValues) => Promise<void>;
+  mode: SignUpFormMode;
+  /** Called with schema-parsed values. Throwing means an unexpected failure. */
+  onSubmit: (values: TValues) => Promise<SubmitResult>;
+  /** Called after a failed submission, e.g. to switch to application-only mode. */
+  onFailure?: (result: Failure, submittedIn: SignUpFormMode) => void;
   /** The form's sections. */
   children: ReactNode;
 };
@@ -31,26 +39,55 @@ type SignUpFormInterfaceProps<TInput extends FieldValues, TValues> = {
  * Everything both sign-up forms share:
  * - validation through the form's zod resolver (no native browser checks),
  * - every control disabled while submitting (`<fieldset disabled>`),
- * - the success section on success, a toast and a usable form on failure.
+ * - the success section on success; on failure, a banner that stays above the
+ *   form (or a toast for an unexpected error) and a usable form.
  */
 export function SignUpFormInterface<TInput extends FieldValues, TValues>({
   form,
   heading,
+  mode,
   onSubmit,
+  onFailure,
   children,
 }: SignUpFormInterfaceProps<TInput, TValues>) {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [failure, setFailure] = useState<{
+    result: Failure;
+    submittedIn: SignUpFormMode;
+  } | null>(null);
+  const bannerRef = useRef<HTMLDivElement>(null);
   const { isSubmitting } = form.formState;
 
+  useEffect(() => {
+    if (!failure) return;
+    bannerRef.current?.scrollIntoView?.({
+      behavior: 'smooth',
+      block: 'center',
+    });
+    bannerRef.current?.focus({ preventScroll: true });
+  }, [failure]);
+
   const handleValidSubmit = async (values: TValues) => {
+    const submittedIn = mode;
+    setFailure(null);
+
+    let result: SubmitResult;
     try {
-      await onSubmit(values);
-      setIsSubmitted(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      result = await onSubmit(values);
     } catch {
       // The form re-enables on its own once `isSubmitting` is false again.
       toast.error(SIGN_UP_FORM_COPY.SUBMIT_FAILED);
+      return;
     }
+
+    if (result.ok) {
+      setIsSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    setFailure({ result, submittedIn });
+    onFailure?.(result, submittedIn);
   };
 
   if (isSubmitted) {
@@ -77,6 +114,14 @@ export function SignUpFormInterface<TInput extends FieldValues, TValues>({
       >
         {heading}
       </h1>
+
+      {failure && (
+        <SubmitResultBanner
+          ref={bannerRef}
+          result={failure.result}
+          submittedIn={failure.submittedIn}
+        />
+      )}
 
       <FormProvider {...form}>
         <form
