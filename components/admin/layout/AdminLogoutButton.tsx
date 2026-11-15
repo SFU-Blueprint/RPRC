@@ -1,0 +1,41 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ROUTES } from '@/lib/constants/routes';
+import { useAuth } from '@/lib/contexts/AuthContext';
+
+/** Signs out the same way as the member navbar, then returns home. */
+export function AdminLogoutButton() {
+  const router = useRouter();
+  const { signOut } = useAuth();
+  const [pending, setPending] = useState(false);
+
+  const handleSignOut = async () => {
+    setPending(true);
+    try {
+      await signOut();
+      router.push(ROUTES.HOME);
+      router.refresh();
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      onClick={handleSignOut}
+      disabled={pending}
+      aria-label="Logout"
+      className="text-white hover:bg-white/10 hover:text-white"
+    >
+      <LogOut aria-hidden="true" />
+      <span className="hidden sm:inline">Logout</span>
+    </Button>
+  );
+}
