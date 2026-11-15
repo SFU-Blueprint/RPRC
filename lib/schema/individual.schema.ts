@@ -4,7 +4,11 @@ import { accountObject, withPasswordsMatch } from './account.schema';
 import { addressSchema } from './address.schema';
 import { interestsSchema } from './interests.schema';
 import { motivationSchema, wordLimitedStringSchema } from './motivation.schema';
-import { nameSchema, phoneNumberSchema, phoneTypeSchema } from './shared.schema';
+import {
+  nameSchema,
+  phoneNumberSchema,
+  phoneTypeSchema,
+} from './shared.schema';
 
 /** The individual application without account fields (application-only mode). */
 export const individualApplicationSchema = z.object({
