@@ -13,11 +13,6 @@ import {
   type ResendConfirmationResponse,
 } from '@/lib/constants/error-types';
 import { ROUTES } from '@/lib/constants/routes';
-import { headers } from 'next/headers';
-import type {
-  IndividualSignUpValues,
-  OrganizationSignUpValues,
-} from '@/types/sign-up-form.types';
 
 export async function signup(formData: FormData): Promise<SignupResponse> {
   const supabase = await createClient();
@@ -312,48 +307,4 @@ export async function resendConfirmationEmail(
     success: true,
     message: 'Confirmation email resent successfully',
   };
-}
-
-// ---------------------------------------------------------------------------
-// PLACEHOLDER until database integration.
-//
-// The single-page sign-up forms (/sign-up/individual, /sign-up/organization)
-// submit account + application together through these two actions. For now
-// they only wait briefly and resolve. Replace their bodies with the real
-// Supabase calls; the forms will not need to change.
-// ---------------------------------------------------------------------------
-
-/** Long enough to see the form's disabled "submitting" state. */
-const SIGN_UP_PLACEHOLDER_DELAY_MS = 1000;
-
-/** Development only: open the form with `?simulate=failure` to test the error path. */
-async function shouldSimulateSignUpFailure(): Promise<boolean> {
-  if (process.env.NODE_ENV === 'production') return false;
-
-  const referer = (await headers()).get('referer');
-  if (!referer) return false;
-
-  return new URL(referer).searchParams.get('simulate') === 'failure';
-}
-
-async function placeholderSignUp(): Promise<void> {
-  await new Promise((resolve) =>
-    setTimeout(resolve, SIGN_UP_PLACEHOLDER_DELAY_MS),
-  );
-
-  if (await shouldSimulateSignUpFailure()) {
-    throw new Error('Simulated sign-up failure');
-  }
-}
-
-export async function signUpIndividual(
-  values: IndividualSignUpValues,
-): Promise<void> {
-  await placeholderSignUp();
-}
-
-export async function signUpOrganization(
-  values: OrganizationSignUpValues,
-): Promise<void> {
-  await placeholderSignUp();
 }

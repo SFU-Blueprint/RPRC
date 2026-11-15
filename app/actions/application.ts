@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import {
   ApplicationStatus,
   PhoneType,
@@ -18,6 +19,7 @@ import {
 import { isAdmin } from '@/lib/helpers/auth-helper';
 import { isCalendarDate } from '@/lib/utils/time-utils';
 import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
+import { nullableArg } from '@/lib/utils/rpc-utils';
 import { phoneNumberSchema } from '@/lib/schema/shared.schema';
 import type { Database } from '@/types/database';
 
@@ -110,8 +112,9 @@ export async function submitIndividualApplication(
   }
 
   try {
-    // Call RPC function for individual application creation
-    const { error: rpcError } = await supabase.rpc(
+    // The application functions are service-role only; the user id comes
+    // from the session above, never from the form.
+    const { error: rpcError } = await createAdminClient().rpc(
       'create_individual_application',
       {
         p_user_id: user.id,
@@ -125,7 +128,7 @@ export async function submitIndividualApplication(
         p_postal_code: data.postalCode,
         p_reason: data.whyrpcmember,
         p_fee_waiver: data.membershipwaiver,
-        p_fee_waiver_reason: data.waiverreason || null,
+        p_fee_waiver_reason: nullableArg(data.waiverreason || null),
         p_interests: data.interests,
       },
     );
@@ -251,14 +254,15 @@ export async function submitOrganizationApplication(
   }
 
   try {
-    // Call RPC function for organization application creation
-    const { error: rpcError } = await supabase.rpc(
+    // The application functions are service-role only; the user id comes
+    // from the session above, never from the form.
+    const { error: rpcError } = await createAdminClient().rpc(
       'create_organization_application',
       {
         p_user_id: user.id,
         p_org_name: data.fullName,
-        p_org_rep_name: data.representativeName || null,
-        p_org_rep_email: data.representativeEmail || null,
+        p_org_rep_name: nullableArg(data.representativeName || null),
+        p_org_rep_email: nullableArg(data.representativeEmail || null),
         p_phone_num: storedPhone,
         p_phone_type: data.phoneType,
         p_mailing_address: data.mailingAddress,
