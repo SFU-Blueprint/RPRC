@@ -36,7 +36,7 @@ const validOrganization = {
   email: 'rep@example.com',
   organizationName: 'Richmond Food Bank Society',
   name: 'John Doe',
-  organizationEmail: 'contact@example.org',
+  representativeEmail: 'rep.personal@example.org',
   password: 'Abcdefghijklm1!',
   confirmPassword: 'Abcdefghijklm1!',
   phoneNumber: '6041234567',
@@ -240,7 +240,7 @@ describe('organizationSchema', () => {
   });
 
   test('accepts an application without the optional fields', () => {
-    const { organizationEmail, programsOrServices, ...required } =
+    const { representativeEmail, programsOrServices, ...required } =
       validOrganization;
     expect(organizationSchema.safeParse(required).success).toBe(true);
   });
@@ -250,11 +250,19 @@ describe('organizationSchema', () => {
     expect(organizationSchema.safeParse(missing).success).toBe(false);
   });
 
-  test('rejects a malformed organization email', () => {
+  test('treats a blank representative email as not provided', () => {
+    const result = organizationSchema.safeParse({
+      ...validOrganization,
+      representativeEmail: '  ',
+    });
+    expect(result.success && result.data.representativeEmail).toBeUndefined();
+  });
+
+  test('rejects a malformed representative email', () => {
     expect(
       organizationSchema.safeParse({
         ...validOrganization,
-        organizationEmail: 'not-an-email',
+        representativeEmail: 'not-an-email',
       }).success,
     ).toBe(false);
   });

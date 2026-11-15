@@ -25,7 +25,7 @@ describe('updateSession admin routing', () => {
     getUser.mockReset();
   });
 
-  it.each(['/', '/membership', '/membership/signup'])(
+  it.each(['/', '/membership', '/sign-up'])(
     'redirects a signed-in admin from %s to the admin dashboard',
     async (path) => {
       signInAs('admin');
