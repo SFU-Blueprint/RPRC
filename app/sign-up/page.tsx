@@ -1,5 +1,5 @@
-/** placeholder page until design is finalized
- * Based on the old multi-step sign-up's first step, without the email and password fields.
+/** Placeholder page until the design is finalized: choose individual or
+ * organization membership, then fill in that form (account + application).
  */
 import type { Metadata } from 'next';
 

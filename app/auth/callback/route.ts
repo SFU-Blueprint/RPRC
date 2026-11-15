@@ -5,7 +5,8 @@ import { ROUTES } from '@/lib/constants/routes'
 import { ErrorType } from '@/lib/constants/error-types'
 
 // GET /auth/callback
-// This route is used to handle the callback from the email confirmation link
+// Exchanges the code from a Supabase email link (password reset; sign-up no
+// longer sends confirmation emails)
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   

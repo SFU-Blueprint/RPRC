@@ -58,13 +58,12 @@ export const ERROR_MESSAGES: Record<
 > = {
   [ErrorType.LINK_EXPIRED]: {
     title: 'Link expired',
-    description:
-      'This confirmation link has expired. Links are valid for 24 hours. Please request a new one.',
+    description: 'This link has expired. Please request a new one.',
   },
   [ErrorType.LINK_INVALID]: {
     title: 'Invalid link',
     description:
-      'This link is invalid or has already been used. Please request a new confirmation link.',
+      'This link is invalid or has already been used. Please request a new one.',
   },
   [ErrorType.SERVER_ERROR]: {
     title: 'Something went wrong',
