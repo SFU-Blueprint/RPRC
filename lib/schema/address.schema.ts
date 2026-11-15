@@ -3,8 +3,9 @@ import { Country } from 'country-state-city';
 
 /**
  * Country names come from `country-state-city`, which is already a dependency
- * and is already the source of the province/state dropdown in
- * components/signup/inputs/AddressInformation.tsx. Keeping one source of truth
+ * and is already the source of the province/state dropdowns (lib/utils/
+ * address-utils.ts, used by the sign-up forms, and the profile edit form).
+ * Keeping one source of truth
  * means the country list and the province list can never drift apart.
  */
 export const COUNTRY_NAMES = Country.getAllCountries().map(

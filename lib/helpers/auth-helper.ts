@@ -44,25 +44,3 @@ export async function isAdmin(): Promise<boolean> {
   const user = await getUser();
   return isAdminByEmail(user?.email ?? '');
 }
-
-/**
- * Check if user has an application
- */
-export async function hasApplication(userId: string): Promise<boolean> {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/application?userId=${userId}`,
-      { cache: 'no-store' },
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      return !!data.application;
-    }
-
-    return false;
-  } catch (error) {
-    console.error('Error checking application:', error);
-    return false;
-  }
-}

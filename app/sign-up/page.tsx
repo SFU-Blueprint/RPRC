@@ -1,5 +1,5 @@
-/** placeholder page until design is finalized
- * a copy of the membership/signup without the email and pass fields.
+/** Placeholder page until the design is finalized: choose individual or
+ * organization membership, then fill in that form (account + application).
  */
 import type { Metadata } from 'next';
 
