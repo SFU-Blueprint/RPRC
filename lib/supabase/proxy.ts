@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { UserRole } from '@/lib/constants/enums';
 import { ROUTES, PROTECTED_ROUTES } from '@/lib/constants/routes';
 
 export async function updateSession(request: NextRequest) {
@@ -42,31 +43,30 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
-  const isMembershipRoute = pathname.startsWith('/membership');
   const isAdminRoute = pathname.startsWith('/admin');
-  const isSigninRoute = pathname === ROUTES.HOME;
-  const isSignupRoute =
-    pathname.startsWith(ROUTES.MEMBERSHIP_SIGNUP) || pathname === '/membership';
-  const isSigninOrSignupRoute = isSigninRoute || isSignupRoute;
+  // Exact, so e.g. "/sign-ups" doesn't count.
+  const isSignUpRoute =
+    pathname === ROUTES.MEMBERSHIP_SIGNUP ||
+    pathname.startsWith(`${ROUTES.MEMBERSHIP_SIGNUP}/`);
+  // Where logged-in users shouldn't stay: sign-in, sign-up and their entry points.
+  const isEntryRoute =
+    pathname === ROUTES.HOME || pathname === ROUTES.MEMBERSHIP || isSignUpRoute;
 
   // Check if accessing protected membership routes
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
     pathname.startsWith(route),
   );
 
+  const redirectTo = (path: string) => {
+    const url = request.nextUrl.clone();
+    url.pathname = path;
+    return NextResponse.redirect(url);
+  };
+
   if (!user) {
-    if (isProtectedRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = ROUTES.MEMBERSHIP_SIGNUP;
-      return NextResponse.redirect(url);
-    }
-
-    if (isAdminRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = ROUTES.HOME;
-      return NextResponse.redirect(url);
-    }
-
+    // The home page has the log-in form; a member whose session expired
+    // should land there, not on sign-up.
+    if (isProtectedRoute || isAdminRoute) return redirectTo(ROUTES.HOME);
     return supabaseResponse;
   }
 
@@ -75,49 +75,42 @@ export async function updateSession(request: NextRequest) {
   // Dev mode: allow authenticated admin users to access all routes, but send them
   // to the admin dashboard from the sign-in and sign-up pages.
   if (isAdminUser) {
-    if (isSigninOrSignupRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = ROUTES.ADMIN_DASHBOARD;
-      return NextResponse.redirect(url);
-    }
+    if (isEntryRoute) return redirectTo(ROUTES.ADMIN_DASHBOARD);
     return supabaseResponse;
   }
 
-  // if user has an application, redirect to membership dashboard, otherwise redirect to membership form
-  const getMembershipLandingPath = async () => {
-    const { data: applications } = await supabase
-      .from('applications')
-      .select('id')
-      .eq('user_id', user.id)
-      .limit(1);
+  // One query for both the role and whether the member has applied.
+  const { data: profile } = await supabase
+    .from('users')
+    .select('role, applications(id)')
+    .eq('id', user.id)
+    .maybeSingle();
+  const hasApplication = (profile?.applications?.length ?? 0) > 0;
+  const signUpForm =
+    profile?.role === UserRole.INDIVIDUAL
+      ? ROUTES.SIGN_UP_INDIVIDUAL
+      : profile?.role === UserRole.ORGANIZATION
+        ? ROUTES.SIGN_UP_ORGANIZATION
+        : null;
 
-    return applications && applications.length > 0
-      ? ROUTES.MEMBERSHIP_DASHBOARD
-      : ROUTES.MEMBERSHIP_FORM;
-  };
-
-  // Logged-in users should not return to sign-in/sign-up entry points.
-  if (isSigninOrSignupRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = isAdminUser
-      ? ROUTES.ADMIN_DASHBOARD
-      : await getMembershipLandingPath();
-    return NextResponse.redirect(url);
+  // Signed in without an application (e.g. the application step failed after
+  // the account was created): finish it on the form for their role. Only
+  // entry points and /membership pages are redirected, never /auth, /error or
+  // /api, and never the Stripe return page.
+  if (!hasApplication && signUpForm) {
+    if (pathname === signUpForm) return supabaseResponse;
+    const redirectsToForm =
+      isEntryRoute ||
+      (pathname.startsWith(`${ROUTES.MEMBERSHIP}/`) &&
+        pathname !== ROUTES.MEMBERSHIP_PAYMENT_RETURN);
+    if (redirectsToForm || isAdminRoute) return redirectTo(signUpForm);
+    return supabaseResponse;
   }
 
-  // Admins are restricted to admin portal.
-  if (isAdminUser && isMembershipRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = ROUTES.ADMIN_DASHBOARD;
-    return NextResponse.redirect(url);
-  }
-
-  // Non-admin users are restricted to membership area.
-  if (!isAdminUser && isAdminRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = await getMembershipLandingPath();
-    return NextResponse.redirect(url);
-  }
+  // Members who have applied, and anyone whose role isn't individual or
+  // organization (never sent to sign-up, or they'd bounce back).
+  if (isEntryRoute || isAdminRoute)
+    return redirectTo(ROUTES.MEMBERSHIP_DASHBOARD);
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:

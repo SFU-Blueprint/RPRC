@@ -7,12 +7,14 @@ import { useRouter } from 'next/navigation';
 import { bodyStyles, headerStyles, robotoCondensed } from '@/app/fonts';
 import { MembershipInfoCard } from '@/components/signup/cards/MembershipInfoCard';
 import { Button } from '@/components/ui/button';
+import { UserRole } from '@/lib/constants/enums';
 import { ROUTES } from '@/lib/constants/routes';
+import { MEMBERSHIP_TYPE_CHOOSER_COPY as COPY } from '@/lib/constants/sign-up';
 import { cn } from '@/lib/utils';
 
 const SIGN_UP_ROUTE_BY_TYPE = {
-  individual: ROUTES.SIGN_UP_INDIVIDUAL,
-  organization: ROUTES.SIGN_UP_ORGANIZATION,
+  [UserRole.INDIVIDUAL]: ROUTES.SIGN_UP_INDIVIDUAL,
+  [UserRole.ORGANIZATION]: ROUTES.SIGN_UP_ORGANIZATION,
 } as const;
 
 /**
@@ -21,8 +23,9 @@ const SIGN_UP_ROUTE_BY_TYPE = {
  */
 export function MembershipTypeChooser() {
   const router = useRouter();
-  const [membershipType, setMembershipType] =
-    useState<keyof typeof SIGN_UP_ROUTE_BY_TYPE>('organization');
+  const [membershipType, setMembershipType] = useState<
+    keyof typeof SIGN_UP_ROUTE_BY_TYPE
+  >(UserRole.ORGANIZATION);
 
   return (
     <div className="rounded-4xl bg-card-background-gray p-8 shadow-card md:p-10 lg:p-12">
@@ -33,23 +36,23 @@ export function MembershipTypeChooser() {
           robotoCondensed.className,
         )}
       >
-        Choose Membership Type
+        {COPY.HEADING}
       </h1>
 
       <div className="flex flex-col gap-4 md:flex-row md:gap-5 lg:flex-col lg:gap-6 xl:flex-row xl:gap-8">
         <MembershipInfoCard
-          title="Individual"
-          price="$5/yr"
-          description="This is the option for individuals who want to join the RPRC. the Membership fee may be waived in special cases. The $5 fee is due after application is approved."
-          isSelected={membershipType === 'individual'}
-          onSelect={() => setMembershipType('individual')}
+          title={COPY.INDIVIDUAL.TITLE}
+          price={COPY.INDIVIDUAL.PRICE}
+          description={COPY.INDIVIDUAL.DESCRIPTION}
+          isSelected={membershipType === UserRole.INDIVIDUAL}
+          onSelect={() => setMembershipType(UserRole.INDIVIDUAL)}
         />
         <MembershipInfoCard
-          title="Organization"
-          price="$25/yr"
-          description="This option is for organizations that want to join or work with the RPRC. The $25 organization fee is due after application is accepted."
-          isSelected={membershipType === 'organization'}
-          onSelect={() => setMembershipType('organization')}
+          title={COPY.ORGANIZATION.TITLE}
+          price={COPY.ORGANIZATION.PRICE}
+          description={COPY.ORGANIZATION.DESCRIPTION}
+          isSelected={membershipType === UserRole.ORGANIZATION}
+          onSelect={() => setMembershipType(UserRole.ORGANIZATION)}
         />
       </div>
 
@@ -58,12 +61,12 @@ export function MembershipTypeChooser() {
           size="lg"
           onClick={() => router.push(SIGN_UP_ROUTE_BY_TYPE[membershipType])}
         >
-          Continue
+          {COPY.CONTINUE}
         </Button>
         <p className={cn('text-center text-content-secondary', bodyStyles.m)}>
-          Already have an account?{' '}
+          {COPY.HAVE_ACCOUNT}{' '}
           <Link href={ROUTES.HOME} className="font-medium underline">
-            Sign in here
+            {COPY.SIGN_IN}
           </Link>
         </p>
       </div>

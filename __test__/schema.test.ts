@@ -1,10 +1,16 @@
 import { describe, expect, test } from 'vitest';
 
 import { addressSchema, postalCodeSchema } from '@/lib/schema/address.schema';
-import { individualSchema } from '@/lib/schema/individual.schema';
+import {
+  individualApplicationSchema,
+  individualSchema,
+} from '@/lib/schema/individual.schema';
 import { interestsSchema } from '@/lib/schema/interests.schema';
 import { motivationSchema } from '@/lib/schema/motivation.schema';
-import { organizationSchema } from '@/lib/schema/organization.schema';
+import {
+  organizationApplicationSchema,
+  organizationSchema,
+} from '@/lib/schema/organization.schema';
 import { passwordSchema } from '@/lib/schema/password.schema';
 import {
   nameSchema,
@@ -265,5 +271,42 @@ describe('organizationSchema', () => {
         representativeEmail: 'not-an-email',
       }).success,
     ).toBe(false);
+  });
+});
+
+describe('account / application split', () => {
+  test('the application schemas leave out the account fields', () => {
+    const individual = individualApplicationSchema.parse(validIndividual);
+    expect(individual).not.toHaveProperty('email');
+    expect(individual).not.toHaveProperty('password');
+    expect(individual).not.toHaveProperty('confirmPassword');
+
+    const organization = organizationApplicationSchema.parse(validOrganization);
+    expect(organization).not.toHaveProperty('password');
+    expect(organization.organizationName).toBe(
+      validOrganization.organizationName,
+    );
+  });
+
+  test('the application schemas do not need the account fields', () => {
+    const { email, password, confirmPassword, ...application } =
+      validIndividual;
+    void email;
+    void password;
+    void confirmPassword;
+    expect(individualApplicationSchema.safeParse(application).success).toBe(
+      true,
+    );
+  });
+
+  test('"Passwords do not match" shows even while other fields are invalid', () => {
+    const result = individualSchema.safeParse({
+      ...validIndividual,
+      name: '',
+      confirmPassword: 'Different1!xyzab',
+    });
+    expect(result.success).toBe(false);
+    const messages = result.error?.issues.map((issue) => issue.message);
+    expect(messages).toContain('Passwords do not match');
   });
 });

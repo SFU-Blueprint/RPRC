@@ -15,6 +15,7 @@ export const ROUTES = {
   DONATE: '/donate',
 
   // Membership
+  MEMBERSHIP: '/membership',
   // points to new signup flow for consistency.
   MEMBERSHIP_SIGNUP: '/sign-up',
   MEMBERSHIP_FORM: '/membership/form',

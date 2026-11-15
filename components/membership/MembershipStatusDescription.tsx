@@ -1,5 +1,6 @@
 import React from 'react';
 import { ApplicationStatus, UserRole } from '@/lib/constants/enums';
+import { CONTACT_EMAILS } from '@/lib/constants/contact';
 import { APPLICATION_FEES } from '@/lib/constants/processing-fees';
 
 export function MembershipStatusDescription({
@@ -9,11 +10,12 @@ export function MembershipStatusDescription({
   status: ApplicationStatus;
   role: UserRole;
 }) {
-  console.log(role);
   const price =
     role === UserRole.ORGANIZATION
       ? APPLICATION_FEES.ORGANIZATION
       : APPLICATION_FEES.INDIVIDUAL;
+  const membershipType =
+    role === UserRole.ORGANIZATION ? 'organization' : 'individual';
 
   if (status === ApplicationStatus.ACTIVE) {
     return (
@@ -52,24 +54,15 @@ export function MembershipStatusDescription({
     );
   }
 
-  if (status === ApplicationStatus.TO_REVIEW) {
+  // Shown for first applications and renewals alike, so the wording is neutral.
+  if (
+    status === ApplicationStatus.TO_REVIEW ||
+    status === ApplicationStatus.CONFLICT
+  ) {
     return (
       <>
-        Your membership renewal is under processing. The status will be updated
-        within <strong>14 business days</strong>.
-        <br />
-        <br />
-        Please check your registered email or membership profile for updates
-        about your application.
-      </>
-    );
-  }
-
-  if (status === ApplicationStatus.CONFLICT) {
-    return (
-      <>
-        Your membership renewal is under processing. The status will be updated
-        within <strong>14 business days</strong>.
+        Your application is being reviewed. The status will be updated within{' '}
+        <strong>14 business days</strong>.
         <br />
         <br />
         Please check your registered email or membership profile for updates
@@ -85,16 +78,16 @@ export function MembershipStatusDescription({
         <strong>within 30 days</strong> to activate it.
         <br />
         <br />
-        The individual membership fee is ${price} and paid annually at the time
-        of renewal.
+        The {membershipType} membership fee is ${price} and paid annually at the
+        time of renewal.
         <br />
         <small>
           For more information, contact{' '}
           <a
-            href="mailto:rprc@gmail.com"
+            href={`mailto:${CONTACT_EMAILS.MEMBERSHIP}`}
             className="underline hover:opacity-75"
           >
-            rprc@gmail.com
+            {CONTACT_EMAILS.MEMBERSHIP}
           </a>
         </small>
       </>
@@ -108,8 +101,11 @@ export function MembershipStatusDescription({
         <br />
         <br />
         For more information, please contact us at{' '}
-        <a href="mailto:rprc@gmail.com" className="underline hover:opacity-75">
-          rprc@gmail.com
+        <a
+          href={`mailto:${CONTACT_EMAILS.MEMBERSHIP}`}
+          className="underline hover:opacity-75"
+        >
+          {CONTACT_EMAILS.MEMBERSHIP}
         </a>
         .
       </>
