@@ -30,9 +30,13 @@ export async function shouldSimulateApplicationFailure(): Promise<boolean> {
   if (process.env.NODE_ENV === 'production') return false;
   const referer = (await headers()).get('referer');
   if (!referer) return false;
-  return (
-    new URL(referer).searchParams.get('simulate') === 'application-failure'
-  );
+  try {
+    return (
+      new URL(referer).searchParams.get('simulate') === 'application-failure'
+    );
+  } catch {
+    return false;
+  }
 }
 
 /** Whether the user already has an application (any status). */

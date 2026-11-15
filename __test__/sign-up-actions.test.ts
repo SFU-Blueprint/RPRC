@@ -280,6 +280,25 @@ describe('signUpIndividual', () => {
 
     expect(await signUpIndividual(individual)).toEqual({ ok: true });
   });
+
+  test('a malformed Referer is ignored by the simulation', async () => {
+    signUpSucceeds();
+    referer.value = 'not a url';
+
+    expect(await signUpIndividual(individual)).toEqual({ ok: true });
+  });
+
+  test('no session ("Confirm email" still on): no application is created', async () => {
+    auth.signUp.mockResolvedValue({
+      data: { user: { id: USER_ID, identities: [{}] }, session: null },
+      error: null,
+    });
+
+    const result = await signUpIndividual(individual);
+
+    expect(result).toEqual({ ok: false, stage: 'account', reason: 'failed' });
+    expect(db.rpc).not.toHaveBeenCalled();
+  });
 });
 
 describe('signUpOrganization', () => {
@@ -358,7 +377,7 @@ describe('applyAsIndividual / applyAsOrganization (application only)', () => {
 
     expect(await applyAsIndividual(individualApplication)).toMatchObject({
       stage: 'application',
-      reason: 'invalid',
+      reason: 'failed',
     });
     expect(db.rpc).not.toHaveBeenCalled();
   });

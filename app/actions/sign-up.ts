@@ -57,10 +57,14 @@ async function createAccount(input: {
   if (!data.user || data.user.identities?.length === 0)
     return accountFailure('email_exists');
 
-  if (!data.session)
-    console.warn(
-      '[sign-up] no session returned: is email confirmation still enabled?',
+  // No session means "Confirm email" is still on in Supabase Auth: the user
+  // can't log in yet, so don't create an application they can't follow up on.
+  if (!data.session) {
+    console.error(
+      '[sign-up] no session returned: turn off "Confirm email" in Supabase Auth.',
     );
+    return accountFailure('failed');
+  }
 
   return { ok: true, userId: data.user.id };
 }
@@ -70,7 +74,7 @@ export async function signUpIndividual(values: unknown): Promise<SubmitResult> {
   const parsed = individualSchema.safeParse(values);
   if (!parsed.success) return accountFailure('invalid');
 
-  const { email, password, ...application } = parsed.data;
+  const { email, password, confirmPassword, ...application } = parsed.data;
   const account = await createAccount({
     email,
     password,
@@ -83,10 +87,7 @@ export async function signUpIndividual(values: unknown): Promise<SubmitResult> {
   // application-only mode (docs/signup-integration-plan.md, decision 3).
   if (await shouldSimulateApplicationFailure())
     return { ok: false, stage: 'application', reason: 'failed' };
-  return createIndividualApplication(
-    account.userId,
-    individualApplicationSchema.parse(application),
-  );
+  return createIndividualApplication(account.userId, application);
 }
 
 /** Logged out: create the account, then the organization application. */
@@ -96,7 +97,7 @@ export async function signUpOrganization(
   const parsed = organizationSchema.safeParse(values);
   if (!parsed.success) return accountFailure('invalid');
 
-  const { email, password, ...application } = parsed.data;
+  const { email, password, confirmPassword, ...application } = parsed.data;
 
   // Checked before creating the account: a conflict the user can fix shouldn't
   // leave a new account stuck without an application.
@@ -119,10 +120,7 @@ export async function signUpOrganization(
 
   if (await shouldSimulateApplicationFailure())
     return { ok: false, stage: 'application', reason: 'failed' };
-  return createOrganizationApplication(
-    account.userId,
-    organizationApplicationSchema.parse(application),
-  );
+  return createOrganizationApplication(account.userId, application);
 }
 
 type ApplicationOnlyUser =
@@ -140,13 +138,29 @@ async function getApplicationOnlyUser(
   if (!user)
     return { ok: false, stage: 'application', reason: 'not_signed_in' };
 
-  const { data: profile } = await createAdminClient()
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (profile?.role !== role)
-    return { ok: false, stage: 'application', reason: 'invalid' };
+  let profileRole: string | null | undefined;
+  try {
+    const { data, error } = await createAdminClient()
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    profileRole = data?.role;
+  } catch (error) {
+    console.error('[sign-up] user lookup failed:', error);
+    return { ok: false, stage: 'application', reason: 'failed' };
+  }
+
+  // The proxy only shows each form to its own role, so this means something
+  // is off with the account rather than with the answers.
+  if (profileRole !== role) {
+    console.error('[sign-up] role mismatch for application-only submission:', {
+      expected: role,
+      actual: profileRole ?? null,
+    });
+    return { ok: false, stage: 'application', reason: 'failed' };
+  }
 
   return { ok: true, userId: user.id };
 }
