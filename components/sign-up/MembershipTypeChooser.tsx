@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { bodyStyles, headerStyles, robotoCondensed } from '@/app/fonts';
-import { MembershipInfoCard } from '@/components/signup/cards/MembershipInfoCard';
+import { MembershipInfoCard } from '@/components/sign-up/cards/MembershipInfoCard';
 import { Button } from '@/components/ui/button';
 import { UserRole } from '@/lib/constants/enums';
 import { ROUTES } from '@/lib/constants/routes';

@@ -7,7 +7,7 @@ import { ROUTES } from '@/lib/constants/routes';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
-import { PasswordInput } from '@/components/signup/inputs/PasswordInput';
+import { PasswordInput } from '@/components/forms/inputs/PasswordInput';
 import { inter, robotoCondensed, headerStyles, bodyStyles } from '@/app/fonts';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';

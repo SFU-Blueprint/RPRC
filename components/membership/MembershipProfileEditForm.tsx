@@ -10,12 +10,12 @@ import {
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { State } from 'country-state-city';
-import { InterestCard } from '@/components/signup/cards/InterestCard';
-import { FormInput } from '@/components/signup/inputs/FormInput';
-import { FormRadioButton } from '@/components/signup/inputs/FormRadioButton';
-import { FormSelect } from '@/components/signup/inputs/FormSelect';
-import { FormTextArea } from '@/components/signup/inputs/FormTextArea';
-import { PhoneInput } from '@/components/signup/inputs/PhoneInput';
+import { InterestCard } from '@/components/membership/InterestCard';
+import { FormInput } from '@/components/forms/inputs/FormInput';
+import { FormRadioButton } from '@/components/forms/inputs/FormRadioButton';
+import { FormSelect } from '@/components/forms/inputs/FormSelect';
+import { FormTextArea } from '@/components/forms/inputs/FormTextArea';
+import { PhoneInput } from '@/components/forms/inputs/PhoneInput';
 import { ALLOWED_COUNTRIES } from '@/lib/constants/sign-up';
 import { bodyStyles, headerStyles, inter, robotoCondensed } from '@/app/fonts';
 import { MEMBERSHIP_INTERESTS } from '@/lib/constants/membership-interests';
