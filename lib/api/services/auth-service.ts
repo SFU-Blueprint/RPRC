@@ -24,9 +24,15 @@ export function subscribeToAuthChanges(
   return () => subscription.unsubscribe();
 }
 
+/**
+ * Signs out and clears the session cookies. Throws if Supabase reports an
+ * error: signOut() returns errors instead of throwing, and on failure the
+ * session is left in place.
+ */
 export async function signOutClient(): Promise<void> {
   const supabase = createClient();
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
 }
 
 export async function exchangeCodeForSession(code: string): Promise<{

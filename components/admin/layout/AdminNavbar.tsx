@@ -1,12 +1,14 @@
 import Image from 'next/image';
 import { robotoCondensed } from '@/app/fonts';
+import { AdminLogoutButton } from '@/components/admin/layout/AdminLogoutButton';
 
 export default function AdminNavbar() {
   return (
     <div
       className="
-          h-14.5 md:h-17 bg-admin-navbar sticky top-0 z-50 w-full 
-          flex items-center justify-center gap-3 
+          h-14.5 md:h-17 bg-admin-navbar sticky top-0 z-50 w-full
+          flex items-center justify-center gap-3
+          pr-14 sm:pr-0
         "
     >
       <Image
@@ -18,13 +20,16 @@ export default function AdminNavbar() {
       />
       <p
         className={`
-            ${robotoCondensed.className} 
+            ${robotoCondensed.className}
             font-medium text-signup-primary-green-500
             text-lg md:text-xl leading-[1.1]
           `}
       >
         Membership Admin Portal
       </p>
+      <div className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2">
+        <AdminLogoutButton />
+      </div>
     </div>
   );
 }
