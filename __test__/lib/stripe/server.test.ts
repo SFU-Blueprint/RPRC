@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createStripeCheckoutSession } from './server';
+import { createStripeCheckoutSession } from '@/lib/stripe/server';
 
 afterEach(() => {
   vi.unstubAllGlobals();

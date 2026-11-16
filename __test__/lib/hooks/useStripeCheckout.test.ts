@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useStripeCheckout } from './useStripeCheckout';
+import { useStripeCheckout } from '@/lib/hooks/useStripeCheckout';
 
 const CHECKOUT_FAILED = 'Checkout could not be started. Please try again.';
 

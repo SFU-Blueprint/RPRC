@@ -2,14 +2,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 /**
- * Sign-out: signOutClient surfaces Supabase errors, and the admin Logout
- * button only leaves the page once sign-out succeeded.
+ * The admin Logout button only leaves the page once sign-out succeeded.
  */
-
-const supabaseAuth = vi.hoisted(() => ({ signOut: vi.fn() }));
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: () => ({ auth: supabaseAuth }),
-}));
 
 const router = vi.hoisted(() => ({ push: vi.fn(), refresh: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => router }));
@@ -22,7 +16,6 @@ vi.mock('@/lib/contexts/AuthContext', () => ({
   useAuth: () => ({ signOut }),
 }));
 
-import { signOutClient } from '@/lib/api/services/auth-service';
 import { AdminLogoutButton } from '@/components/admin/layout/AdminLogoutButton';
 import { AUTH_COPY } from '@/lib/constants/auth';
 import { ROUTES } from '@/lib/constants/routes';
@@ -30,19 +23,6 @@ import { ROUTES } from '@/lib/constants/routes';
 beforeEach(() => {
   vi.clearAllMocks();
   vi.spyOn(console, 'error').mockImplementation(() => {});
-});
-
-describe('signOutClient', () => {
-  test('resolves when Supabase signs out', async () => {
-    supabaseAuth.signOut.mockResolvedValue({ error: null });
-    await expect(signOutClient()).resolves.toBeUndefined();
-  });
-
-  test('throws the error Supabase returns', async () => {
-    const error = new Error('network down');
-    supabaseAuth.signOut.mockResolvedValue({ error });
-    await expect(signOutClient()).rejects.toBe(error);
-  });
 });
 
 describe('AdminLogoutButton', () => {

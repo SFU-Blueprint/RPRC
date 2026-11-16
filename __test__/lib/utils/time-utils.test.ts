@@ -3,7 +3,7 @@ import {
   formatCalendarDate,
   getLocalDateString,
   isCalendarDate,
-} from './time-utils';
+} from '@/lib/utils/time-utils';
 
 describe('formatCalendarDate', () => {
   it('formats the calendar date as given, regardless of time zone', () => {

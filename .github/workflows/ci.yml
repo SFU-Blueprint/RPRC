@@ -46,7 +46,7 @@ jobs:
             | xargs -0 -r npx prettier --check
 
       - name: Tests
-        run: npx vitest run --passWithNoTests
+        run: npx vitest run
 
       - name: Build
         run: npm run build
