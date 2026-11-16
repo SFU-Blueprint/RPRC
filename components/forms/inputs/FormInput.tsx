@@ -52,9 +52,9 @@ export function FormInput({
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            showValidation && error && "border-destructive bg-destructive/5",
-            showValidation && value && !error && "border-green-500",
-            "bg-white"
+            showValidation && error && 'border-destructive bg-destructive/5',
+            showValidation && value && !error && 'border-green-500',
+            'bg-white',
           )}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={
@@ -85,10 +85,7 @@ export function FormInput({
         </p>
       ) : (
         helperText && (
-          <p
-            id={`${label}-helper`}
-            className="text-sm text-muted-foreground"
-          >
+          <p id={`${label}-helper`} className="text-sm text-muted-foreground">
             {helperText}
           </p>
         )

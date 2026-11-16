@@ -55,7 +55,9 @@ function ResetPasswordForm() {
       const { error: exchangeError } = await exchangeCodeForSession(code);
 
       if (exchangeError) {
-        console.error('Error exchanging code for session, redirecting to error page');
+        console.error(
+          'Error exchanging code for session, redirecting to error page',
+        );
         router.replace(`${ROUTES.ERROR}?type=${ErrorType.LINK_INVALID}`);
         return;
       }
@@ -207,11 +209,13 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <React.Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner className="size-6 text-gray-600" />
-      </div>
-    }>
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Spinner className="size-6 text-gray-600" />
+        </div>
+      }
+    >
       <ResetPasswordForm />
     </React.Suspense>
   );

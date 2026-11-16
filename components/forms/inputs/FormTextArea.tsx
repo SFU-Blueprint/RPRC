@@ -30,14 +30,18 @@ export function FormTextArea({
   rows = 5,
   disabled = false,
   showValidation = false,
-  required = false
+  required = false,
 }: FormTextAreaProps) {
   return (
     <div className="w-full flex flex-col gap-2">
       {/* Label - Bold with Roboto Condensed */}
       <Label
         htmlFor={label}
-        className={cn("text-gray-900", headerStyles.mResponsive, robotoCondensed.className)}
+        className={cn(
+          'text-gray-900',
+          headerStyles.mResponsive,
+          robotoCondensed.className,
+        )}
       >
         {label}
       </Label>
@@ -52,9 +56,9 @@ export function FormTextArea({
           rows={rows}
           disabled={disabled}
           className={cn(
-            "rounded-[20px] resize-vertical",
-            showValidation && error && "border-destructive bg-destructive/5",
-            showValidation && value && !error && "border-green-500"
+            'rounded-[20px] resize-vertical',
+            showValidation && error && 'border-destructive bg-destructive/5',
+            showValidation && value && !error && 'border-green-500',
           )}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={
@@ -85,10 +89,7 @@ export function FormTextArea({
         </p>
       ) : (
         helperText && (
-          <p
-            id={`${label}-helper`}
-            className="text-sm text-muted-foreground"
-          >
+          <p id={`${label}-helper`} className="text-sm text-muted-foreground">
             {helperText}
           </p>
         )

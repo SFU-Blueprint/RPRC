@@ -21,12 +21,12 @@ export function InterestCard({
       variant="outline"
       onClick={onToggle}
       className={cn(
-        "w-full px-4 py-2 h-auto",
-        "border-1 border-gray-600",
-        "rounded-full",
-        "flex items-center justify-center gap-3",
-        "hover:hover:bg-signup-neutral-200",
-        isSelected ? "bg-signup-neutral-200" : "bg-signup-off-white",
+        'w-full px-4 py-2 h-auto',
+        'border-1 border-gray-600',
+        'rounded-full',
+        'flex items-center justify-center gap-3',
+        'hover:hover:bg-signup-neutral-200',
+        isSelected ? 'bg-signup-neutral-200' : 'bg-signup-off-white',
       )}
       aria-pressed={isSelected}
       aria-label={`${isSelected ? 'Deselect' : 'Select'} ${label}`}
@@ -39,9 +39,7 @@ export function InterestCard({
       )}
 
       {/* Label */}
-      <span className="text-gray-800 font-medium">
-        {label}
-      </span>
+      <span className="text-gray-800 font-medium">{label}</span>
     </Button>
   );
 }

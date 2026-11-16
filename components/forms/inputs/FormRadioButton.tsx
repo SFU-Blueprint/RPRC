@@ -36,14 +36,16 @@ export function FormRadioButton({
         {/* Custom Radio Circle */}
         <div
           className={cn(
-            "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200",
+            'w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200',
             checked
-              ? "bg-primary border-primary"
-              : "bg-background border-input group-hover:border-primary/50"
+              ? 'bg-primary border-primary'
+              : 'bg-background border-input group-hover:border-primary/50',
           )}
         >
           {/* Inner white dot when selected */}
-          {checked && <div className="w-2.5 h-2.5 bg-primary-foreground rounded-full" />}
+          {checked && (
+            <div className="w-2.5 h-2.5 bg-primary-foreground rounded-full" />
+          )}
         </div>
       </div>
 

@@ -50,7 +50,9 @@ export const HomePageForm = () => {
         error &&
         typeof error === 'object' &&
         'digest' in error &&
-        String((error as { digest?: string }).digest).startsWith('NEXT_REDIRECT')
+        String((error as { digest?: string }).digest).startsWith(
+          'NEXT_REDIRECT',
+        )
       ) {
         throw error;
       }
@@ -68,8 +70,8 @@ export const HomePageForm = () => {
       </h3>
 
       <p className="text-gray-700 text-xs mb-6">
-        Sign in to your account to access your membership profile, view
-        upcoming events, and manage your preferences.
+        Sign in to your account to access your membership profile, view upcoming
+        events, and manage your preferences.
       </p>
 
       {error && (
