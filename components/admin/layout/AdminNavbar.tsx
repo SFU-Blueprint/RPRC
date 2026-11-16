@@ -8,6 +8,7 @@ export default function AdminNavbar() {
       className="
           h-14.5 md:h-17 bg-admin-navbar sticky top-0 z-50 w-full
           flex items-center justify-center gap-3
+          pr-14 sm:pr-0
         "
     >
       <Image

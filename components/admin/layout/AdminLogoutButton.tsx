@@ -3,11 +3,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { AUTH_COPY } from '@/lib/constants/auth';
 import { ROUTES } from '@/lib/constants/routes';
 import { useAuth } from '@/lib/contexts/AuthContext';
 
-/** Signs out the same way as the member navbar, then returns home. */
+/**
+ * Signs out the same way as the member navbar, then returns home. On failure
+ * the admin stays signed in and sees a toast.
+ */
 export function AdminLogoutButton() {
   const router = useRouter();
   const { signOut } = useAuth();
@@ -17,11 +22,14 @@ export function AdminLogoutButton() {
     setPending(true);
     try {
       await signOut();
-      router.push(ROUTES.HOME);
-      router.refresh();
-    } finally {
+    } catch (error) {
+      console.error('[auth] sign-out failed:', error);
+      toast.error(AUTH_COPY.SIGN_OUT_FAILED);
       setPending(false);
+      return;
     }
+    router.push(ROUTES.HOME);
+    router.refresh();
   };
 
   return (

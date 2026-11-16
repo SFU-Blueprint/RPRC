@@ -14,6 +14,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
+import { AUTH_COPY } from '@/lib/constants/auth';
 import { ROUTES } from '@/lib/constants/routes';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import {
@@ -42,17 +44,25 @@ export function Navbar({ initialUser }: NavbarProps) {
     () => getAvatarFallbackText(displayName),
     [displayName],
   );
-  const avatarUrl = useMemo(() => getDefaultAvatarUrl(displayName), [displayName]);
-  const avatarHref =
-    user
-      ? (user?.user_metadata?.role === 'admin'
-        ? ROUTES.ADMIN_DASHBOARD
-        : ROUTES.MEMBERSHIP_DASHBOARD)
-      : initialUser.avatarHref;
+  const avatarUrl = useMemo(
+    () => getDefaultAvatarUrl(displayName),
+    [displayName],
+  );
+  const avatarHref = user
+    ? user?.user_metadata?.role === 'admin'
+      ? ROUTES.ADMIN_DASHBOARD
+      : ROUTES.MEMBERSHIP_DASHBOARD
+    : initialUser.avatarHref;
   const isAuthenticated = user ? true : initialUser.isAuthenticated;
 
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('[auth] sign-out failed:', error);
+      toast.error(AUTH_COPY.SIGN_OUT_FAILED);
+      return;
+    }
     router.push(ROUTES.HOME);
     router.refresh();
   };

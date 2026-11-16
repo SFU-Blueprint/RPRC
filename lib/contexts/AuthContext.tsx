@@ -37,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return unsubscribe;
   }, []);
 
+  // Throws if sign-out fails; the user is only cleared once it succeeds.
   const signOut = async () => {
     await signOutClient();
     setUser(null);
