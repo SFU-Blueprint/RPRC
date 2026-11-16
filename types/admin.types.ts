@@ -128,3 +128,19 @@ export type AdminApplicationPageData = {
   details: AdminApplicationDetailsData;
   reviewHistory: ReviewHistoryItem[];
 };
+
+/** Input for the `submitApplicationReview` server action. */
+export type SubmitApplicationReviewInput = {
+  appId: string;
+  reviewerName: string;
+  reviewDate: string;
+  decision: Database['public']['Enums']['review_decision'];
+  reason: string;
+  waiverDecision?: Database['public']['Enums']['review_decision'];
+  waiverReason?: string;
+};
+
+export type SubmitApplicationReviewResult = {
+  success: boolean;
+  error?: string;
+};

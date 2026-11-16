@@ -4,6 +4,8 @@ import { getStripeCheckoutSession } from '@/lib/stripe/server';
 import type { StripeCheckoutSession } from '@/types/payment.types';
 import { fulfillCheckoutSession } from '@/lib/api/services/server/payment-service';
 import { PaymentTransactionStatus } from '@/lib/constants/enums';
+import { PAYMENT_RETURN_COPY as COPY } from '@/lib/constants/payments';
+import { PAYMENT_CURRENCY } from '@/lib/constants/processing-fees';
 import { ROUTES } from '@/lib/constants/routes';
 
 type SearchParams = Promise<{ session_id?: string }>;
@@ -44,37 +46,37 @@ export default async function MembershipPaymentReturnPage({
   const paid = recordedStatus === PaymentTransactionStatus.SUCCEEDED;
   const processing = recordedStatus === PaymentTransactionStatus.PROCESSING;
   const amount = session
-    ? `${session.currency?.toUpperCase() ?? 'CAD'} $${((session.amount_total ?? 0) / 100).toFixed(2)}`
+    ? `${(session.currency ?? PAYMENT_CURRENCY).toUpperCase()} $${((session.amount_total ?? 0) / 100).toFixed(2)}`
     : '';
 
   const message = !sessionId
-    ? 'No checkout session was provided.'
+    ? COPY.NO_SESSION
     : !user
-      ? 'Please sign in to view your payment status.'
+      ? COPY.SIGN_IN_REQUIRED
       : !session
-        ? 'We could not confirm this payment. If you were charged, it will appear on your dashboard shortly. Otherwise, try again from your dashboard.'
+        ? COPY.UNCONFIRMED
         : paid
-          ? `Your payment of ${amount} was received and your membership is now active.`
+          ? COPY.paid(amount)
           : processing
-            ? `Your payment of ${amount} is processing. Your membership will activate once it clears.`
-            : `Stripe reports payment status “${session.payment_status ?? 'unknown'}”. No membership changes were made.`;
+            ? COPY.processing(amount)
+            : COPY.otherStatus(session.payment_status ?? 'unknown');
 
   return (
     <main className="mx-auto max-w-xl px-5 py-16">
       <section className="rounded-3xl border bg-white p-8 shadow-sm">
         <h1 className="text-2xl font-semibold">
           {paid
-            ? 'Payment received'
+            ? COPY.HEADING_PAID
             : processing
-              ? 'Payment processing'
-              : 'Payment status'}
+              ? COPY.HEADING_PROCESSING
+              : COPY.HEADING_DEFAULT}
         </h1>
         <p className="mt-3 text-content-secondary">{message}</p>
         <Link
           className="mt-6 inline-block underline"
           href={ROUTES.MEMBERSHIP_DASHBOARD}
         >
-          Return to membership dashboard
+          {COPY.BACK_TO_DASHBOARD}
         </Link>
       </section>
     </main>

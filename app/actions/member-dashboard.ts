@@ -4,7 +4,11 @@ import { revalidatePath } from 'next/cache';
 import { getMemberDashboardData } from '@/lib/api/services/server/member-dashboard-service';
 import { createClient, type SupabaseServerClient } from '@/lib/supabase/server';
 import { ApplicationStatus } from '@/lib/constants/enums';
-import { ApplicationErrorCode } from '@/lib/constants/application-errors';
+import {
+  ActionErrorMessage,
+  ApplicationErrorCode,
+  MembershipErrorMessage,
+} from '@/lib/constants/application-errors';
 import {
   PROFILE_EDITABLE_STATUSES,
   RESUBMITTABLE_STATUSES,
@@ -54,7 +58,9 @@ export async function submitMembershipProfileUpdate(
   if (!parsed.success) {
     return {
       success: false,
-      error: parsed.error.issues[0]?.message ?? 'Invalid profile details',
+      error:
+        parsed.error.issues[0]?.message ??
+        MembershipErrorMessage.INVALID_PROFILE,
       code: ApplicationErrorCode.VALIDATION_ERROR,
     };
   }
@@ -65,25 +71,24 @@ export async function submitMembershipProfileUpdate(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) {
-    return { success: false, error: 'User not authenticated' };
+    return { success: false, error: ActionErrorMessage.UNAUTHENTICATED };
   }
 
   const application = await getLatestApplication(supabase, user.id);
   if (!application) {
-    return { success: false, error: 'Application not found' };
+    return { success: false, error: ActionErrorMessage.APPLICATION_NOT_FOUND };
   }
   if (application.type !== values.role) {
     return {
       success: false,
-      error: 'Profile type does not match your application',
+      error: MembershipErrorMessage.PROFILE_TYPE_MISMATCH,
       code: ApplicationErrorCode.VALIDATION_ERROR,
     };
   }
   if (!PROFILE_EDITABLE_STATUSES.includes(application.status)) {
     return {
       success: false,
-      error:
-        'Your profile cannot be edited while your application is being processed',
+      error: MembershipErrorMessage.PROFILE_LOCKED,
       code: ApplicationErrorCode.VALIDATION_ERROR,
     };
   }
@@ -119,7 +124,7 @@ export async function submitMembershipProfileUpdate(
     console.error('Membership profile update error:', rpcError);
     return {
       success: false,
-      error: 'Failed to save membership profile',
+      error: MembershipErrorMessage.PROFILE_SAVE_FAILED,
       code: ApplicationErrorCode.SERVER_ERROR,
     };
   }
@@ -141,17 +146,20 @@ export async function submitMembershipRenewal(): Promise<MembershipActionResult>
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      return { success: false, error: 'User not authenticated' };
+      return { success: false, error: ActionErrorMessage.UNAUTHENTICATED };
     }
 
     const application = await getLatestApplication(supabase, user.id);
     if (!application) {
-      return { success: false, error: 'Application not found' };
+      return {
+        success: false,
+        error: ActionErrorMessage.APPLICATION_NOT_FOUND,
+      };
     }
     if (!RESUBMITTABLE_STATUSES.includes(application.status)) {
       return {
         success: false,
-        error: 'Your membership cannot be renewed right now',
+        error: MembershipErrorMessage.RENEWAL_NOT_ALLOWED,
       };
     }
 
@@ -165,7 +173,7 @@ export async function submitMembershipRenewal(): Promise<MembershipActionResult>
       .eq('application_id', application.id);
 
     if (deleteError) {
-      return { success: false, error: 'Failed to submit renewal' };
+      return { success: false, error: MembershipErrorMessage.RENEWAL_FAILED };
     }
 
     // Only move the row if it is still in the status we checked.
@@ -177,13 +185,13 @@ export async function submitMembershipRenewal(): Promise<MembershipActionResult>
       .select('id');
 
     if (updateError || !updated?.length) {
-      return { success: false, error: 'Failed to submit renewal' };
+      return { success: false, error: MembershipErrorMessage.RENEWAL_FAILED };
     }
 
     revalidatePath(ROUTES.MEMBERSHIP_DASHBOARD);
 
     return { success: true };
   } catch {
-    return { success: false, error: 'An unexpected error occurred' };
+    return { success: false, error: ActionErrorMessage.UNEXPECTED };
   }
 }

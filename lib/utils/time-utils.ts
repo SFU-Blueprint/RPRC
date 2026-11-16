@@ -59,3 +59,7 @@ export function formatDisplayDate(date: string) {
   if (Number.isNaN(parsed.getTime())) return date;
   return formatDateWithOrdinal(parsed);
 }
+
+/** Resolves after `ms` milliseconds. */
+export const sleep = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));

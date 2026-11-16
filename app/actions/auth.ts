@@ -9,6 +9,7 @@ import {
   type ForgotPasswordResponse,
   type ResetPasswordResponse,
 } from '@/lib/constants/error-types';
+import { AUTH_COPY } from '@/lib/constants/auth';
 import { ROUTES } from '@/lib/constants/routes';
 
 export async function login(formData: FormData): Promise<LoginResponse> {
@@ -20,7 +21,7 @@ export async function login(formData: FormData): Promise<LoginResponse> {
   // Validate inputs
   if (!email || !password) {
     return {
-      error: 'Email and password are required',
+      error: AUTH_COPY.CREDENTIALS_REQUIRED,
       code: AuthErrorCode.VALIDATION_ERROR,
     };
   }
@@ -36,20 +37,20 @@ export async function login(formData: FormData): Promise<LoginResponse> {
     // Handle specific auth errors
     if (error.message?.includes('Invalid login credentials')) {
       return {
-        error: 'Invalid email or password',
+        error: AUTH_COPY.INVALID_CREDENTIALS,
         code: AuthErrorCode.INVALID_CREDENTIALS,
       };
     }
 
     return {
-      error: error.message || 'Failed to sign in',
+      error: error.message || AUTH_COPY.SIGN_IN_FAILED,
       code: AuthErrorCode.SERVER_ERROR,
     };
   }
 
   if (!data.user) {
     return {
-      error: 'Failed to sign in',
+      error: AUTH_COPY.SIGN_IN_FAILED,
       code: AuthErrorCode.SERVER_ERROR,
     };
   }
@@ -75,7 +76,7 @@ export async function forgotPassword(
   // Validate input
   if (!email) {
     return {
-      error: 'Email is required',
+      error: AUTH_COPY.EMAIL_REQUIRED,
       code: AuthErrorCode.VALIDATION_ERROR,
     };
   }
@@ -94,21 +95,20 @@ export async function forgotPassword(
       error.message?.includes('too many')
     ) {
       return {
-        error:
-          'Please wait before requesting another email. Try again in 1 minute.',
+        error: AUTH_COPY.RESET_EMAIL_RATE_LIMITED,
         code: AuthErrorCode.RATE_LIMITED,
       };
     }
 
     return {
-      error: error.message || 'Failed to send reset email',
+      error: error.message || AUTH_COPY.RESET_EMAIL_FAILED,
       code: AuthErrorCode.SERVER_ERROR,
     };
   }
 
   return {
     success: true,
-    message: 'Password reset email sent successfully',
+    message: AUTH_COPY.RESET_EMAIL_SENT,
   };
 }
 
@@ -122,7 +122,7 @@ export async function resetPassword(
   // Basic validation - detailed validation handled by PasswordInput component
   if (!password) {
     return {
-      error: 'Password is required',
+      error: AUTH_COPY.PASSWORD_REQUIRED,
       code: AuthErrorCode.VALIDATION_ERROR,
     };
   }
@@ -147,13 +147,13 @@ export async function resetPassword(
     }
 
     return {
-      error: error.message || 'Failed to reset password',
+      error: error.message || AUTH_COPY.RESET_PASSWORD_FAILED,
       code: AuthErrorCode.SERVER_ERROR,
     };
   }
 
   return {
     success: true,
-    message: 'Password reset successfully',
+    message: AUTH_COPY.PASSWORD_RESET,
   };
 }

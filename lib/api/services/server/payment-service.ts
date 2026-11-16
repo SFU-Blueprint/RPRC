@@ -13,7 +13,15 @@ import {
   PaymentTransactionStatus,
   type ApplicationType,
 } from '@/lib/constants/enums';
-import { PaymentErrorMessage } from '@/lib/constants/payments';
+import {
+  DOUBLE_PAYMENT_MESSAGE,
+  PAYMENT_COLUMNS,
+  PaymentErrorMessage,
+  SESSION_WAIT_ATTEMPTS,
+  SESSION_WAIT_MS,
+} from '@/lib/constants/payments';
+import { PostgresErrorCode } from '@/lib/constants/postgres';
+import { sleep } from '@/lib/utils/time-utils';
 import { PAYMENT_CURRENCY } from '@/lib/constants/processing-fees';
 import type {
   CheckoutResult,
@@ -40,17 +48,6 @@ type RetireOutcome =
   /** The session's state couldn't be confirmed or changed. The payment is left open. */
   | { kind: 'failed' };
 
-const PAYMENT_COLUMNS = 'id, status, stripe_session_id, amount, created_at';
-
-// Postgres unique_violation: payments_one_open_per_application allows one open payment
-// (requires_payment_method or processing) per application.
-const UNIQUE_VIOLATION = '23505';
-
-// How long a request that lost the insert race waits for the winner to store its
-// Checkout Session id before creating (the same, idempotent) session itself.
-const SESSION_WAIT_ATTEMPTS = 6;
-const SESSION_WAIT_MS = 500;
-
 const ALREADY_PAID: CheckoutResult = {
   ok: false,
   status: 409,
@@ -62,11 +59,6 @@ const CHECKOUT_FAILED: CheckoutResult = {
   status: 502,
   error: PaymentErrorMessage.CHECKOUT_FAILED,
 };
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const DOUBLE_PAYMENT_MESSAGE =
-  '[payments] two payments for the same application and approval round were paid. Refund one.';
 
 /**
  * A payment counts for the application's current approval round if it was created after
@@ -217,7 +209,9 @@ export async function startMembershipCheckout(input: {
     .select(PAYMENT_COLUMNS)
     .single();
 
-  if (insertError?.code === UNIQUE_VIOLATION) {
+  // payments_one_open_per_application allows one open payment (requires_payment_method
+  // or processing) per application, so a unique violation means another request won.
+  if (insertError?.code === PostgresErrorCode.UNIQUE_VIOLATION) {
     // Another request created the open payment first. Use that one.
     const { data: winner, error: winnerError } = await admin
       .from('payments')
@@ -659,7 +653,7 @@ export async function fulfillCheckoutSession(
     // retired and a newer payment is open. Money already on its way takes priority over an
     // unpaid session, so retire the newer payment (or record it, if it was paid) and retry.
     if (
-      updateError?.code === UNIQUE_VIOLATION &&
+      updateError?.code === PostgresErrorCode.UNIQUE_VIOLATION &&
       resolveConflicts &&
       payment.application_id
     ) {
@@ -693,7 +687,7 @@ export async function fulfillCheckoutSession(
         }
       }
       ({ error: updateError } = await update());
-      if (updateError?.code === UNIQUE_VIOLATION) {
+      if (updateError?.code === PostgresErrorCode.UNIQUE_VIOLATION) {
         // Both payments are paid or settling. Don't fail forever: leave this one as it is
         // (its later async_payment_succeeded event can still record it) and flag a refund.
         console.error(DOUBLE_PAYMENT_MESSAGE, {

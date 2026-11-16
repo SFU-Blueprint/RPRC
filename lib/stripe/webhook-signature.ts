@@ -1,13 +1,12 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-
-const DEFAULT_TOLERANCE_SECONDS = 300;
+import { STRIPE_WEBHOOK_TOLERANCE_SECONDS } from '@/lib/constants/payments';
 
 export function verifyStripeWebhookSignature(
   payload: string,
   signatureHeader: string,
   secret: string,
   nowSeconds = Math.floor(Date.now() / 1000),
-  toleranceSeconds = DEFAULT_TOLERANCE_SECONDS,
+  toleranceSeconds = STRIPE_WEBHOOK_TOLERANCE_SECONDS,
 ) {
   const fields = signatureHeader
     .split(',')
