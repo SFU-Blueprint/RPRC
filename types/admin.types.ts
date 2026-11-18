@@ -1,4 +1,4 @@
-import { ApplicationStatus, ReviewDecision } from '@/lib/constants';
+import { APPLICATION_STATUS_TYPES, ReviewDecision } from '@/lib/constants';
 import type { Database } from '@/types/database';
 
 /** Config for one status chip: color, label, and theme (ApplicationStatus or ReviewDecision). */
@@ -45,13 +45,7 @@ export type ApplicationType = {
   applicantName: string;
   type: 'individual' | 'organization';
   dateReceived: string | Date;
-  status:
-    | 'to_review'
-    | 'rejected'
-    | 'payment_pending'
-    | 'active'
-    | 'expired'
-    | 'conflict';
+  status: ApplicationStatus;
   reviewer1: string;
   reviewer2: string;
 };
@@ -128,3 +122,10 @@ export type AdminApplicationPageData = {
   details: AdminApplicationDetailsData;
   reviewHistory: ReviewHistoryItem[];
 };
+
+export type CsvColumn<T> = {
+  header: string;
+  value: (row: T) => string | null | undefined;
+};
+
+export type ApplicationStatus = (typeof APPLICATION_STATUS_TYPES)[number]['value'];

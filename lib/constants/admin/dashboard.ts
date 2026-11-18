@@ -1,4 +1,4 @@
-import { ApplicationType, type AdminDashboardStats } from '@/types/admin.types';
+import { ApplicationStatus, type AdminDashboardStats, type ApplicationType } from '@/types/admin.types';
 
 /* Stat card types. */
 export const STAT_CARD_TYPES = ['independent', 'organization', 'toReview'] as const;
@@ -43,3 +43,11 @@ export const ADMIN_DASHBOARD_CONST = {
   ],
 };
 
+export const STATUS_LABELS = Object.fromEntries(
+  APPLICATION_STATUS_TYPES.map(({ value, label }) => [value, label])
+) as Record<ApplicationStatus, string>;
+
+export const TYPE_LABELS: Record<ApplicationType['type'], string> = {
+  individual: 'Individual',
+  organization: 'Organization',
+};

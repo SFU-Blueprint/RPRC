@@ -12,6 +12,7 @@ import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
 import { getPagination } from '@/lib/utils/pagination-utils';
 import { filterApplicationsBySearch } from '@/lib/utils/application-search-utils';
 import type { ManageApplicationsProps } from '@/types/admin.types';
+import { downloadApplicationsCsv } from '@/lib/utils/csv-utils';
 
 export default function ManageApplications({ applications }: ManageApplicationsProps) {
   const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
@@ -34,22 +35,27 @@ export default function ManageApplications({ applications }: ManageApplicationsP
   return (
     <div className="mb-20 w-full">
       {/* No backdrop on mobile; backdrop container from md up */}
-      <div
-        className="rounded-[16px] p-5 md:border-2 md:bg-[#F6F6F6] md:p-5 md:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_4px_16px_rgba(0,0,0,0.04)] lg:p-6"
-      >
-        {/* Title and Search row */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6 first:mt-0">
+      <div className="rounded-[16px] p-5 md:border-2 md:bg-[#F6F6F6] md:p-5 md:shadow-[0_2px_8px_rgba(0,0,0,0.06),0_4px_16px_rgba(0,0,0,0.04)] lg:p-6">
+        <div className="flex items-center justify-between gap-4">
           <h1
-            className={`${robotoCondensed.className} text-[30px] md:text-[32px] font-bold shrink-0`}
+            className={`${robotoCondensed.className} text-[30px] md:text-[32px] font-bold`}
           >
             Manage Applications
           </h1>
-          <div className="w-full md:w-auto [&>div]:!mt-0">
-            <AdminSearchBar value={searchQuery} onChange={setSearchQuery} />
-          </div>
+          <Button
+            type="button"
+            onClick={() => downloadApplicationsCsv(filteredBySearch)}
+            className={`${inter.className} cursor-pointer shrink-0 gap-2 h-auto font-semibold text-[14px] md:text-[16px] text-primary-black px-4.25 md:px-6.75 py-3.25 md:py-3.5 rounded-lg border-2 border-gray-400 text-nowrap leading-5 bg-transparent hover:bg-primary-black hover:text-primary-foreground hover:border-primary-black`}
+          >
+            Download List
+          </Button>
         </div>
 
-        {/* Filter Tabs */}
+        <div className="mt-6 w-full [&>div]:!mt-0">
+          <AdminSearchBar value={searchQuery} onChange={setSearchQuery} />
+        </div>
+
+        {/* Row 3: Filter Tabs */}
         <div
           className={`${inter.className} flex gap-x-4 overflow-x-auto scrollbar-hide mt-6 p-0`}
         >
