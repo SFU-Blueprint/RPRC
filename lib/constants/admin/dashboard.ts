@@ -1,7 +1,7 @@
 import {
   type AdminDashboardStats,
   type ApplicationType,
-  type CsvColumn
+  type CsvColumn,
 } from '@/types/admin.types';
 import { ApplicationStatus } from '@/lib/constants/enums';
 
