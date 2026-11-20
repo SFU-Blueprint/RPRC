@@ -2,6 +2,7 @@ import {
   ApplicationStatus,
   type AdminDashboardStats,
   type ApplicationType,
+  type CsvColumn
 } from '@/types/admin.types';
 
 /* Stat card types. */
@@ -59,3 +60,15 @@ export const TYPE_LABELS: Record<ApplicationType['type'], string> = {
   individual: 'Individual',
   organization: 'Organization',
 };
+
+export const CSV_COLUMNS: CsvColumn<ApplicationType>[] = [
+  { header: 'Applicant Name', value: (a) => a.applicantName },
+  { header: 'Application Type', value: (a) => TYPE_LABELS[a.type] ?? a.type },
+  {
+    header: 'Date Received',
+    value: (a) => new Date(a.dateReceived).toLocaleDateString('en-CA'),
+  },
+  { header: 'Status', value: (a) => STATUS_LABELS[a.status] ?? a.status },
+  { header: 'Reviewer 1', value: (a) => a.reviewer1 },
+  { header: 'Reviewer 2', value: (a) => a.reviewer2 },
+];

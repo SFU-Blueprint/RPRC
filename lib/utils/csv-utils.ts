@@ -1,17 +1,5 @@
-import { STATUS_LABELS, TYPE_LABELS } from '@/lib/constants/admin';
-import type { CsvColumn, ApplicationType } from '@/types/admin.types';
-
-const CSV_COLUMNS: CsvColumn<ApplicationType>[] = [
-  { header: 'Applicant Name', value: (a) => a.applicantName },
-  { header: 'Application Type', value: (a) => TYPE_LABELS[a.type] ?? a.type },
-  {
-    header: 'Date Received',
-    value: (a) => new Date(a.dateReceived).toLocaleDateString('en-CA'),
-  },
-  { header: 'Status', value: (a) => STATUS_LABELS[a.status] ?? a.status },
-  { header: 'Reviewer 1', value: (a) => a.reviewer1 },
-  { header: 'Reviewer 2', value: (a) => a.reviewer2 },
-];
+import { CSV_COLUMNS } from '@/lib/constants/admin';
+import type { ApplicationType } from '@/types/admin.types';
 
 const escape = (v: string | null | undefined): string => {
   const text = v ?? '';
