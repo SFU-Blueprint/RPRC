@@ -8,15 +8,6 @@ type Tab = {
   value: string;
 };
 
-const TAB_VALUE_TO_STATUS: Record<string, string> = {
-  toReview: 'to_review',
-  paymentPending: 'payment_pending',
-  active: 'active',
-  expired: 'expired',
-  rejected: 'rejected',
-  conflict: 'conflict',
-};
-
 type UseApplicationListOptions = {
   applications: ApplicationType[];
   currentTab: Tab;
@@ -46,10 +37,7 @@ export function useApplicationList({
 
   const filteredApplications = useMemo(() => {
     if (currentTab.value === 'all') return applications;
-    const status = TAB_VALUE_TO_STATUS[currentTab.value];
-    return status
-      ? applications.filter((app) => app.status === status)
-      : applications;
+    return applications.filter((app) => app.status === currentTab.value);
   }, [applications, currentTab]);
 
   const paginatedApplications = useMemo(() => {
