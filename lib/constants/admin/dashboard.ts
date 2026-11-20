@@ -1,9 +1,9 @@
 import {
-  ApplicationStatus,
   type AdminDashboardStats,
   type ApplicationType,
   type CsvColumn
 } from '@/types/admin.types';
+import { ApplicationStatus } from '@/lib/constants/enums';
 
 /* Stat card types. */
 export const STAT_CARD_TYPES = [
@@ -24,12 +24,12 @@ export function toStatCardsData(stats: AdminDashboardStats): StatCardsData {
 
 /* Single source of truth for application status types.  */
 export const APPLICATION_STATUS_TYPES = [
-  { value: 'toReview', label: 'To Review' },
-  { value: 'paymentPending', label: 'Payment Pending' },
-  { value: 'active', label: 'Active' },
-  { value: 'expired', label: 'Expired' },
-  { value: 'conflict', label: 'Conflict' },
-  { value: 'rejected', label: 'Rejected' },
+  { value: ApplicationStatus.TO_REVIEW, label: 'To Review' },
+  { value: ApplicationStatus.PAYMENT_PENDING, label: 'Payment Pending' },
+  { value: ApplicationStatus.ACTIVE, label: 'Active' },
+  { value: ApplicationStatus.EXPIRED, label: 'Expired' },
+  { value: ApplicationStatus.CONFLICT, label: 'Conflict' },
+  { value: ApplicationStatus.REJECTED, label: 'Rejected' },
 ] as const;
 
 const ALL_TAB = { value: 'all', label: 'All' } as const;
@@ -52,9 +52,15 @@ export const ADMIN_DASHBOARD_CONST = {
   ],
 };
 
-export const STATUS_LABELS = Object.fromEntries(
-  APPLICATION_STATUS_TYPES.map(({ value, label }) => [value, label]),
-) as Record<ApplicationStatus, string>;
+export const STATUS_LABELS: Record<ApplicationStatus, string> = {
+  [ApplicationStatus.TO_REVIEW]: 'To Review',
+  [ApplicationStatus.PAYMENT_PENDING]: 'Payment Pending',
+  [ApplicationStatus.ACTIVE]: 'Active',
+  [ApplicationStatus.EXPIRES_SOON]: 'Expires Soon',
+  [ApplicationStatus.EXPIRED]: 'Expired',
+  [ApplicationStatus.CONFLICT]: 'Conflict',
+  [ApplicationStatus.REJECTED]: 'Rejected',
+};
 
 export const TYPE_LABELS: Record<ApplicationType['type'], string> = {
   individual: 'Individual',

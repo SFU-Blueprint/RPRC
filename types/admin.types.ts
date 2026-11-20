@@ -1,5 +1,6 @@
-import { APPLICATION_STATUS_TYPES, ReviewDecision } from '@/lib/constants';
+import { ReviewDecision } from '@/lib/constants';
 import type { Database } from '@/types/database';
+import type { ApplicationStatus } from '@/lib/constants/enums';
 
 /** Config for one status chip: color, label, and theme (ApplicationStatus or ReviewDecision). */
 export type StatusChipType = {
@@ -127,6 +128,3 @@ export type CsvColumn<T> = {
   header: string;
   value: (row: T) => string | null | undefined;
 };
-
-export type ApplicationStatus =
-  (typeof APPLICATION_STATUS_TYPES)[number]['value'];
