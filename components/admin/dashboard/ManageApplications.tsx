@@ -14,22 +14,24 @@ import { filterApplicationsBySearch } from '@/lib/utils/application-search-utils
 import type { ManageApplicationsProps } from '@/types/admin.types';
 import { downloadApplicationsCsv } from '@/lib/utils/csv-utils';
 
-export default function ManageApplications({ applications }: ManageApplicationsProps) {
+export default function ManageApplications({
+  applications,
+}: ManageApplicationsProps) {
   const [currentTab, setCurrentTab] = useState(ADMIN_DASHBOARD_CONST.TABS[0]);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredBySearch = useMemo(
     () => filterApplicationsBySearch(applications, searchQuery),
-    [applications, searchQuery]
+    [applications, searchQuery],
   );
 
   const paginationMobile = useMemo(
     () => getPagination(filteredBySearch.length, 5),
-    [filteredBySearch.length]
+    [filteredBySearch.length],
   );
   const paginationDesktop = useMemo(
     () => getPagination(filteredBySearch.length, 10),
-    [filteredBySearch.length]
+    [filteredBySearch.length],
   );
 
   return (
@@ -67,10 +69,11 @@ export default function ManageApplications({ applications }: ManageApplicationsP
                 type="button"
                 onClick={() => setCurrentTab(tab)}
                 variant="outline"
-                className={`cursor-pointer h-auto font-semibold text-[14px] md:text-[16px] px-4.25 md:px-6.75 py-3.25 md:py-3.5 rounded-lg border-2 border-gray-400 text-nowrap leading-5 ${isActive
-                  ? 'bg-primary-black text-primary-foreground border-primary-black hover:bg-primary-black hover:text-primary-foreground'
-                  : 'bg-transparent hover:bg-primary-black hover:text-primary-foreground hover:border-primary-black'
-                  }`}
+                className={`cursor-pointer h-auto font-semibold text-[14px] md:text-[16px] px-4.25 md:px-6.75 py-3.25 md:py-3.5 rounded-lg border-2 border-gray-400 text-nowrap leading-5 ${
+                  isActive
+                    ? 'bg-primary-black text-primary-foreground border-primary-black hover:bg-primary-black hover:text-primary-foreground'
+                    : 'bg-transparent hover:bg-primary-black hover:text-primary-foreground hover:border-primary-black'
+                }`}
               >
                 {tab.label}
               </Button>

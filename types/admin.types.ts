@@ -128,4 +128,5 @@ export type CsvColumn<T> = {
   value: (row: T) => string | null | undefined;
 };
 
-export type ApplicationStatus = (typeof APPLICATION_STATUS_TYPES)[number]['value'];
+export type ApplicationStatus =
+  (typeof APPLICATION_STATUS_TYPES)[number]['value'];
