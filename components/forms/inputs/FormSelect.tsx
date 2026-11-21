@@ -45,9 +45,9 @@ export function FormSelect({
         <SelectTrigger
           id={label}
           className={cn(
-            "w-full",
-            showValidation && error && "border-destructive bg-destructive/5",
-            showValidation && value && !error && "border-green-500"
+            'w-full',
+            showValidation && error && 'border-destructive bg-destructive/5',
+            showValidation && value && !error && 'border-green-500',
           )}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? `${label}-error` : undefined}

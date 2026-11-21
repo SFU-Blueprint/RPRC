@@ -9,10 +9,10 @@ import {
   bodyStyles,
   buttonStyles,
 } from '@/app/fonts';
-import { SuccessInfoCard } from '../cards/SuccessInfoCard';
+import { SuccessInfoCard } from '@/components/sign-up/cards/SuccessInfoCard';
 import { INFO_CARDS } from '@/lib/constants/membership';
 
-export function Step3Success() {
+export function SignUpSuccess() {
   return (
     <div
       className={`bg-signup-neutral-100 rounded-[25px] shadow-[0px_-1px_2px_-1px_rgba(0,0,0,0.15),0px_1px_3px_1px_rgba(0,0,0,0.15)] p-6 sm:p-8 md:p-10 lg:p-12 w-full mx-auto ${inter.className} mt-16.25`}

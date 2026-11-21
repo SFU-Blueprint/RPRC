@@ -255,6 +255,8 @@ If the user leaves after an application failure, logging in later brings them ba
 
 ### 4.3 Keep (still used elsewhere)
 
+> **Moved since (2026-11-16):** `components/signup` was merged away. `Step3Success` is now `components/sign-up/SignUpSuccess.tsx`; `MembershipInfoCard`, `SignUpInfoBox` and `SuccessInfoCard` are in `components/sign-up/cards/`; `InterestCard` is in `components/membership/`; the `inputs/*` files are in `components/forms/inputs/`. The paths below are as they were when this plan was written.
+
 | Piece                                                                                                   | Used by                                                                           |
 | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | `Step3Success`                                                                                          | renewal (`renew-success/page.tsx:7,40`) and #66 (`SignUpFormInterface.tsx:12,59`) |

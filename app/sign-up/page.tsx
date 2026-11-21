@@ -4,7 +4,7 @@
 import type { Metadata } from 'next';
 
 import { MembershipTypeChooser } from '@/components/sign-up/MembershipTypeChooser';
-import { SignUpInfoBox } from '@/components/signup/cards/SignUpInfoBox';
+import { SignUpInfoBox } from '@/components/sign-up/cards/SignUpInfoBox';
 
 export const metadata: Metadata = {
   title: 'Choose Membership Type',

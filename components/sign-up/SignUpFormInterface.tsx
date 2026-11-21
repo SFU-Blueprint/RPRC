@@ -9,7 +9,7 @@ import {
 import { toast } from 'sonner';
 
 import { headerStyles, robotoCondensed } from '@/app/fonts';
-import { Step3Success } from '@/components/signup/Pages/Step3Success';
+import { SignUpSuccess } from '@/components/sign-up/SignUpSuccess';
 import { Button } from '@/components/ui/button';
 import { InfoBox } from '@/components/ui/infobox';
 import { SIGN_UP_FORM_COPY } from '@/lib/constants/sign-up';
@@ -108,7 +108,7 @@ export function SignUpFormInterface<TInput extends FieldValues, TValues>({
   if (isSubmitted) {
     return (
       <div className={FORM_WIDTH}>
-        <Step3Success />
+        <SignUpSuccess />
       </div>
     );
   }

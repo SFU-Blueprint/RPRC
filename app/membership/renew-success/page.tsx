@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { inter } from '@/app/fonts';
-import { Step3Success } from '@/components/signup/Pages/Step3Success';
+import { SignUpSuccess } from '@/components/sign-up/SignUpSuccess';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Spinner } from '@/components/ui/spinner';
 import MembershipProfileBanner from '@/components/membership/MembershipProfileBanner';
@@ -35,7 +35,7 @@ function MembershipRenewContent() {
       <div className="max-w-screen-2xl mx-auto pb-12 md:pb-16 lg:pb-20 mt-10">
         <div className="w-full flex justify-center">
           <div className="w-full max-w-[80%]">
-            <Step3Success />
+            <SignUpSuccess />
           </div>
         </div>
       </div>

@@ -77,9 +77,9 @@ export function PhoneInput({
             onChange={handleChange}
             placeholder="(555)-123-4567"
             className={cn(
-              showValidation && error && "border-destructive bg-destructive/5",
-              showValidation && value && !error && "border-green-500",
-              "bg-white"
+              showValidation && error && 'border-destructive bg-destructive/5',
+              showValidation && value && !error && 'border-green-500',
+              'bg-white',
             )}
             maxLength={14}
             aria-invalid={error ? 'true' : 'false'}
