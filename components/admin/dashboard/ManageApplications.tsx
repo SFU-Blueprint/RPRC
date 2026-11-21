@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ADMIN_DASHBOARD_CONST } from '@/lib/constants/admin';
 import { getPagination } from '@/lib/utils/pagination-utils';
-import { filterApplicationsBySearch } from '@/lib/utils/application-search-utils';
+import { filterApplicationsBySearch, filterApplicationsByTab } from '@/lib/utils/application-search-filter-utils';
 import type { ManageApplicationsProps } from '@/types/admin.types';
 import { downloadApplicationsCsv } from '@/lib/utils/csv-utils';
 
@@ -23,6 +23,11 @@ export default function ManageApplications({
   const filteredBySearch = useMemo(
     () => filterApplicationsBySearch(applications, searchQuery),
     [applications, searchQuery],
+  );
+
+  const filteredByTab = useMemo(
+    () => filterApplicationsByTab(filteredBySearch, currentTab.value),
+    [filteredBySearch, currentTab.value],
   );
 
   const paginationMobile = useMemo(
@@ -46,7 +51,7 @@ export default function ManageApplications({
           </h1>
           <Button
             type="button"
-            onClick={() => downloadApplicationsCsv(filteredBySearch)}
+            onClick={() => downloadApplicationsCsv(filteredByTab)}
             className={`${inter.className} cursor-pointer shrink-0 gap-2 h-auto font-semibold text-[14px] md:text-[16px] text-primary-black px-4.25 md:px-6.75 py-3.25 md:py-3.5 rounded-lg border-2 border-gray-400 text-nowrap leading-5 bg-transparent hover:bg-primary-black hover:text-primary-foreground hover:border-primary-black`}
           >
             Download List
@@ -69,11 +74,10 @@ export default function ManageApplications({
                 type="button"
                 onClick={() => setCurrentTab(tab)}
                 variant="outline"
-                className={`cursor-pointer h-auto font-semibold text-[14px] md:text-[16px] px-4.25 md:px-6.75 py-3.25 md:py-3.5 rounded-lg border-2 border-gray-400 text-nowrap leading-5 ${
-                  isActive
-                    ? 'bg-primary-black text-primary-foreground border-primary-black hover:bg-primary-black hover:text-primary-foreground'
-                    : 'bg-transparent hover:bg-primary-black hover:text-primary-foreground hover:border-primary-black'
-                }`}
+                className={`cursor-pointer h-auto font-semibold text-[14px] md:text-[16px] px-4.25 md:px-6.75 py-3.25 md:py-3.5 rounded-lg border-2 border-gray-400 text-nowrap leading-5 ${isActive
+                  ? 'bg-primary-black text-primary-foreground border-primary-black hover:bg-primary-black hover:text-primary-foreground'
+                  : 'bg-transparent hover:bg-primary-black hover:text-primary-foreground hover:border-primary-black'
+                  }`}
               >
                 {tab.label}
               </Button>

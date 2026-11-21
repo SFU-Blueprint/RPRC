@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import type { ApplicationType } from '@/types/admin.types';
+import { filterApplicationsByTab } from '@/lib/utils/application-search-filter-utils';
 
 type Tab = {
   label: string;
@@ -35,10 +36,10 @@ export function useApplicationList({
     [key],
   );
 
-  const filteredApplications = useMemo(() => {
-    if (currentTab.value === 'all') return applications;
-    return applications.filter((app) => app.status === currentTab.value);
-  }, [applications, currentTab]);
+  const filteredApplications = useMemo(
+    () => filterApplicationsByTab(applications, currentTab.value),
+    [applications, currentTab.value],
+  );
 
   const paginatedApplications = useMemo(() => {
     if (!pagination) {
