@@ -15,6 +15,7 @@ import type {
   MemberDashboardData,
   MembershipActionResult,
 } from '@/types/membership.types';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 /** The user's latest application, which is the one the dashboard shows. */
 async function getLatestApplication(
@@ -186,4 +187,36 @@ export async function submitMembershipRenewal(): Promise<MembershipActionResult>
   } catch {
     return { success: false, error: 'An unexpected error occurred' };
   }
+}
+
+/**
+ * Permanently deletes the signed-in member's account.
+ *
+ * The user id comes from the verified session, never from the client, so a
+ * member can only delete their own account. The session is then signed out so
+ * the stale cookie is cleared.
+ *
+ * @returns `{ success: true }`, or `{ success: false, error }` with a message
+ * safe to show the user (not signed in, or the deletion failed).
+ */
+export async function deleteMemberProfile(): Promise<
+  { success: true } | { success: false; error: string }
+> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { success: false, error: 'You are not signed in.' };
+
+  const { error } = await createAdminClient().auth.admin.deleteUser(user.id);
+  if (error) {
+    console.error('[member-dashboard] deleting the profile failed:', error);
+    return {
+      success: false,
+      error: 'Could not delete your profile. Please try again.',
+    };
+  }
+
+  await supabase.auth.signOut();
+  return { success: true };
 }
