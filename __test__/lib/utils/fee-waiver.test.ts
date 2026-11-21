@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isFeeWaiverGranted } from './fee-waiver';
+import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
 
 const approve = (waiver: 'approve' | 'reject' | null = null) => ({
   decision: 'approve' as const,

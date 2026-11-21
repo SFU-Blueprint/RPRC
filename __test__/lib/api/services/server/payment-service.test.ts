@@ -66,7 +66,7 @@ const {
   fulfillCheckoutSession,
   getPaymentStatusForSession,
   startMembershipCheckout,
-} = await import('./payment-service');
+} = await import('@/lib/api/services/server/payment-service');
 
 const APPROVED_AT = '2026-11-01T00:00:00Z';
 const THIS_ROUND = '2026-11-02T00:00:00Z';

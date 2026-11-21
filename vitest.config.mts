@@ -7,5 +7,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./__test__/setup.ts'],
+    // Every test lives under __test__/, mirroring the source tree.
+    include: ['__test__/**/*.test.{ts,tsx}'],
   },
 });

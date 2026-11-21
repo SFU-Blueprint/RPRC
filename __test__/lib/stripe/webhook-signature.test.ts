@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { verifyStripeWebhookSignature } from './webhook-signature';
+import { verifyStripeWebhookSignature } from '@/lib/stripe/webhook-signature';
 
 const secret = 'whsec_test_secret';
 const timestamp = 1_800_000_000;
