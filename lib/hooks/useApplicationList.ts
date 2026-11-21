@@ -2,19 +2,11 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import type { ApplicationType } from '@/types/admin.types';
+import { filterApplicationsByTab } from '@/lib/utils/application-search-filter-utils';
 
 type Tab = {
   label: string;
   value: string;
-};
-
-const TAB_VALUE_TO_STATUS: Record<string, string> = {
-  toReview: 'to_review',
-  paymentPending: 'payment_pending',
-  active: 'active',
-  expired: 'expired',
-  rejected: 'rejected',
-  conflict: 'conflict',
 };
 
 type UseApplicationListOptions = {
@@ -44,13 +36,10 @@ export function useApplicationList({
     [key],
   );
 
-  const filteredApplications = useMemo(() => {
-    if (currentTab.value === 'all') return applications;
-    const status = TAB_VALUE_TO_STATUS[currentTab.value];
-    return status
-      ? applications.filter((app) => app.status === status)
-      : applications;
-  }, [applications, currentTab]);
+  const filteredApplications = useMemo(
+    () => filterApplicationsByTab(applications, currentTab.value),
+    [applications, currentTab.value],
+  );
 
   const paginatedApplications = useMemo(() => {
     if (!pagination) {

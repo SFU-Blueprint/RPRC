@@ -1,7 +1,16 @@
-import { ApplicationType, type AdminDashboardStats } from '@/types/admin.types';
+import {
+  type AdminDashboardStats,
+  type ApplicationType,
+  type CsvColumn,
+} from '@/types/admin.types';
+import { ApplicationStatus } from '@/lib/constants/enums';
 
 /* Stat card types. */
-export const STAT_CARD_TYPES = ['independent', 'organization', 'toReview'] as const;
+export const STAT_CARD_TYPES = [
+  'independent',
+  'organization',
+  'toReview',
+] as const;
 
 export type StatCardType = (typeof STAT_CARD_TYPES)[number];
 
@@ -15,12 +24,12 @@ export function toStatCardsData(stats: AdminDashboardStats): StatCardsData {
 
 /* Single source of truth for application status types.  */
 export const APPLICATION_STATUS_TYPES = [
-  { value: 'toReview', label: 'To Review' },
-  { value: 'paymentPending', label: 'Payment Pending' },
-  { value: 'active', label: 'Active' },
-  { value: 'expired', label: 'Expired' },
-  { value: 'conflict', label: 'Conflict' },
-  { value: 'rejected', label: 'Rejected' },
+  { value: ApplicationStatus.TO_REVIEW, label: 'To Review' },
+  { value: ApplicationStatus.PAYMENT_PENDING, label: 'Payment Pending' },
+  { value: ApplicationStatus.ACTIVE, label: 'Active' },
+  { value: ApplicationStatus.EXPIRED, label: 'Expired' },
+  { value: ApplicationStatus.CONFLICT, label: 'Conflict' },
+  { value: ApplicationStatus.REJECTED, label: 'Rejected' },
 ] as const;
 
 const ALL_TAB = { value: 'all', label: 'All' } as const;
@@ -43,3 +52,29 @@ export const ADMIN_DASHBOARD_CONST = {
   ],
 };
 
+export const STATUS_LABELS: Record<ApplicationStatus, string> = {
+  [ApplicationStatus.TO_REVIEW]: 'To Review',
+  [ApplicationStatus.PAYMENT_PENDING]: 'Payment Pending',
+  [ApplicationStatus.ACTIVE]: 'Active',
+  [ApplicationStatus.EXPIRES_SOON]: 'Expires Soon',
+  [ApplicationStatus.EXPIRED]: 'Expired',
+  [ApplicationStatus.CONFLICT]: 'Conflict',
+  [ApplicationStatus.REJECTED]: 'Rejected',
+};
+
+export const TYPE_LABELS: Record<ApplicationType['type'], string> = {
+  individual: 'Individual',
+  organization: 'Organization',
+};
+
+export const CSV_COLUMNS: CsvColumn<ApplicationType>[] = [
+  { header: 'Applicant Name', value: (a) => a.applicantName },
+  { header: 'Application Type', value: (a) => TYPE_LABELS[a.type] ?? a.type },
+  {
+    header: 'Date Received',
+    value: (a) => new Date(a.dateReceived).toLocaleDateString('en-CA'),
+  },
+  { header: 'Status', value: (a) => STATUS_LABELS[a.status] ?? a.status },
+  { header: 'Reviewer 1', value: (a) => a.reviewer1 },
+  { header: 'Reviewer 2', value: (a) => a.reviewer2 },
+];
