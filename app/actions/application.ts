@@ -4,26 +4,18 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { ApplicationStatus, ReviewDecision } from '@/lib/constants/enums';
 import { ROUTES } from '@/lib/constants/routes';
-import { ReviewErrorMessage } from '@/lib/constants/application-errors';
+import {
+  ActionErrorMessage,
+  ReviewErrorMessage,
+} from '@/lib/constants/application-errors';
 import { isAdmin } from '@/lib/helpers/auth-helper';
 import { isCalendarDate } from '@/lib/utils/time-utils';
 import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
 import type { Database } from '@/types/database';
-
-type SubmitApplicationReviewInput = {
-  appId: string;
-  reviewerName: string;
-  reviewDate: string;
-  decision: Database['public']['Enums']['review_decision'];
-  reason: string;
-  waiverDecision?: Database['public']['Enums']['review_decision'];
-  waiverReason?: string;
-};
-
-type SubmitApplicationReviewResult = {
-  success: boolean;
-  error?: string;
-};
+import type {
+  SubmitApplicationReviewInput,
+  SubmitApplicationReviewResult,
+} from '@/types/admin.types';
 
 function getNextApplicationStatus(
   reviews: Array<
@@ -62,11 +54,11 @@ export async function submitApplicationReview(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { success: false, error: 'User not authenticated' };
+    return { success: false, error: ActionErrorMessage.UNAUTHENTICATED };
   }
 
   if (!(await isAdmin())) {
-    return { success: false, error: 'Unauthorized: admin role required' };
+    return { success: false, error: ReviewErrorMessage.ADMIN_REQUIRED };
   }
 
   if (
@@ -76,7 +68,7 @@ export async function submitApplicationReview(
     !input.decision ||
     !input.reason.trim()
   ) {
-    return { success: false, error: 'All review fields are required' };
+    return { success: false, error: ReviewErrorMessage.MISSING_FIELDS };
   }
 
   if (!isCalendarDate(input.reviewDate)) {

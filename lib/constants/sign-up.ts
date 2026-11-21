@@ -9,6 +9,7 @@ import type { DefaultValues } from 'react-hook-form';
 import { CONTACT_EMAILS } from '@/lib/constants/contact';
 import { APPLICATION_FEES } from '@/lib/constants/processing-fees';
 import { ROUTES } from '@/lib/constants/routes';
+import { UserRole } from '@/lib/constants/enums';
 
 import type { FieldOption } from '@/types/sign-up-fields.types';
 import type {
@@ -84,6 +85,12 @@ export const SUBMIT_RESULT_COPY = {
 } as const satisfies Record<string, SubmitResultCopy>;
 
 /** The `/sign-up` landing, where the membership type is chosen. */
+/** Where the membership type chooser sends each choice. */
+export const SIGN_UP_ROUTE_BY_TYPE = {
+  [UserRole.INDIVIDUAL]: ROUTES.SIGN_UP_INDIVIDUAL,
+  [UserRole.ORGANIZATION]: ROUTES.SIGN_UP_ORGANIZATION,
+} as const;
+
 export const MEMBERSHIP_TYPE_CHOOSER_COPY = {
   HEADING: 'Choose Membership Type',
   INDIVIDUAL: {

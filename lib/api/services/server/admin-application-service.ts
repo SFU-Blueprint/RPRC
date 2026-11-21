@@ -1,3 +1,4 @@
+import { AdminErrorMessage } from '@/lib/constants/application-errors';
 import { ApplicationStatus } from '@/lib/constants/enums';
 import { createClient } from '@/lib/supabase/server';
 import type {
@@ -90,7 +91,7 @@ export async function getAdminApplicationList(): Promise<ApplicationType[]> {
       '[getAdminApplicationList] applications query failed:',
       appError,
     );
-    throw new Error('Failed to load applications. Please try again.');
+    throw new Error(AdminErrorMessage.LOAD_APPLICATIONS_FAILED);
   }
 
   const rows = (applicationRows ?? []) as ApplicationRow[];

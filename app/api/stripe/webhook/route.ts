@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { verifyStripeWebhookSignature } from '@/lib/stripe/webhook-signature';
 import { fulfillCheckoutSession } from '@/lib/api/services/server/payment-service';
-import { STRIPE_CHECKOUT_EVENTS } from '@/lib/constants/payments';
+import {
+  STRIPE_CHECKOUT_EVENTS,
+  WebhookErrorMessage,
+} from '@/lib/constants/payments';
 import type { StripeEvent } from '@/types/payment.types';
 
 export const runtime = 'nodejs';
@@ -12,7 +15,7 @@ export async function POST(request: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret)
     return NextResponse.json(
-      { error: 'Webhook signing secret is not configured.' },
+      { error: WebhookErrorMessage.SECRET_NOT_CONFIGURED },
       { status: 503 },
     );
 
@@ -20,7 +23,7 @@ export async function POST(request: Request) {
   const rawBody = await request.text();
   if (!signature || !verifyStripeWebhookSignature(rawBody, signature, secret)) {
     return NextResponse.json(
-      { error: 'Invalid Stripe signature.' },
+      { error: WebhookErrorMessage.INVALID_SIGNATURE },
       { status: 400 },
     );
   }
@@ -30,14 +33,14 @@ export async function POST(request: Request) {
     event = JSON.parse(rawBody) as StripeEvent;
   } catch {
     return NextResponse.json(
-      { error: 'Invalid event payload.' },
+      { error: WebhookErrorMessage.INVALID_PAYLOAD },
       { status: 400 },
     );
   }
 
   if (!event.id || !event.type)
     return NextResponse.json(
-      { error: 'Invalid event payload.' },
+      { error: WebhookErrorMessage.INVALID_PAYLOAD },
       { status: 400 },
     );
   if (!CHECKOUT_EVENTS.has(event.type))
@@ -46,7 +49,7 @@ export async function POST(request: Request) {
   const session = event.data?.object;
   if (!session?.id)
     return NextResponse.json(
-      { error: 'Checkout Session was missing.' },
+      { error: WebhookErrorMessage.SESSION_MISSING },
       { status: 400 },
     );
 
@@ -75,7 +78,7 @@ export async function POST(request: Request) {
       error,
     });
     return NextResponse.json(
-      { error: 'The payment could not be recorded.' },
+      { error: WebhookErrorMessage.RECORD_FAILED },
       { status: 500 },
     );
   }

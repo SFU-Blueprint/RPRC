@@ -3,6 +3,7 @@ import {
   PAYMENT_CURRENCY,
 } from '@/lib/constants/processing-fees';
 import { ApplicationType } from '@/lib/constants/enums';
+import { STRIPE_PRODUCT_DESCRIPTION } from '@/lib/constants/payments';
 import { ROUTES } from '@/lib/constants/routes';
 import type { StripeCheckoutSession } from '@/types/payment.types';
 
@@ -58,7 +59,7 @@ export async function createStripeCheckoutSession(input: {
     'line_items[0][price_data][unit_amount]': String(input.amountMinor),
     'line_items[0][price_data][product_data][name]': `RPRC ${membershipLabel} Membership`,
     'line_items[0][price_data][product_data][description]':
-      'Annual membership dues',
+      STRIPE_PRODUCT_DESCRIPTION,
     client_reference_id: input.paymentId,
     'metadata[payment_id]': input.paymentId,
     'metadata[application_id]': input.applicationId,

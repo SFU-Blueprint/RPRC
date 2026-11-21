@@ -9,13 +9,11 @@ import { MembershipInfoCard } from '@/components/sign-up/cards/MembershipInfoCar
 import { Button } from '@/components/ui/button';
 import { UserRole } from '@/lib/constants/enums';
 import { ROUTES } from '@/lib/constants/routes';
-import { MEMBERSHIP_TYPE_CHOOSER_COPY as COPY } from '@/lib/constants/sign-up';
+import {
+  MEMBERSHIP_TYPE_CHOOSER_COPY as COPY,
+  SIGN_UP_ROUTE_BY_TYPE,
+} from '@/lib/constants/sign-up';
 import { cn } from '@/lib/utils';
-
-const SIGN_UP_ROUTE_BY_TYPE = {
-  [UserRole.INDIVIDUAL]: ROUTES.SIGN_UP_INDIVIDUAL,
-  [UserRole.ORGANIZATION]: ROUTES.SIGN_UP_ORGANIZATION,
-} as const;
 
 /**
  * `/sign-up` landing: pick a membership type, then continue to its form.
