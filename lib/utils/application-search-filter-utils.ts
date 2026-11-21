@@ -13,3 +13,12 @@ export function filterApplicationsBySearch(
     return name.includes(q) || r1.includes(q) || r2.includes(q);
   });
 }
+
+/** Applications matching the status tab. The "all" tab matches everything. */
+export function filterApplicationsByTab(
+  applications: ApplicationType[],
+  tabValue: string,
+): ApplicationType[] {
+  if (tabValue === 'all') return applications;
+  return applications.filter((app) => app.status === tabValue);
+}

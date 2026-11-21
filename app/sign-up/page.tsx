@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function SignUpPage() {
   return (
-    <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-16">
+    <div className="my-auto grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-16">
       <SignUpInfoBox />
       <MembershipTypeChooser />
     </div>

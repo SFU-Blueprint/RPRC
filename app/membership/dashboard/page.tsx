@@ -28,17 +28,40 @@ import {
 import {
   fetchMemberDashboardData,
   submitMembershipProfileUpdate,
+  deleteMemberProfile,
 } from '@/app/actions/member-dashboard';
 import type {
   MemberDashboardData,
   OrganizationMemberDashboardData,
 } from '@/types/membership.types';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import DeleteProfileModal from '@/components/membership/modals/DeleteProfileModal';
 
 export default function MembershipDashboard() {
+  const router = useRouter();
   // This was not working!!! I hate auth context providers!!!!
   // const { user, loading } = useAuth();
   const [authLoading, setAuthLoading] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteProfile = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteMemberProfile();
+      if (!result.success) {
+        toast.error('Failed to delete profile', { description: result.error });
+        return;
+      }
+      setIsDeleteModalOpen(false);
+      toast.success('Your profile has been deleted');
+      router.replace('/');
+      router.refresh();
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const [dashboardData, setDashboardData] =
     useState<MemberDashboardData | null>(null);
@@ -226,9 +249,14 @@ export default function MembershipDashboard() {
               )}
             </div>
             <div>
-              <a className={`text-destructive-default underline p-3`}>
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(true)}
+                disabled={isEditingProfile || isSavingProfile}
+                className="text-destructive-default underline p-3 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 Delete Profile
-              </a>
+              </button>
               <p className="p-3 text-content-secondary">
                 You can delete your profile if you wish to cancel your
                 membership.
@@ -246,6 +274,12 @@ export default function MembershipDashboard() {
         isOpen={isDiscardChangesModalOpen}
         onClose={() => setIsDiscardChangesModalOpen(false)}
         onDiscard={handleDiscardChanges}
+      />
+      <DeleteProfileModal
+        isOpen={isDeleteModalOpen}
+        isDeleting={isDeleting}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteProfile}
       />
     </div>
   );

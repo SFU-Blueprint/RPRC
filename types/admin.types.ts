@@ -1,5 +1,6 @@
-import { ApplicationStatus, ReviewDecision } from '@/lib/constants';
+import { ReviewDecision } from '@/lib/constants';
 import type { Database } from '@/types/database';
+import type { ApplicationStatus } from '@/lib/constants/enums';
 
 /** Config for one status chip: color, label, and theme (ApplicationStatus or ReviewDecision). */
 export type StatusChipType = {
@@ -45,13 +46,7 @@ export type ApplicationType = {
   applicantName: string;
   type: 'individual' | 'organization';
   dateReceived: string | Date;
-  status:
-    | 'to_review'
-    | 'rejected'
-    | 'payment_pending'
-    | 'active'
-    | 'expired'
-    | 'conflict';
+  status: ApplicationStatus;
   reviewer1: string;
   reviewer2: string;
 };
@@ -127,4 +122,9 @@ export type AdminApplicationPageData = {
   headerStatus: Database['public']['Enums']['application_status'] | null;
   details: AdminApplicationDetailsData;
   reviewHistory: ReviewHistoryItem[];
+};
+
+export type CsvColumn<T> = {
+  header: string;
+  value: (row: T) => string | null | undefined;
 };
