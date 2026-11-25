@@ -11,7 +11,6 @@ import {
 import { isAdmin } from '@/lib/helpers/auth-helper';
 import { isCalendarDate } from '@/lib/utils/time-utils';
 import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
-import { EmailTemplate } from '@/lib/constants/email';
 import { queueStatusEmail } from '@/lib/email/send-status-email';
 import type { Database } from '@/types/database';
 import type {
@@ -57,16 +56,16 @@ function getStatusEmail(
 ): StatusEmail | null {
   switch (nextStatus) {
     case ApplicationStatus.PAYMENT_PENDING:
-      return { template: EmailTemplate.APPLICATION_APPROVED };
+      return { status: ApplicationStatus.PAYMENT_PENDING };
     case ApplicationStatus.ACTIVE:
       // Only a granted fee waiver activates from a review.
       return {
-        template: EmailTemplate.MEMBERSHIP_ACTIVE,
+        status: ApplicationStatus.ACTIVE,
         feeWaived: true,
         renewal: Boolean(memberSince),
       };
     case ApplicationStatus.REJECTED:
-      return { template: EmailTemplate.APPLICATION_REJECTED };
+      return { status: ApplicationStatus.REJECTED };
     default:
       return null;
   }

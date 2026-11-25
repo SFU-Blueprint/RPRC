@@ -442,7 +442,7 @@ describe('applyAsIndividual / applyAsOrganization (application only)', () => {
 });
 
 describe('application received email', () => {
-  const received = { template: 'application_received', renewal: false };
+  const received = { status: 'to_review', renewal: false };
 
   test('is queued for the new application after sign-up', async () => {
     signUpSucceeds();

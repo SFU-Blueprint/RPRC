@@ -773,7 +773,7 @@ describe('startMembershipCheckout', () => {
 
 describe('membership active email', () => {
   const activeEmail = (renewal: boolean) => ({
-    template: 'membership_active',
+    status: 'active',
     feeWaived: false,
     renewal,
   });

@@ -5,8 +5,8 @@ import ApplicationApproved from '@/emails/ApplicationApproved';
 import ApplicationReceived from '@/emails/ApplicationReceived';
 import ApplicationRejected from '@/emails/ApplicationRejected';
 import MembershipActive from '@/emails/MembershipActive';
-import { EMAIL_COPY, EmailTemplate } from '@/lib/constants/email';
-import { ApplicationType } from '@/lib/constants/enums';
+import { EMAIL_COPY } from '@/lib/constants/email';
+import { ApplicationStatus, ApplicationType } from '@/lib/constants/enums';
 import { APPLICATION_FEES } from '@/lib/constants/processing-fees';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getSiteUrl } from '@/lib/utils/site-url';
@@ -45,13 +45,13 @@ function buildEmail(
   siteUrl: string,
 ): { subject: string; element: ReactElement } {
   const base = { name: recipient.name, siteUrl };
-  switch (email.template) {
-    case EmailTemplate.APPLICATION_RECEIVED:
+  switch (email.status) {
+    case ApplicationStatus.TO_REVIEW:
       return {
         subject: EMAIL_COPY.RECEIVED.SUBJECT(email.renewal),
         element: <ApplicationReceived {...base} renewal={email.renewal} />,
       };
-    case EmailTemplate.APPLICATION_APPROVED:
+    case ApplicationStatus.PAYMENT_PENDING:
       return {
         subject: EMAIL_COPY.APPROVED.SUBJECT,
         element: (
@@ -65,7 +65,7 @@ function buildEmail(
           />
         ),
       };
-    case EmailTemplate.MEMBERSHIP_ACTIVE:
+    case ApplicationStatus.ACTIVE:
       return {
         subject: EMAIL_COPY.ACTIVE.SUBJECT(email.renewal),
         element: (
@@ -76,7 +76,7 @@ function buildEmail(
           />
         ),
       };
-    case EmailTemplate.APPLICATION_REJECTED:
+    case ApplicationStatus.REJECTED:
       return {
         subject: EMAIL_COPY.REJECTED.SUBJECT,
         element: <ApplicationRejected {...base} />,
@@ -96,7 +96,7 @@ export async function sendStatusEmail(
   if (!recipient) {
     console.warn('[email] no recipient; not sending', {
       applicationId,
-      template: email.template,
+      status: email.status,
     });
     return;
   }
@@ -125,7 +125,7 @@ export function queueStatusEmail(
     } catch (error) {
       console.error('[email] sending failed', {
         applicationId,
-        template: email.template,
+        status: email.status,
         error,
       });
     }
@@ -137,7 +137,7 @@ export function queueStatusEmail(
     // after() throws outside a request scope; nothing to attach the send to.
     console.error('[email] could not schedule', {
       applicationId,
-      template: email.template,
+      status: email.status,
       error,
     });
   }

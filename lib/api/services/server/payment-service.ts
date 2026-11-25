@@ -13,7 +13,6 @@ import {
   PaymentTransactionStatus,
   type ApplicationType,
 } from '@/lib/constants/enums';
-import { EmailTemplate } from '@/lib/constants/email';
 import {
   DOUBLE_PAYMENT_MESSAGE,
   PAYMENT_COLUMNS,
@@ -464,7 +463,7 @@ async function activateForPayment(
   // checkout can all get here for the same payment, and Stripe can deliver twice.
   if (activated?.length)
     queueStatusEmail(applicationId, {
-      template: EmailTemplate.MEMBERSHIP_ACTIVE,
+      status: ApplicationStatus.ACTIVE,
       feeWaived: false,
       renewal: Boolean(application.member_since),
     });

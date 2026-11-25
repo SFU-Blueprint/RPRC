@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 
-import { EmailTemplate } from '@/lib/constants/email';
+import { ApplicationStatus } from '@/lib/constants/enums';
 import { queueStatusEmail } from '@/lib/email/send-status-email';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { nullableArg } from '@/lib/utils/rpc-utils';
@@ -82,7 +82,7 @@ async function afterApplicationCreated(userId: string): Promise<void> {
   if (!data) throw new Error('Application not found after creating it');
 
   queueStatusEmail(data.id, {
-    template: EmailTemplate.APPLICATION_RECEIVED,
+    status: ApplicationStatus.TO_REVIEW,
     renewal: false,
   });
 }

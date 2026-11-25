@@ -59,7 +59,7 @@ afterEach(() => {
 describe('sendStatusEmail', () => {
   it('sends the received email to the account email, greeting by name', async () => {
     await sendStatusEmail('app_1', {
-      template: 'application_received',
+      status: 'to_review',
       renewal: false,
     });
 
@@ -78,7 +78,7 @@ describe('sendStatusEmail', () => {
   it('greets an organization by name and quotes the organization fee', async () => {
     recipient.response = { data: organization, error: null };
 
-    await sendStatusEmail('app_1', { template: 'application_approved' });
+    await sendStatusEmail('app_1', { status: 'payment_pending' });
 
     expect(sent().to).toBe('info@foodbank.org');
     expect(sent().html).toContain('Hi Richmond Food Bank Society,');
@@ -97,7 +97,7 @@ describe('sendStatusEmail', () => {
     'active email with feeWaived=%s renewal=%s has the right headline',
     async (feeWaived, renewal, headline) => {
       await sendStatusEmail('app_1', {
-        template: 'membership_active',
+        status: 'active',
         feeWaived,
         renewal,
       });
@@ -108,7 +108,7 @@ describe('sendStatusEmail', () => {
 
   it('uses renewal wording in the received email for a renewal', async () => {
     await sendStatusEmail('app_1', {
-      template: 'application_received',
+      status: 'to_review',
       renewal: true,
     });
 
@@ -119,7 +119,7 @@ describe('sendStatusEmail', () => {
   });
 
   it('puts the general contact address in the rejected email', async () => {
-    await sendStatusEmail('app_1', { template: 'application_rejected' });
+    await sendStatusEmail('app_1', { status: 'rejected' });
 
     expect(sent().html).toContain('mailto:info@richmondprc.org');
     expect(sent().html).toContain('Your application has been rejected.');
@@ -129,7 +129,7 @@ describe('sendStatusEmail', () => {
     recipient.response = { data: null, error: null };
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    await sendStatusEmail('app_1', { template: 'application_rejected' });
+    await sendStatusEmail('app_1', { status: 'rejected' });
 
     expect(transport.deliverEmail).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe('sendStatusEmail', () => {
 
 describe('queueStatusEmail', () => {
   it('schedules the send with after()', async () => {
-    queueStatusEmail('app_1', { template: 'application_rejected' });
+    queueStatusEmail('app_1', { status: 'rejected' });
     await vi.waitFor(() => expect(transport.deliverEmail).toHaveBeenCalled());
 
     expect(nextServer.after).toHaveBeenCalledTimes(1);
@@ -150,7 +150,7 @@ describe('queueStatusEmail', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     expect(() =>
-      queueStatusEmail('app_1', { template: 'application_rejected' }),
+      queueStatusEmail('app_1', { status: 'rejected' }),
     ).not.toThrow();
     await vi.waitFor(() =>
       expect(error).toHaveBeenCalledWith(
@@ -168,7 +168,7 @@ describe('queueStatusEmail', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     expect(() =>
-      queueStatusEmail('app_1', { template: 'application_rejected' }),
+      queueStatusEmail('app_1', { status: 'rejected' }),
     ).not.toThrow();
     expect(error).toHaveBeenCalledWith(
       '[email] could not schedule',

@@ -1,5 +1,4 @@
-import { ApplicationType } from '@/lib/constants/enums';
-import { EmailTemplate } from '@/lib/constants/email';
+import type { ApplicationStatus, ApplicationType } from '@/lib/constants/enums';
 
 export type OutgoingEmail = {
   to: string;
@@ -8,14 +7,15 @@ export type OutgoingEmail = {
   text: string;
 };
 
+/** A status email, keyed by the status the application just moved into. */
 export type StatusEmail =
-  | { template: typeof EmailTemplate.APPLICATION_RECEIVED; renewal: boolean }
-  | { template: typeof EmailTemplate.APPLICATION_APPROVED }
+  | { status: typeof ApplicationStatus.TO_REVIEW; renewal: boolean }
+  | { status: typeof ApplicationStatus.PAYMENT_PENDING }
   | {
-      template: typeof EmailTemplate.MEMBERSHIP_ACTIVE;
+      status: typeof ApplicationStatus.ACTIVE;
       feeWaived: boolean;
       renewal: boolean;
     }
-  | { template: typeof EmailTemplate.APPLICATION_REJECTED };
+  | { status: typeof ApplicationStatus.REJECTED };
 
 export type Recipient = { email: string; name: string; type: ApplicationType };

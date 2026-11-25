@@ -3,15 +3,6 @@ import { INFO_CARDS } from '@/lib/constants/membership';
 /** Local Mailpit SMTP (exposed by `smtp_port` under `[local_smtp]` in supabase/config.toml). */
 export const LOCAL_SMTP = { HOST: '127.0.0.1', PORT: 54325 } as const;
 
-/** The four membership status emails. */
-export const EmailTemplate = {
-  APPLICATION_RECEIVED: 'application_received',
-  APPLICATION_APPROVED: 'application_approved',
-  MEMBERSHIP_ACTIVE: 'membership_active',
-  APPLICATION_REJECTED: 'application_rejected',
-} as const;
-export type EmailTemplate = (typeof EmailTemplate)[keyof typeof EmailTemplate];
-
 /** Reuses an `INFO_CARDS` entry's text (not its lucide icon, which can't go in an email). */
 function infoCardText(id: number) {
   const card = INFO_CARDS.find((entry) => entry.ID === id);
@@ -28,7 +19,6 @@ export const EMAIL_CARDS = {
   }),
 } as const;
 
-/** Shared email copy. Headlines per the table in docs/email-templates-plan.md. */
 export const EMAIL_COPY = {
   HEADER_TITLE: 'RPRC Membership',
   GREETING: (name: string) => (name ? `Hi ${name},` : 'Hi,'),

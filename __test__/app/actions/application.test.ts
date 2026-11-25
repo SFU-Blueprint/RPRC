@@ -286,7 +286,7 @@ describe('submitApplicationReview emails', () => {
 
     expect(email.queueStatusEmail).toHaveBeenCalledTimes(1);
     expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
-      template: 'application_approved',
+      status: 'payment_pending',
     });
   });
 
@@ -303,7 +303,7 @@ describe('submitApplicationReview emails', () => {
       member_since: expect.any(String),
     });
     expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
-      template: 'membership_active',
+      status: 'active',
       feeWaived: true,
       renewal: false,
     });
@@ -325,7 +325,7 @@ describe('submitApplicationReview emails', () => {
       member_since: memberSince,
     });
     expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
-      template: 'membership_active',
+      status: 'active',
       feeWaived: true,
       renewal: true,
     });
@@ -345,7 +345,7 @@ describe('submitApplicationReview emails', () => {
     await submitApplicationReview({ ...review, decision: 'reject' });
 
     expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
-      template: 'application_rejected',
+      status: 'rejected',
     });
   });
 

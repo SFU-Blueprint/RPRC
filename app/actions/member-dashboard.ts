@@ -14,7 +14,6 @@ import {
   RESUBMITTABLE_STATUSES,
 } from '@/lib/constants/membership-status-rules';
 import { ROUTES } from '@/lib/constants/routes';
-import { EmailTemplate } from '@/lib/constants/email';
 import { queueStatusEmail } from '@/lib/email/send-status-email';
 import { memberProfileEditSchema } from '@/lib/schema/member-profile-edit.schema';
 import type {
@@ -194,7 +193,7 @@ export async function submitMembershipRenewal(): Promise<MembershipActionResult>
     // A lapsing member renewing gets renewal wording; a first application re-applied
     // after a rejection doesn't.
     queueStatusEmail(application.id, {
-      template: EmailTemplate.APPLICATION_RECEIVED,
+      status: ApplicationStatus.TO_REVIEW,
       renewal: Boolean(application.member_since),
     });
 

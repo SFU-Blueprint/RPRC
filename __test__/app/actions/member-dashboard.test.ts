@@ -63,7 +63,7 @@ describe('submitMembershipRenewal email', () => {
     expect(result).toEqual({ success: true });
     expect(email.queueStatusEmail).toHaveBeenCalledTimes(1);
     expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
-      template: 'application_received',
+      status: 'to_review',
       renewal: true,
     });
   });
@@ -75,7 +75,7 @@ describe('submitMembershipRenewal email', () => {
     await submitMembershipRenewal();
 
     expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
-      template: 'application_received',
+      status: 'to_review',
       renewal: false,
     });
   });
