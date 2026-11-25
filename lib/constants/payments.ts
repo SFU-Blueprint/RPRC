@@ -1,3 +1,5 @@
+import { CheckoutResult } from '@/types/payment.types';
+
 /** Stripe Checkout events the webhook handles. `npm run stripe:listen` forwards the same list. */
 export const STRIPE_CHECKOUT_EVENTS = [
   'checkout.session.completed',
@@ -20,6 +22,18 @@ export const PaymentErrorMessage = {
     'Your payment history could not be loaded. Please try again.',
   CHECKOUT_FAILED: 'Checkout could not be started. Please try again.',
 } as const;
+
+export const ALREADY_PAID: CheckoutResult = {
+  ok: false,
+  status: 409,
+  error: PaymentErrorMessage.ALREADY_PAID,
+};
+
+export const CHECKOUT_FAILED: CheckoutResult = {
+  ok: false,
+  status: 502,
+  error: PaymentErrorMessage.CHECKOUT_FAILED,
+};
 
 /** Responses from the Stripe webhook route. Stripe reads these, not members. */
 export const WebhookErrorMessage = {

@@ -33,6 +33,7 @@ vi.mock('@/lib/supabase/admin', () => {
     const builder = {
       select: () => builder,
       limit: () => builder,
+      order: () => builder,
       eq: (column: string, value: unknown) => {
         filters.push((row) => row[column] === value);
         return builder;
@@ -55,11 +56,17 @@ vi.mock('@/lib/supabase/admin', () => {
       from: query,
       rpc: async (name: string, args: Row) => {
         db.rpc(name, args);
+        // Like the real functions, a successful call creates the application row.
+        if (!db.rpcError)
+          db.applications.push({ id: 'app_new', user_id: args.p_user_id });
         return { error: db.rpcError };
       },
     }),
   };
 });
+
+const email = vi.hoisted(() => ({ queueStatusEmail: vi.fn() }));
+vi.mock('@/lib/email/send-status-email', () => email);
 
 const {
   applyAsIndividual,
@@ -138,6 +145,7 @@ beforeEach(() => {
   db.users = [];
   db.rpcError = null;
   db.rpc.mockReset();
+  email.queueStatusEmail.mockReset();
   referer.value = 'http://localhost:3000/sign-up/individual';
 });
 
@@ -185,6 +193,7 @@ describe('signUpIndividual', () => {
     });
 
     db.rpc.mockReset();
+    db.applications = []; // a fresh account, not a second application
     await signUpIndividual({ ...individual, waiverReason: 'left over' });
     expect(db.rpc.mock.calls[0][1]).toMatchObject({
       p_fee_waiver: false,
@@ -429,5 +438,48 @@ describe('applyAsIndividual / applyAsOrganization (application only)', () => {
       ok: true,
     });
     expect(db.rpc.mock.calls[0][0]).toBe('create_organization_application');
+  });
+});
+
+describe('application received email', () => {
+  const received = { template: 'application_received', renewal: false };
+
+  test('is queued for the new application after sign-up', async () => {
+    signUpSucceeds();
+
+    const result = await signUpIndividual(individual);
+
+    expect(result).toEqual({ ok: true });
+    expect(email.queueStatusEmail).toHaveBeenCalledTimes(1);
+    expect(email.queueStatusEmail).toHaveBeenCalledWith('app_new', received);
+  });
+
+  test('is queued when a signed-in organization applies', async () => {
+    signedInAs('organization');
+
+    const result = await applyAsOrganization(organizationApplication);
+
+    expect(result).toEqual({ ok: true });
+    expect(email.queueStatusEmail).toHaveBeenCalledWith('app_new', received);
+  });
+
+  test('is not queued when creating the application fails', async () => {
+    signUpSucceeds();
+    db.rpcError = { message: 'insert failed' };
+
+    await signUpIndividual(individual);
+
+    expect(email.queueStatusEmail).not.toHaveBeenCalled();
+  });
+
+  test('a failure while queueing leaves the submission successful', async () => {
+    signedInAs('individual');
+    email.queueStatusEmail.mockImplementation(() => {
+      throw new Error('boom');
+    });
+
+    const result = await applyAsIndividual(individualApplication);
+
+    expect(result).toEqual({ ok: true });
   });
 });

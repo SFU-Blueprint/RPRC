@@ -62,6 +62,9 @@ vi.mock('@/lib/stripe/server', async (importOriginal) => ({
   ...stripe,
 }));
 
+const email = vi.hoisted(() => ({ queueStatusEmail: vi.fn() }));
+vi.mock('@/lib/email/send-status-email', () => email);
+
 const {
   fulfillCheckoutSession,
   getPaymentStatusForSession,
@@ -134,9 +137,16 @@ const pendingApplication = {
 
 // What activation reads before updating the application.
 const activationLookup = {
-  data: { status: 'payment_pending', finalized_at: APPROVED_AT },
+  data: {
+    status: 'payment_pending',
+    finalized_at: APPROVED_AT,
+    member_since: null,
+  },
   error: null,
 };
+
+// The activation update's answer when it changed the row (`.select('id')`).
+const activatedRow = { data: [{ id: 'app_1' }], error: null };
 
 const ok = { data: null, error: null };
 const uniqueViolation = {
@@ -206,7 +216,10 @@ describe('fulfillCheckoutSession', () => {
       stripe_payment_intent_id: 'pi_1',
     });
     const activation = updates('applications')[0];
-    expect(activation?.payload).toEqual({ status: 'active' });
+    expect(activation?.payload).toEqual({
+      status: 'active',
+      member_since: expect.any(String),
+    });
     expect(activation?.filters).toEqual([
       ['id', 'eq', 'app_1'],
       ['status', 'eq', 'payment_pending'],
@@ -755,5 +768,129 @@ describe('startMembershipCheckout', () => {
     expect(updates('payments')[0]?.payload).toMatchObject({
       status: 'failed',
     });
+  });
+});
+
+describe('membership active email', () => {
+  const activeEmail = (renewal: boolean) => ({
+    template: 'membership_active',
+    feeWaived: false,
+    renewal,
+  });
+
+  it('is queued once when the webhook activates the membership', async () => {
+    responses.payments = [{ data: payment, error: null }, ok];
+    responses.applications = [activationLookup, activatedRow];
+
+    await fulfillCheckoutSession(paidSession, 'checkout.session.completed');
+
+    expect(email.queueStatusEmail).toHaveBeenCalledTimes(1);
+    expect(email.queueStatusEmail).toHaveBeenCalledWith(
+      'app_1',
+      activeEmail(false),
+    );
+  });
+
+  it('is not queued when another caller already activated the row', async () => {
+    // The update matched nothing: the return page or a repeated delivery got there first.
+    responses.payments = [{ data: payment, error: null }, ok];
+    responses.applications = [activationLookup, { data: [], error: null }];
+
+    await fulfillCheckoutSession(paidSession, 'checkout.session.completed');
+
+    expect(email.queueStatusEmail).not.toHaveBeenCalled();
+  });
+
+  it('uses renewal wording and keeps member_since when the application was active before', async () => {
+    const memberSince = '2025-01-15T00:00:00Z';
+    responses.payments = [{ data: payment, error: null }, ok];
+    responses.applications = [
+      {
+        data: { ...activationLookup.data, member_since: memberSince },
+        error: null,
+      },
+      activatedRow,
+    ];
+
+    await fulfillCheckoutSession(paidSession);
+
+    expect(updates('applications')[0]?.payload).toEqual({
+      status: 'active',
+      member_since: memberSince,
+    });
+    expect(email.queueStatusEmail).toHaveBeenCalledWith(
+      'app_1',
+      activeEmail(true),
+    );
+  });
+
+  it('is not queued for a payment from an earlier approval round', async () => {
+    responses.payments = [
+      { data: { ...payment, created_at: LAST_ROUND }, error: null },
+      ok,
+    ];
+    responses.applications = [activationLookup];
+
+    await fulfillCheckoutSession(paidSession);
+
+    expect(email.queueStatusEmail).not.toHaveBeenCalled();
+  });
+
+  it('is queued from the checkout repair path (paid but never activated)', async () => {
+    responses.applications = [
+      pendingApplication,
+      activationLookup,
+      activatedRow,
+    ];
+    responses.payments = [
+      { data: [{ ...openPayment, status: 'succeeded' }], error: null },
+    ];
+
+    await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(email.queueStatusEmail).toHaveBeenCalledTimes(1);
+    expect(email.queueStatusEmail).toHaveBeenCalledWith(
+      'app_1',
+      activeEmail(false),
+    );
+  });
+
+  it('is queued when checkout finds an already-completed session', async () => {
+    responses.applications = [
+      pendingApplication,
+      activationLookup,
+      activatedRow,
+    ];
+    responses.payments = [
+      { data: [openPayment], error: null },
+      { data: payment, error: null },
+      ok,
+    ];
+    stripe.getStripeCheckoutSession.mockResolvedValue(paidSession);
+
+    await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(email.queueStatusEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it('is queued when checkout retires an open session that turns out to be paid', async () => {
+    responses.applications = [
+      pendingApplication,
+      activationLookup,
+      activatedRow,
+    ];
+    responses.payments = [
+      { data: [{ ...openPayment, amount: 4 }], error: null },
+      { data: { ...payment, amount: 4 }, error: null },
+      ok,
+    ];
+    stripe.getStripeCheckoutSession.mockResolvedValue({
+      ...paidSession,
+      amount_total: 400,
+    });
+
+    await startMembershipCheckout({ userId: 'user_1' });
+
+    expect(email.queueStatusEmail).toHaveBeenCalledTimes(1);
   });
 });

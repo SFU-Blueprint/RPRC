@@ -14,6 +14,8 @@ import {
   RESUBMITTABLE_STATUSES,
 } from '@/lib/constants/membership-status-rules';
 import { ROUTES } from '@/lib/constants/routes';
+import { EmailTemplate } from '@/lib/constants/email';
+import { queueStatusEmail } from '@/lib/email/send-status-email';
 import { memberProfileEditSchema } from '@/lib/schema/member-profile-edit.schema';
 import type {
   MemberDashboardData,
@@ -28,7 +30,7 @@ async function getLatestApplication(
 ) {
   const { data, error } = await supabase
     .from('applications')
-    .select('id, status, type')
+    .select('id, status, type, member_since')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -188,6 +190,13 @@ export async function submitMembershipRenewal(): Promise<MembershipActionResult>
     if (updateError || !updated?.length) {
       return { success: false, error: MembershipErrorMessage.RENEWAL_FAILED };
     }
+
+    // A lapsing member renewing gets renewal wording; a first application re-applied
+    // after a rejection doesn't.
+    queueStatusEmail(application.id, {
+      template: EmailTemplate.APPLICATION_RECEIVED,
+      renewal: Boolean(application.member_since),
+    });
 
     revalidatePath(ROUTES.MEMBERSHIP_DASHBOARD);
 

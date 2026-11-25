@@ -11,11 +11,14 @@ import {
 import { isAdmin } from '@/lib/helpers/auth-helper';
 import { isCalendarDate } from '@/lib/utils/time-utils';
 import { isFeeWaiverGranted } from '@/lib/utils/fee-waiver';
+import { EmailTemplate } from '@/lib/constants/email';
+import { queueStatusEmail } from '@/lib/email/send-status-email';
 import type { Database } from '@/types/database';
 import type {
   SubmitApplicationReviewInput,
   SubmitApplicationReviewResult,
 } from '@/types/admin.types';
+import type { StatusEmail } from '@/types/email.types';
 
 function getNextApplicationStatus(
   reviews: Array<
@@ -42,6 +45,31 @@ function getNextApplicationStatus(
   }
 
   return ApplicationStatus.TO_REVIEW;
+}
+
+/**
+ * The email for a status this review just set. Conflict sends nothing; a review that
+ * leaves the application in to_review returns before writing, so it never gets here.
+ */
+function getStatusEmail(
+  nextStatus: ApplicationStatus,
+  memberSince: string | null,
+): StatusEmail | null {
+  switch (nextStatus) {
+    case ApplicationStatus.PAYMENT_PENDING:
+      return { template: EmailTemplate.APPLICATION_APPROVED };
+    case ApplicationStatus.ACTIVE:
+      // Only a granted fee waiver activates from a review.
+      return {
+        template: EmailTemplate.MEMBERSHIP_ACTIVE,
+        feeWaived: true,
+        renewal: Boolean(memberSince),
+      };
+    case ApplicationStatus.REJECTED:
+      return { template: EmailTemplate.APPLICATION_REJECTED };
+    default:
+      return null;
+  }
 }
 
 export async function submitApplicationReview(
@@ -77,7 +105,7 @@ export async function submitApplicationReview(
 
   const { data: application } = await supabase
     .from('applications')
-    .select('status')
+    .select('status, member_since')
     .eq('id', input.appId)
     .single();
 
@@ -212,6 +240,10 @@ export async function submitApplicationReview(
     .update({
       status: nextStatus,
       finalized_at: isFinalized ? new Date().toISOString() : null,
+      // A fee-waived approval activates the membership here; record the first activation.
+      ...(nextStatus === ApplicationStatus.ACTIVE && {
+        member_since: application.member_since ?? new Date().toISOString(),
+      }),
     })
     .eq('id', input.appId)
     .eq('status', application.status)
@@ -223,6 +255,9 @@ export async function submitApplicationReview(
   if (!updatedApplication?.length) {
     return withdrawReview();
   }
+
+  const statusEmail = getStatusEmail(nextStatus, application.member_since);
+  if (statusEmail) queueStatusEmail(input.appId, statusEmail);
 
   revalidatePath(ROUTES.ADMIN_DASHBOARD);
   revalidatePath(ROUTES.ADMIN_APPLICATION_DETAIL(input.appId));

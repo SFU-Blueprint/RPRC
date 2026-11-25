@@ -96,6 +96,7 @@ export type Database = {
           created_at: string;
           finalized_at: string | null;
           id: string;
+          member_since: string | null;
           status: Database['public']['Enums']['application_status'];
           type: Database['public']['Enums']['application_type'];
           user_id: string;
@@ -105,6 +106,7 @@ export type Database = {
           created_at?: string;
           finalized_at?: string | null;
           id?: string;
+          member_since?: string | null;
           status?: Database['public']['Enums']['application_status'];
           type: Database['public']['Enums']['application_type'];
           user_id: string;
@@ -113,6 +115,7 @@ export type Database = {
           created_at?: string;
           finalized_at?: string | null;
           id?: string;
+          member_since?: string | null;
           status?: Database['public']['Enums']['application_status'];
           type?: Database['public']['Enums']['application_type'];
           user_id?: string;

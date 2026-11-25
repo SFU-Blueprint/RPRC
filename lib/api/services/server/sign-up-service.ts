@@ -1,5 +1,7 @@
 import { headers } from 'next/headers';
 
+import { EmailTemplate } from '@/lib/constants/email';
+import { queueStatusEmail } from '@/lib/email/send-status-email';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { nullableArg } from '@/lib/utils/rpc-utils';
 import type {
@@ -64,11 +66,25 @@ export async function isOrganizationPhoneTaken(
 }
 
 /**
- * Runs after the application is created. Never fails the submission.
- * TODO(email): send the "application received" email (docs/email-templates-plan.md).
+ * Runs after the application is created. Never fails the submission (the caller catches).
+ * Sends the "application received" email. The individual RPC returns no id, so look up the
+ * user's application: `finishApplication` only creates one when the user had none.
  */
 async function afterApplicationCreated(userId: string): Promise<void> {
-  void userId;
+  const { data, error } = await createAdminClient()
+    .from('applications')
+    .select('id')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`Application lookup failed: ${error.message}`);
+  if (!data) throw new Error('Application not found after creating it');
+
+  queueStatusEmail(data.id, {
+    template: EmailTemplate.APPLICATION_RECEIVED,
+    renewal: false,
+  });
 }
 
 async function finishApplication(

@@ -50,3 +50,5 @@ local-test/
 
 # docs
 per-docs
+# React Email preview build output (npm run email:dev)
+.react-email/
