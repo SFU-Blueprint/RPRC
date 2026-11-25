@@ -65,11 +65,11 @@ from auth.users where email like '%@rprc.test' and email <> 'admin@rprc.test';
 -- ---------------------------------------------------------------------------
 -- Applications
 -- ---------------------------------------------------------------------------
-insert into public.applications (id, user_id, type, status, created_at, finalized_at) values
-  ('00000000-0000-4000-b000-000000000002', '00000000-0000-4000-a000-000000000002', 'individual', 'to_review', now() - interval '2 days', null),
-  ('00000000-0000-4000-b000-000000000003', '00000000-0000-4000-a000-000000000003', 'organization', 'to_review', now() - interval '1 day', null),
-  ('00000000-0000-4000-b000-000000000004', '00000000-0000-4000-a000-000000000004', 'individual', 'payment_pending', now() - interval '7 days', now() - interval '1 day'),
-  ('00000000-0000-4000-b000-000000000005', '00000000-0000-4000-a000-000000000005', 'individual', 'active', now() - interval '60 days', now() - interval '50 days');
+insert into public.applications (id, user_id, type, status, created_at, finalized_at, member_since) values
+  ('00000000-0000-4000-b000-000000000002', '00000000-0000-4000-a000-000000000002', 'individual', 'to_review', now() - interval '2 days', null, null),
+  ('00000000-0000-4000-b000-000000000003', '00000000-0000-4000-a000-000000000003', 'organization', 'to_review', now() - interval '1 day', null, null),
+  ('00000000-0000-4000-b000-000000000004', '00000000-0000-4000-a000-000000000004', 'individual', 'payment_pending', now() - interval '7 days', now() - interval '1 day', null),
+  ('00000000-0000-4000-b000-000000000005', '00000000-0000-4000-a000-000000000005', 'individual', 'active', now() - interval '60 days', now() - interval '50 days', now() - interval '50 days');
 
 insert into public.individual_application_details (application_id, reason, fee_waiver, fee_waiver_reason) values
   ('00000000-0000-4000-b000-000000000002', 'I want to help reduce poverty in Richmond.', true, 'I am a student with limited income.'),

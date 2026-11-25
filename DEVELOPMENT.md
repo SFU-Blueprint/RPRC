@@ -66,7 +66,7 @@ least 4 GB of memory (`memory=6GB` under `[wsl2]` in `.wslconfig`).
 | --------------- | --------------------------------------------------------- |
 | App             | http://localhost:3000                                     |
 | Supabase Studio | http://127.0.0.1:54323                                    |
-| Mailpit (email) | http://127.0.0.1:54324 (signup confirmations, resets)     |
+| Mailpit (email) | http://127.0.0.1:54324 (auth emails and status emails)    |
 | Postgres        | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 
 ### Seeded accounts
@@ -103,6 +103,15 @@ accounts use the password `password123`.
   covers the case where the browser never comes back from Stripe. See
   `docs/stripe-membership-payments.md`.
 
+- **Status emails:** the app emails members when their application is received, approved,
+  activated or rejected (`lib/email/`, templates in `emails/`). Locally, with `RESEND_API_KEY`
+  left blank, they go to Mailpit's SMTP port (54325, enabled in `supabase/config.toml`), so every
+  email shows up at http://127.0.0.1:54324 and nothing reaches a real inbox. If Mailpit shows
+  nothing after you pulled this change, restart the stack once (`npm run db:stop`, then
+  `npm run db:start`) so the SMTP port is exposed. To test a renewal, set `member@rprc.test`'s
+  application to `expired` in Studio and renew from the dashboard.
+- **Email templates:** `npm run email:dev` opens the React Email preview at
+  http://localhost:3001, with sample props and a plain-text view. Nothing is sent.
 - **Start over:** `npm run db:reset` re-runs all migrations and the seed.
 
 ### Generating types

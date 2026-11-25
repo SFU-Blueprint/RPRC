@@ -5,6 +5,7 @@ import {
 import { ApplicationType } from '@/lib/constants/enums';
 import { STRIPE_PRODUCT_DESCRIPTION } from '@/lib/constants/payments';
 import { ROUTES } from '@/lib/constants/routes';
+import { getSiteUrl } from '@/lib/utils/site-url';
 import type { StripeCheckoutSession } from '@/types/payment.types';
 
 /** Membership fee in whole dollars (CAD). */
@@ -12,22 +13,6 @@ export function getMembershipFee(type: ApplicationType): number {
   return type === ApplicationType.ORGANIZATION
     ? APPLICATION_FEES.ORGANIZATION
     : APPLICATION_FEES.INDIVIDUAL;
-}
-
-function getSiteUrl(requestOrigin?: string) {
-  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  const siteUrl =
-    configuredUrl ||
-    (process.env.NODE_ENV === 'development' ? requestOrigin : undefined);
-  if (!siteUrl) throw new Error('NEXT_PUBLIC_SITE_URL is not configured.');
-
-  const url = new URL(siteUrl);
-  if (url.protocol !== 'https:' && process.env.NODE_ENV !== 'development') {
-    throw new Error(
-      'NEXT_PUBLIC_SITE_URL must use HTTPS outside local development.',
-    );
-  }
-  return url.origin;
 }
 
 function getSecretKey() {

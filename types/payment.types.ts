@@ -1,5 +1,9 @@
 import type { Tables } from '@/types/database';
-import type { PaymentTransactionStatus } from '@/lib/constants/enums';
+import type {
+  ApplicationType,
+  PaymentTransactionStatus,
+} from '@/lib/constants/enums';
+import { SupabaseAdminClient } from '@/lib/supabase/admin';
 
 /** The fields of a Stripe Checkout Session this app reads. */
 export type StripeCheckoutSession = {
@@ -38,3 +42,20 @@ export type FulfillmentResult =
       userId: string;
     }
   | { outcome: 'ignored'; reason: string };
+
+export type CheckoutContext = {
+  admin: SupabaseAdminClient;
+  application: { id: string; type: ApplicationType };
+  fee: number;
+  userId: string;
+  email?: string | null;
+  requestOrigin?: string;
+};
+
+export type RetireOutcome =
+  /** The session was expired (or never existed) and the payment is now canceled. */
+  | { kind: 'canceled' }
+  /** The session had already been completed, so it was recorded instead. */
+  | { kind: 'recorded'; result: FulfillmentResult }
+  /** The session's state couldn't be confirmed or changed. The payment is left open. */
+  | { kind: 'failed' };

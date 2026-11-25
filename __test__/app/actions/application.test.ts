@@ -47,6 +47,8 @@ vi.mock('@/lib/supabase/server', () => ({
 vi.mock('@/lib/helpers/auth-helper', () => ({ isAdmin: async () => true }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
+const email = vi.hoisted(() => ({ queueStatusEmail: vi.fn() }));
+vi.mock('@/lib/email/send-status-email', () => email);
 
 const { submitApplicationReview } = await import('@/app/actions/application');
 const { ReviewErrorMessage } =
@@ -79,6 +81,7 @@ const deletedReview = () =>
 beforeEach(() => {
   calls.length = 0;
   responses = {};
+  email.queueStatusEmail.mockReset();
 });
 
 describe('submitApplicationReview finalized_at', () => {
@@ -253,5 +256,135 @@ describe('submitApplicationReview review_date', () => {
       error: ReviewErrorMessage.INVALID_REVIEW_DATE,
     });
     expect(calls.some((c) => c.op === 'insert')).toBe(false);
+  });
+});
+
+describe('submitApplicationReview emails', () => {
+  // A second review that finalizes the application: one earlier review plus this one.
+  const finalizingReview = (
+    earlier: { decision: string; waiver_decision: string | null },
+    application: Record<string, unknown> = { status: 'to_review' },
+  ) => {
+    responses.applications = [
+      { data: application, error: null },
+      statusUpdated,
+    ];
+    responses.application_reviews = [
+      { data: [earlier], error: null },
+      inserted,
+      recount(2),
+    ];
+  };
+
+  it('sends the approved email when the application moves to payment_pending', async () => {
+    finalizingReview({ decision: 'approve', waiver_decision: null });
+    responses.individual_application_details = [
+      { data: { fee_waiver: false }, error: null },
+    ];
+
+    await submitApplicationReview(review);
+
+    expect(email.queueStatusEmail).toHaveBeenCalledTimes(1);
+    expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
+      status: 'payment_pending',
+    });
+  });
+
+  it('sends the fee-waived active email and records member_since', async () => {
+    finalizingReview({ decision: 'approve', waiver_decision: 'approve' });
+    responses.individual_application_details = [
+      { data: { fee_waiver: true }, error: null },
+    ];
+
+    await submitApplicationReview(review);
+
+    expect(applicationUpdate()?.payload).toMatchObject({
+      status: 'active',
+      member_since: expect.any(String),
+    });
+    expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
+      status: 'active',
+      feeWaived: true,
+      renewal: false,
+    });
+  });
+
+  it('uses renewal wording and keeps member_since for a fee-waived renewal', async () => {
+    const memberSince = '2025-01-15T00:00:00Z';
+    finalizingReview(
+      { decision: 'approve', waiver_decision: 'approve' },
+      { status: 'to_review', member_since: memberSince },
+    );
+    responses.individual_application_details = [
+      { data: { fee_waiver: true }, error: null },
+    ];
+
+    await submitApplicationReview(review);
+
+    expect(applicationUpdate()?.payload).toMatchObject({
+      member_since: memberSince,
+    });
+    expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
+      status: 'active',
+      feeWaived: true,
+      renewal: true,
+    });
+  });
+
+  it('does not write member_since when the application only reaches payment_pending', async () => {
+    finalizingReview({ decision: 'approve', waiver_decision: null });
+
+    await submitApplicationReview(review);
+
+    expect(applicationUpdate()?.payload).not.toHaveProperty('member_since');
+  });
+
+  it('sends the rejected email on a second rejection', async () => {
+    finalizingReview({ decision: 'reject', waiver_decision: null });
+
+    await submitApplicationReview({ ...review, decision: 'reject' });
+
+    expect(email.queueStatusEmail).toHaveBeenCalledWith('app_1', {
+      status: 'rejected',
+    });
+  });
+
+  it('sends nothing when the reviews conflict', async () => {
+    finalizingReview({ decision: 'reject', waiver_decision: null });
+
+    await submitApplicationReview(review);
+
+    expect(applicationUpdate()?.payload.status).toBe('conflict');
+    expect(email.queueStatusEmail).not.toHaveBeenCalled();
+  });
+
+  it('sends nothing for a first review that keeps the application in to_review', async () => {
+    responses.applications = [{ data: { status: 'to_review' }, error: null }];
+    responses.application_reviews = [
+      { data: [], error: null },
+      inserted,
+      recount(1),
+    ];
+
+    await submitApplicationReview(review);
+
+    expect(email.queueStatusEmail).not.toHaveBeenCalled();
+  });
+
+  it('sends nothing when the status update did not apply', async () => {
+    responses.applications = [
+      { data: { status: 'to_review' }, error: null },
+      statusNotUpdated,
+    ];
+    responses.application_reviews = [
+      { data: [{ decision: 'approve', waiver_decision: null }], error: null },
+      inserted,
+      recount(2),
+      ok,
+    ];
+
+    await submitApplicationReview(review);
+
+    expect(email.queueStatusEmail).not.toHaveBeenCalled();
   });
 });

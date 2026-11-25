@@ -19,53 +19,22 @@ import {
   PaymentErrorMessage,
   SESSION_WAIT_ATTEMPTS,
   SESSION_WAIT_MS,
+  ALREADY_PAID,
+  CHECKOUT_FAILED,
 } from '@/lib/constants/payments';
 import { PostgresErrorCode } from '@/lib/constants/postgres';
 import { sleep } from '@/lib/utils/time-utils';
+import { queueStatusEmail } from '@/lib/email/send-status-email';
 import { PAYMENT_CURRENCY } from '@/lib/constants/processing-fees';
 import type {
   CheckoutResult,
   FulfillmentResult,
   PaymentRow,
   StripeCheckoutSession,
+  CheckoutContext,
+  RetireOutcome,
 } from '@/types/payment.types';
 
-type CheckoutContext = {
-  admin: SupabaseAdminClient;
-  application: { id: string; type: ApplicationType };
-  fee: number;
-  userId: string;
-  email?: string | null;
-  requestOrigin?: string;
-};
-
-/** What happened when an open payment was retired. */
-type RetireOutcome =
-  /** The session was expired (or never existed) and the payment is now canceled. */
-  | { kind: 'canceled' }
-  /** The session had already been completed, so it was recorded instead. */
-  | { kind: 'recorded'; result: FulfillmentResult }
-  /** The session's state couldn't be confirmed or changed. The payment is left open. */
-  | { kind: 'failed' };
-
-const ALREADY_PAID: CheckoutResult = {
-  ok: false,
-  status: 409,
-  error: PaymentErrorMessage.ALREADY_PAID,
-};
-
-const CHECKOUT_FAILED: CheckoutResult = {
-  ok: false,
-  status: 502,
-  error: PaymentErrorMessage.CHECKOUT_FAILED,
-};
-
-/**
- * A payment counts for the application's current approval round if it was created after
- * the latest approval. Applications are reused for renewals, so older payments paid for an
- * earlier round. The amount is deliberately not compared with the current fee: each payment
- * stores the fee the member was asked for, and paying that amount counts.
- */
 function countsForCurrentRound(
   paymentCreatedAt: string,
   approvedAt: string | null,
@@ -76,13 +45,6 @@ function countsForCurrentRound(
   );
 }
 
-/**
- * Creates (or reuses) a Stripe Checkout Session for the member's payment-pending application
- * and records it in `payments`. The amount is derived server-side from the application type.
- *
- * An application has at most one open payment (enforced by a unique index), so repeat or
- * simultaneous clicks all end up on the same payments row and the same Checkout Session.
- */
 export async function startMembershipCheckout(input: {
   userId: string;
   email?: string | null;
@@ -251,11 +213,6 @@ export async function startMembershipCheckout(input: {
   return createSessionForPayment(context, inserted.id, { ownsPayment: true });
 }
 
-/**
- * Returns the Checkout Session URL for an open payment of the current round, creating the
- * session if it doesn't exist yet. Returns null when the payment can no longer be used
- * (its session expired, or it failed), so the caller can create a new one.
- */
 async function reuseOpenPayment(
   context: CheckoutContext,
   payment: PaymentRow,
@@ -463,7 +420,7 @@ async function activateForPayment(
 ) {
   const { data: application, error: lookupError } = await admin
     .from('applications')
-    .select('status, finalized_at')
+    .select('status, finalized_at, member_since')
     .eq('id', applicationId)
     .maybeSingle();
   if (lookupError)
@@ -490,13 +447,26 @@ async function activateForPayment(
     return;
   }
 
-  const { error: activationError } = await admin
+  const { data: activated, error: activationError } = await admin
     .from('applications')
-    .update({ status: ApplicationStatus.ACTIVE })
+    .update({
+      status: ApplicationStatus.ACTIVE,
+      member_since: application.member_since ?? new Date().toISOString(),
+    })
     .eq('id', applicationId)
-    .eq('status', ApplicationStatus.PAYMENT_PENDING);
+    .eq('status', ApplicationStatus.PAYMENT_PENDING)
+    .select('id');
   if (activationError)
     throw new Error(`Membership activation failed: ${activationError.message}`);
+
+  // Only the caller whose update changed the row sends: the webhook, the return page and
+  // checkout can all get here for the same payment, and Stripe can deliver twice.
+  if (activated?.length)
+    queueStatusEmail(applicationId, {
+      status: ApplicationStatus.ACTIVE,
+      feeWaived: false,
+      renewal: Boolean(application.member_since),
+    });
 }
 
 /**
